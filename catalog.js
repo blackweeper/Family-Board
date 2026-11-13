@@ -4,6 +4,6 @@ const catalog = [
   { id: 'prism', title: 'Couleurs en cavale', icon: '🐸', color: 'violet', type: 'home', category: 'À plusieurs', players: '2 à 4 joueurs', description: 'Retrouve le cochon rose, le fantôme blanc, la poule jaune et la grenouille verte avant les autres.' },
   { id: 'pico', title: 'Pico et la Cascade', icon: '🥚', color: 'mint', type: 'home', category: 'À plusieurs', players: '2 à 4 joueurs', description: 'Fais glisser Pico et sauve les œufs avec ton équipe avant que la loutre ne trouve le nid.' },
   { id: 'table', title: 'À table !', color: 'coral', players: '2 à 4 joueurs', description: 'Taco, chaton ou pizza ? Devine ta prochaine carte et sois le premier à vider ta pile.' },
-  { id: 'coop', title: 'La Ronde du Poulailler', color: 'mint', players: '1 à 4 joueurs', description: 'Fais tourner la roue et remplis les trois nids avant que le renard n’atteigne le poulailler.' },
+  { id: 'coop', title: 'La Ronde du Poulailler', color: 'mint', players: '1 à 4 joueurs', description: 'Arrête le curseur dans le vert et remplis les trois nids avant que le renard n’atteigne le poulailler.' },
   { id: 'toys', title: 'Duel des jouets', color: 'blue', players: '2 joueurs · dès 5 ans', description: 'Déploie tes jouets, relie les bases et décroche trois étoiles sur le terrain de ton choix.' },
 ];
