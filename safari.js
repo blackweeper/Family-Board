@@ -15,6 +15,8 @@ function safariPortrait(animal) {
 
 function safariGame() {
   let playerCount = 4;
+  let selectedSeat = 0;
+  const players = [...safariAnimals];
   let mode = 'little';
   let soundOn = true;
   let scores = [];
@@ -98,7 +100,7 @@ function safariGame() {
   function setup() {
     phase = 'setup';
     stage.innerHTML = `
-      <div class="safari-intro">
+      <div class="safari-intro safari-lobby">
         <div class="safari-config">
           <h1>Boum Safari</h1>
           <p>Deux animaux identiques ? Tape !</p>
@@ -111,6 +113,25 @@ function safariGame() {
           </div></fieldset>
           <button class="safari-start" data-start>▶ Jouer</button>
         </div>
+        <section class="safari-selection" aria-labelledby="safari-selection-title">
+          <h2 id="safari-selection-title">Choisissez vos animaux</h2>
+          <p>Touche un joueur, puis son animal. Deux joueurs peuvent échanger leurs animaux.</p>
+          <div class="safari-pickers" aria-label="Joueurs">
+            ${players.slice(0, playerCount).map((animal, index) => `
+              <button class="safari-picker safari-seat-color-${index}" data-select-seat="${index}"
+                aria-label="Joueur ${index + 1} · ${animal[1]}" aria-pressed="${index === selectedSeat}">
+                <span class="safari-picker-portrait">${safariPortrait(animal)}</span>
+                <span>Joueur ${index + 1}</span>
+              </button>`).join('')}
+          </div>
+          <div class="safari-pickers safari-animal-options" aria-label="Animaux pour le joueur ${selectedSeat + 1}">
+            ${safariAnimals.map((animal, index) => `
+              <button class="safari-picker" data-animal="${index}" aria-pressed="${players[selectedSeat] === animal}">
+                <span class="safari-picker-portrait">${safariPortrait(animal)}</span>
+                <span>${animal[1]}</span>
+              </button>`).join('')}
+          </div>
+        </section>
       </div>`;
   }
 
@@ -150,8 +171,8 @@ function safariGame() {
         </div>
         ${scores.map((score, index) => `
           <button class="safari-seat seat-${index} ${blocked.has(index) ? 'seat-blocked' : ''}" data-seat="${index}"
-            aria-label="${safariAnimals[index][1]}, ${score} étoiles${blocked.has(index) ? ', en pause pour ce tour' : ''}">
-            <span class="safari-mascot">${safariPortrait(safariAnimals[index])}</span>
+            aria-label="${players[index][1]}, ${score} étoiles${blocked.has(index) ? ', en pause pour ce tour' : ''}">
+            <span class="safari-mascot">${safariPortrait(players[index])}</span>
             <span class="safari-stars" aria-hidden="true">${'★'.repeat(score)}${'☆'.repeat(5-score)}</span>
           </button>`).join('')}
       </div>`;
@@ -174,7 +195,7 @@ function safariGame() {
       return;
     }
     scores[index]++;
-    const winner = safariAnimals[index];
+    const winner = players[index];
     if (scores[index] < 5) {
       effect('point');
       endRound(winner[0] + ' + ⭐');
@@ -208,8 +229,23 @@ function safariGame() {
     if (button.hasAttribute('data-seat') && event.detail === 0) react(Number(button.dataset.seat), button);
     if (button.hasAttribute('data-start')) begin();
     if (button.hasAttribute('data-setup')) setup();
+    if (button.hasAttribute('data-select-seat')) {
+      selectedSeat = Number(button.dataset.selectSeat);
+      setup();
+      stage.querySelector(`[data-select-seat="${selectedSeat}"]`).focus({ preventScroll: true });
+    }
+    if (button.hasAttribute('data-animal')) {
+      const animal = safariAnimals[Number(button.dataset.animal)];
+      const previousSeat = players.indexOf(animal);
+      [players[selectedSeat], players[previousSeat]] = [animal, players[selectedSeat]];
+      setup();
+      stage.querySelector(`[data-animal="${button.dataset.animal}"]`).focus({ preventScroll: true });
+    }
     if (button.dataset.count || button.dataset.mode) {
-      if (button.dataset.count) playerCount = Number(button.dataset.count);
+      if (button.dataset.count) {
+        playerCount = Number(button.dataset.count);
+        selectedSeat = Math.min(selectedSeat, playerCount - 1);
+      }
       if (button.dataset.mode) mode = button.dataset.mode;
       setup();
       stage.querySelector(button.dataset.count ? `[data-count="${playerCount}"]` : `[data-mode="${mode}"]`).focus();
