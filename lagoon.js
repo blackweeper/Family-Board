@@ -3,6 +3,10 @@ const lagoonCrew = [
   { name: 'Crabe', portrait: 'crab', color: '#ffa18a' },
   { name: 'Poulpe', portrait: 'octopus', color: '#c7aaff' },
   { name: 'Tortue', portrait: 'turtle', color: '#f7d278' },
+  { name: 'Macareux', portrait: 'puffin', color: '#9fd0ff' },
+  { name: 'Hippocampe', portrait: 'seahorse', color: '#a3e9b7' },
+  { name: 'Axolotl', portrait: 'axolotl', color: '#ffc0e2' },
+  { name: 'Dauphin', portrait: 'dolphin', color: '#b7dcff' },
 ];
 const lagoonTreasures = [
   'Coquillage', 'Cristal', 'Pièce', 'Corail', 'Étoile de mer', 'Boussole',
@@ -12,22 +16,23 @@ const lagoonRules = `
   <h2>Comment jouer ?</h2>
   <ol>
     <li>À ton tour, touche <strong>Piocher</strong>. Tu peux révéler jusqu’à cinq trésors.</li>
-    <li>Touche <strong>Encaisser</strong> pour mettre une perle à l’abri par trésor. À partir de trois trésors différents, tu gagnes deux perles de plus.</li>
+    <li><strong>Encaisser</strong> rapporte 1 perle avec 2 trésors, 2 perles avec 3 trésors et 3 perles avec 4 trésors. Avec un seul trésor, tu peux passer sans marquer.</li>
     <li>Un trésor en double fait tanguer ton radeau. Tu perds les trouvailles de ce tour et la main passe au suivant.</li>
     <li>Au troisième tangage, plouf ! Tu perds deux perles en réserve, avec un minimum de zéro. Ton radeau repart droit.</li>
-    <li>Le premier équipage à mettre dix perles à l’abri gagne.</li>
+    <li><strong>Cinq trésors différents dans le même tour</strong> donnent la victoire immédiate. Tu peux aussi gagner en mettant dix perles à l’abri au fil des tours.</li>
   </ol>`;
 
 function lagoonGame() {
   let count = 4;
   let seat = 0;
-  const lineup = [...lagoonCrew];
+  const lineup = lagoonCrew.slice(0, 4);
   let active = 0;
   let fleet = [];
   let haul = [];
   let phase = 'setup';
   let message = '';
   let splashed = false;
+  let fullChest = false;
   let muted = false;
   let audio;
 
@@ -48,7 +53,7 @@ function lagoonGame() {
   const rules = app.querySelector('.lagoon-rules');
   const focus = selector => stage.querySelector(selector)?.focus({ preventScroll: true });
   const portrait = crew => `<img src="./covers/lagoon-${crew.portrait}.jpg" alt="" draggable="false">`;
-  const bankValue = () => haul.length + (haul.length >= 3 ? 2 : 0);
+  const bankValue = () => Math.max(0, haul.length - 1);
 
   function sound(notes) {
     if (muted || !window.AudioContext) return;
@@ -104,6 +109,7 @@ function lagoonGame() {
     haul = [];
     phase = 'turn';
     splashed = false;
+    fullChest = false;
     message = `À ${fleet[active].name} de jouer !`;
     render();
     focus('[data-draw]');
@@ -115,7 +121,12 @@ function lagoonGame() {
     const duplicate = haul.includes(treasure);
     haul.push(treasure);
     if (!duplicate) {
-      message = haul.length === 5 ? 'Coffre plein !' : haul.length >= 3 ? '+2 perles de bonus !' : 'Encore ou j’encaisse ?';
+      if (haul.length === 5) {
+        fullChest = true;
+        win();
+        return;
+      }
+      message = haul.length === 1 ? 'Encore un trésor ou je passe ?' : 'Encore ou j’encaisse ?';
       sound([523, 659]);
       render();
       focus(haul.length < 5 ? '[data-draw]' : '[data-bank]');
@@ -142,11 +153,22 @@ function lagoonGame() {
     const crew = fleet[active];
     const award = bankValue();
     crew.bank += award;
-    phase = crew.bank >= lagoonGoal ? 'won' : 'banked';
-    message = `+${award} ${award === 1 ? 'perle' : 'perles'} à l’abri !`;
-    sound(phase === 'won' ? [523, 659, 784, 1047] : [523, 659, 784]);
+    if (crew.bank >= lagoonGoal) {
+      win();
+      return;
+    }
+    phase = 'banked';
+    message = award ? `+${award} ${award === 1 ? 'perle' : 'perles'} à l’abri !` : 'Tour passé.';
+    if (award) sound([523, 659, 784]);
     render();
-    focus(phase === 'won' ? '[data-start]' : '[data-next]');
+    focus('[data-next]');
+  }
+
+  function win() {
+    phase = 'won';
+    sound([523, 659, 784, 1047]);
+    render();
+    focus('[data-start]');
   }
 
   function raft(crew, index) {
@@ -166,7 +188,7 @@ function lagoonGame() {
         <div class="lagoon-victory-copy">
           <div class="lagoon-winner" aria-hidden="true">${portrait(crew)}</div>
           <h1>${crew.name} gagne !</h1>
-          <p>◈ ${crew.bank} perles à l’abri</p>
+          <p>${fullChest ? '✦ Cinq trésors différents dans le même tour !' : `◈ ${crew.bank} perles à l’abri`}</p>
           <div class="lagoon-actions">
             <button class="lagoon-action" data-start>↻ Rejouer</button>
             <button class="secondary" data-setup>Changer les joueurs</button>
@@ -189,7 +211,7 @@ function lagoonGame() {
           <p class="lagoon-message" role="status">${message}</p>
           <div class="lagoon-actions">${phase === 'turn' ? `
             <button class="lagoon-action" data-draw ${haul.length >= 5 ? 'disabled' : ''}>▣ Piocher</button>
-            <button class="lagoon-action bank" data-bank ${haul.length ? '' : 'disabled'}>◈ Encaisser ${haul.length ? bankValue() : ''}</button>` :
+            <button class="lagoon-action bank" data-bank ${haul.length ? '' : 'disabled'}>${haul.length === 1 ? 'Passer' : `◈ Encaisser${haul.length ? ' ' + bankValue() : ''}`}</button>` :
             `<button class="lagoon-action" data-next>${portrait(fleet[(active + 1) % count])} Au suivant →</button>`}</div>
         </div>
       </div>`;
@@ -210,7 +232,8 @@ function lagoonGame() {
     } else if (button.hasAttribute('data-crew')) {
       const chosen = lagoonCrew[Number(button.dataset.crew)];
       const previous = lineup.indexOf(chosen);
-      [lineup[seat], lineup[previous]] = [chosen, lineup[seat]];
+      if (previous !== -1) lineup[previous] = lineup[seat];
+      lineup[seat] = chosen;
       setup();
       focus(`[data-crew="${button.dataset.crew}"]`);
     } else if (button.hasAttribute('data-start')) start();
