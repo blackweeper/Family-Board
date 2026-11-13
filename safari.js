@@ -5,7 +5,7 @@ const safariRules = `
     <li>Choisis ton animal et place-toi devant sa zone colorée.</li>
     <li>Regarde l’animal à gauche, puis attends que la carte de droite se retourne.</li>
     <li>Deux animaux identiques ? Tape ta zone le plus vite possible. En mode Famille, la carte ⚡ invite tout le monde à taper.</li>
-    <li>Si tu tapes trop tôt ou sur deux animaux différents, ta zone se bloque pour ce tour.</li>
+    <li>Si tu tapes trop tôt ou sur deux animaux différents, tu perds une étoile (minimum zéro) et ta zone se bloque pour ce tour.</li>
     <li>Le premier bon réflexe rapporte une étoile. Avec cinq étoiles, tu gagnes !</li>
   </ol>`;
 
@@ -173,6 +173,15 @@ function safariGame() {
     }, (mode === 'little' ? 1350 : 780) + Math.random() * 800);
   }
 
+  function stars(score) {
+    return '★'.repeat(score) + '☆'.repeat(5 - score);
+  }
+
+  function seatLabel(index) {
+    const score = scores[index];
+    return `${players[index][1]}, ${score} ${score === 1 ? 'étoile' : 'étoiles'}${blocked.has(index) ? ', en pause pour ce tour' : ''}`;
+  }
+
   function draw(message) {
     stage.innerHTML = `
       <div class="safari-table seats-${playerCount}" data-phase="${phase}">
@@ -185,9 +194,9 @@ function safariGame() {
         </div>
         ${scores.map((score, index) => `
           <button class="safari-seat seat-${index} ${blocked.has(index) ? 'seat-blocked' : ''}" data-seat="${index}"
-            aria-label="${players[index][1]}, ${score} étoiles${blocked.has(index) ? ', en pause pour ce tour' : ''}">
+            aria-label="${seatLabel(index)}">
             <span class="safari-mascot">${safariPortrait(players[index])}</span>
-            <span class="safari-stars" aria-hidden="true">${'★'.repeat(score)}${'☆'.repeat(5-score)}</span>
+            <span class="safari-stars" aria-hidden="true">${stars(score)}</span>
           </button>`).join('')}
       </div>`;
   }
@@ -202,9 +211,11 @@ function safariGame() {
     if ((phase !== 'ready' && phase !== 'reveal') || blocked.has(index)) return;
     if (phase === 'ready' || !matches) {
       blocked.add(index);
+      scores[index] = Math.max(0, scores[index] - 1);
       effect('miss');
       button.classList.add('seat-blocked');
-      button.setAttribute('aria-label', button.getAttribute('aria-label') + ', en pause pour ce tour');
+      button.querySelector('.safari-stars').textContent = stars(scores[index]);
+      button.setAttribute('aria-label', seatLabel(index));
       if (blocked.size === playerCount && phase === 'reveal') endRound('Tour suivant');
       return;
     }

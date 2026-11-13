@@ -18,7 +18,7 @@
 .safari-card { width:clamp(66px,12vw,156px); aspect-ratio:4/5; display:grid; place-items:center; border:4px solid #fff2c9; border-radius:18px; background:#ffe9a6; color:#fff7d4; font-size:clamp(35px,7vw,90px); box-shadow:0 6px 0 #122921; }
 .safari-card.face-down { background:repeating-linear-gradient(135deg,#266b64 0 14px,#328078 14px 28px); }
 .safari-status { min-height:1.5em; margin:.75rem 0 0; font-weight:800; }
-.safari-seat { min-width:0; border:0; border-radius:18px; display:grid; place-content:center; gap:5px; background:transparent; color:#fff8d9; cursor:pointer; touch-action:none; user-select:none; }
+.safari-seat { min-width:0; border:0; border-radius:18px; display:grid; place-content:center; gap:5px; background:transparent; color:#fff8d9; cursor:pointer; touch-action:none; user-select:none; -webkit-tap-highlight-color:transparent; appearance:none; }
 .safari-mascot { font-size:clamp(26px,5vw,60px); line-height:1; }
 .safari-stars { font-size:clamp(11px,1.8vw,24px); font-weight:900; white-space:nowrap; text-shadow:0 2px 3px #081a12,0 0 6px #081a12; }
 .seat-0 { grid-area:3/2; --seat:#f9d981; }
@@ -65,7 +65,6 @@
 .safari-mascot { width:clamp(38px,7vw,88px); aspect-ratio:1; margin:auto; border-color:var(--seat); box-shadow:0 4px 12px #05190dd9; }
 .safari-status { text-shadow:0 2px 4px #061a10,0 0 8px #061a10; }
 .safari-winner { width:clamp(88px,17vw,170px); aspect-ratio:1; margin:auto; }
-.safari-seat:active .safari-mascot { filter:brightness(1.2); }
 .safari-seat:focus-visible { outline:0; }
 .safari-seat:focus-visible .safari-mascot { outline:3px solid #fff3cd; outline-offset:4px; }
 @media(prefers-reduced-motion:reduce) { .safari-table[data-phase=reveal] .safari-card:last-child { animation:none; } }
