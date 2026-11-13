@@ -1,4 +1,4 @@
-const CACHE = 'family-board-v38';
+const CACHE = 'family-board-v39';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
@@ -25,8 +25,9 @@ const ASSETS = [
   'covers/lagoon-axolotl.jpg', 'covers/lagoon-dolphin.jpg',
   'safari.js', 'safari.css', 'covers/safari.jpg', 'covers/safari-board.jpg',
   'toys.js', 'toys.css', 'covers/toys.jpg',
-  'covers/toys-castle.jpg', 'covers/toys-jungle.jpg', 'covers/toys-space.jpg',
+  'covers/toys-castle.jpg', 'covers/toys-jungle.jpg', 'covers/toys-space.jpg', 'covers/toys-pirate.jpg', 'covers/toys-snow.jpg',
   'covers/toys-robot.png', 'covers/toys-dino.png', 'covers/toys-rabbit.png', 'covers/toys-lion.png',
+  'covers/toys-raccoon.png', 'covers/toys-fox.png', 'covers/toys-octopus.png', 'covers/toys-bear.png',
   'launcher.js', 'manifest.webmanifest',
 ].map(path => new URL(path, self.registration.scope).href);
 

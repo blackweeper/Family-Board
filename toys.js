@@ -1,39 +1,53 @@
 const toysUnits = [
-  { id:'robot', name:'Bip le robot', power:'Pioche une carte après l’avoir posé.', icon:'▤' },
-  { id:'dino', name:'Turbo le dino', power:'Peut sauter une case pour atteindre une base vide.', icon:'↟' },
-  { id:'rabbit', name:'Lune le lapin', power:'Ses trois points lui permettent de reprendre une base plus faible.' },
-  { id:'lion', name:'Milo le lion', power:'Avec quatre points, c’est le jouet le plus fort.' },
+  { id:'robot', name:'Bip le robot' },
+  { id:'dino', name:'Turbo le dino' },
+  { id:'rabbit', name:'Lune le lapin' },
+  { id:'lion', name:'Milo le lion' },
+  { id:'raccoon', name:'Zig le raton' },
+  { id:'fox', name:'Flèche le renard' },
+  { id:'octopus', name:'Bulle la pieuvre' },
+  { id:'bear', name:'Roc l’ours' },
 ];
 const toysWorlds = [
-  { id:'castle', name:'Château des blocs', stars:[1,3,4,5,7], extra:[[1,3],[5,7]], blocked:[] },
-  { id:'jungle', name:'Jungle des cabanes', stars:[0,2,4,6,8], extra:[[0,4],[4,8]], blocked:[[1,4],[4,7]] },
-  { id:'space', name:'Station des étoiles', stars:[1,3,4,5,7], extra:[[2,4],[4,6]], blocked:[[3,4],[4,5]] },
+  { id:'castle', name:'Château des blocs', extra:[[1,3],[8,10]], blocked:[[3,4],[7,8]] },
+  { id:'jungle', name:'Jungle des cabanes', extra:[[0,4],[4,8],[3,7],[7,11]], blocked:[[1,4],[7,10],[4,5],[6,7]] },
+  { id:'space', name:'Station des fusées', extra:[[2,4],[4,6],[5,7],[7,9]], blocked:[[3,4],[7,8],[4,7]] },
+  { id:'pirate', name:'Lagon des pirates', extra:[[0,4],[7,11],[4,8],[3,7]], blocked:[[0,1],[10,11],[3,6],[5,8]] },
+  { id:'snow', name:'Train des neiges', extra:[[2,4],[7,9],[0,4],[8,10]], blocked:[[0,3],[8,11],[4,7]] },
 ];
-const toysTeams = [{name:'Bleus', color:'#8fe5ff'}, {name:'Corails', color:'#ffad8e'}];
-const toysSites = Array.from({length:9}, (_,i)=>[20+i%3*30, 27+Math.floor(i/3)*23]);
+const toysTeams = ['Bleus','Rouges'];
+const toysSites = Array.from({length:12},(_,i)=>[22+i%3*28,25+Math.floor(i/3)*16.67]);
 toysSites.push([50,91],[50,9]);
+const toysHome = player => 12+player;
 
 function toysLinks(world) {
-  const links = [[9,6],[9,7],[9,8],[10,0],[10,1],[10,2]];
-  for (let i=0; i<9; i++) {
-    if (i%3 < 2) links.push([i,i+1]);
-    if (i < 6) links.push([i,i+3]);
+  const links = [[12,9],[12,10],[12,11],[13,0],[13,1],[13,2]];
+  for (let i=0;i<12;i++){
+    if (i%3<2) links.push([i,i+1]);
+    if (i<9) links.push([i,i+3]);
   }
-  return links.filter(([a,b])=>!world.blocked.some(([c,d])=>a===c && b===d)).concat(world.extra);
+  return links.filter(([a,b])=>!world.blocked.some(([c,d])=>a===c&&b===d)).concat(world.extra);
 }
 
-function toysPortrait(id) {
-  return '<img src="./covers/toys-'+toysUnits[id].id+'.png" alt="" draggable="false">';
+function toysPortrait(player,unit) {
+  return '<img src="./covers/toys-'+toysUnits[player*4+unit].id+'.png" alt="" draggable="false">';
 }
 
-function toysCard(id) {
-  const unit = toysUnits[id];
-  return toysPortrait(id)+'<span class="toys-pips" aria-hidden="true">'+ '●'.repeat(id+1)+'</span>'+
-    (unit.icon ? '<span class="toys-power" aria-hidden="true">'+unit.icon+'</span>' : '');
+function toysCard(player,unit) {
+  return '<span class="toys-card" data-team="'+player+'">'+toysPortrait(player,unit)+
+    '<span class="toys-rank" aria-hidden="true">'+(unit+1)+'</span>'+
+    (unit<2 ? '<span class="toys-power" aria-hidden="true">'+(unit===0?'▤':'↟')+'</span>':'')+'</span>';
 }
+
+const toysRules = '<h2>Comment jouer ?</h2><ol>'+
+  '<li>Installez-vous face à face. À ton tour, touche la pile pour piocher deux cartes, ou touche un jouet puis une case accessible.</li>'+
+  '<li>Suis les chemins dessinés sur le terrain. Les cartes reliées à leur quartier général brillent. Pour reprendre une case, utilise un jouet dont le nombre est au moins aussi grand.</li>'+
+  '<li>Les jouets de force 1 donnent une carte. Ceux de force 2 peuvent sauter une case pour se poser sur une case vide. Ceux de force 3 et 4 sont les plus forts.</li>'+
+  '<li>Atteins le quartier général adverse par un chemin relié au tien pour gagner. Si les deux équipes sont bloquées, la partie est nulle.</li></ol>'+
+  '<div class="toys-guide">'+toysUnits.map((unit,id)=>'<div>'+toysCard(Math.floor(id/4),id%4)+'<strong>'+unit.name+'</strong></div>').join('')+'</div>';
 
 function toysDeck() {
-  const deck = [0,1,2,0,1,2,3,0,1,2,3,0,1,2,3];
+  const deck = Array.from({length:20},(_,i)=>i%4);
   for(let i=deck.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [deck[i],deck[j]]=[deck[j],deck[i]];
@@ -42,103 +56,87 @@ function toysDeck() {
 }
 
 function toysGame() {
-  let world = 0;
-  let turn = 0;
-  let phase = 'setup';
-  let chosen = -1;
-  let pieces = [];
-  let hands = [];
-  let decks = [];
-  let stars = [];
-  let fresh = -1;
-  let passes = 0;
-  let timer;
-  let audio;
-  let muted = false;
-  let message = '';
-  const starGoal = 3;
-  const other = () => 1-turn;
-  const team = i => toysTeams[i].name;
-  const map = () => toysWorlds[world];
-  const neighbors = (id) => toysLinks(map()).flatMap(([a,b])=>a===id ? [b] : b===id ? [a] : []);
+  let world=0, turn=0, phase='setup', chosen=-1, pieces=[], hands=[], decks=[], links=[], adjacency=[];
+  let fresh=-1, added=0, passes=0, timer, audio, muted=false, message='';
+  const map=()=>toysWorlds[world];
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  const handLimit=6;
 
-  app.innerHTML = '<section class="toys"><div class="toys-bar">'+
-    '<button class="secondary" id="back">← Jeux</button>'+
-    '<button class="secondary" id="toys-sound" aria-pressed="true">🔊 Son</button>'+
+  app.innerHTML='<section class="toys"><div class="toys-bar">'+
+    '<button class="secondary" id="back">← Jeux</button><button class="secondary" id="toys-sound" aria-pressed="true">🔊 Son</button>'+
     '<button class="secondary" id="toys-rules">? Règles</button></div><div id="toys-stage"></div>'+
-    '<dialog class="toys-rules" aria-label="Règles du Duel des jouets"><h2>Comment jouer ?</h2><ol>'+
-    '<li>Installez-vous face à face. À ton tour, pioche jusqu’à deux jouets ou choisis un jouet de ta main, puis une base qui s’allume.</li>'+
-    '<li>Suis les chemins qui partent de ta cabane en passant par tes jouets. Pour prendre une base adverse, pose un jouet avec au moins autant de points que celui qui l’occupe.</li>'+
-    '<li>Une base marquée d’une étoile te rapporte une étoile la première fois que tu la prends.</li>'+
-    '<li>Gagne avec trois étoiles ou en atteignant la cabane adverse. Si les deux équipes ne peuvent plus jouer, le plus d’étoiles l’emporte.</li></ol>'+
-    '<div class="toys-guide">'+toysUnits.map((unit,i)=>'<div class="toys-guide-card">'+toysCard(i)+'<div><strong>'+unit.name+'</strong><p>'+unit.power+'</p></div></div>').join('')+'</div>'+
+    '<dialog class="toys-rules" aria-label="Règles du Duel des jouets">'+toysRules+
     '<form method="dialog"><button class="toys-action">Compris !</button></form></dialog></section>';
-  const stage = app.querySelector('#toys-stage');
-  const rules = app.querySelector('.toys-rules');
-  const rulesButton = app.querySelector('#toys-rules');
-  const focus = selector => stage.querySelector(selector)?.focus({preventScroll:true});
+  const stage=app.querySelector('#toys-stage');
+  const rules=app.querySelector('.toys-rules');
+  const rulesButton=app.querySelector('#toys-rules');
+  const focus=selector=>stage.querySelector(selector)?.focus({preventScroll:true});
 
   function sound(pitches) {
-    if (muted || !window.AudioContext) return;
+    if(muted||!window.AudioContext) return;
     audio ??= new AudioContext();
     audio.resume().catch(()=>{});
     pitches.forEach((pitch,i)=>{
-      const start = audio.currentTime + .09*i;
-      const tone = audio.createOscillator();
-      const gain = audio.createGain();
-      tone.frequency.value = pitch;
+      const start=audio.currentTime+.075*i;
+      const tone=audio.createOscillator(),gain=audio.createGain();
+      tone.frequency.value=pitch;
       gain.gain.setValueAtTime(.001,start);
-      gain.gain.exponentialRampToValueAtTime(.10,start+.023);
-      gain.gain.exponentialRampToValueAtTime(.001,start+.25);
+      gain.gain.exponentialRampToValueAtTime(.09,start+.02);
+      gain.gain.exponentialRampToValueAtTime(.001,start+.23);
       tone.connect(gain).connect(audio.destination);
       tone.start(start);
-      tone.stop(start+.26);
+      tone.stop(start+.24);
     });
   }
 
   function setup() {
-    phase = 'setup';
-    rulesButton.disabled = false;
-    stage.innerHTML = '<div class="toys-intro"><div class="toys-intro-copy"><h1>Duel<br>des jouets</h1>'+
-      '<p>2 joueurs · Dès 5 ans</p><fieldset><legend>Choisis ton terrain</legend><div class="toys-worlds">'+
-      toysWorlds.map((item,i)=>'<button data-world="'+i+'" aria-pressed="'+(world===i)+'"><img src="./covers/toys-'+item.id+'.jpg" alt=""><span>'+item.name+'</span></button>').join('')+
-      '</div></fieldset><button class="toys-action" data-start>▶ Jouer</button></div></div>';
+    phase='setup';
+    rulesButton.disabled=false;
+    stage.innerHTML='<div class="toys-intro"><h1>Duel des jouets</h1><fieldset><legend>Choisis ton terrain</legend><div class="toys-worlds">'+
+      toysWorlds.map((item,i)=>'<button data-world="'+i+'" aria-label="'+item.name+'" aria-pressed="'+(world===i)+'"><img src="./covers/toys-'+item.id+'.jpg" alt=""><span>'+item.name+'</span></button>').join('')+
+      '</div></fieldset><button class="toys-action" data-start aria-label="Jouer">▶</button></div>';
   }
 
   function start() {
     turn=0;
     phase='pick';
     chosen=-1;
-    pieces=Array(11).fill(null);
+    pieces=Array(toysSites.length).fill(null);
+    links=toysLinks(map());
+    adjacency=toysSites.map(()=>[]);
+    for(const [a,b] of links){
+      adjacency[a].push(b);
+      adjacency[b].push(a);
+    }
     decks=[toysDeck(),toysDeck()];
     hands=decks.map(deck=>[0,1,2,deck.pop()]);
-    stars=[new Set(),new Set()];
     fresh=-1;
+    added=0;
     passes=0;
     message='';
     render();
     sound([392,523,659]);
+    focus('.toys-seat.current [data-hand]:enabled');
   }
 
   function reach(player) {
-    const connected = new Set([9+player]);
-    for(const id of connected) {
-      for(const next of neighbors(id)){
-        if (pieces[next]?.player === player) connected.add(next);
+    const connected=new Set([toysHome(player)]);
+    for(const id of connected){
+      for(const next of adjacency[id]){
+        if(pieces[next]?.player===player) connected.add(next);
       }
     }
     return connected;
   }
 
-  function legal(unit) {
-    const connected = reach(turn);
-    const border = new Set([...connected].flatMap(neighbors));
-    const options = [...border].filter(id=>id!==9+turn &&
-      (id===9+other() || !pieces[id] || (pieces[id].player!==turn && unit>=pieces[id].unit)));
+  function legal(unit,connected) {
+    const border=new Set([...connected].flatMap(id=>adjacency[id]));
+    const options=new Set([...border].filter(id=>id!==toysHome(turn)&&
+      (!pieces[id]||(pieces[id].player!==turn&&unit>=pieces[id].unit))));
     if(unit===1){
       for(const adjacent of border){
-        for(const id of neighbors(adjacent)){
-          if(id<9 && !pieces[id] && !options.includes(id)) options.push(id);
+        for(const id of adjacency[adjacent]){
+          if(id<12&&!pieces[id]) options.add(id);
         }
       }
     }
@@ -146,99 +144,100 @@ function toysGame() {
   }
 
   function canDraw(player) {
-    return hands[player].length<5 && decks[player].length>0;
+    return hands[player].length<=handLimit-2&&decks[player].length>=2;
   }
 
-  function playerArea(player) {
-    const isActive = player===turn;
-    const active = isActive && phase==='pick';
-    const position = player===0 ? 'south' : 'north';
-    return '<div class="toys-seat '+position+' '+(isActive?'current':'')+'" style="--team:'+toysTeams[player].color+'" aria-label="Équipe '+team(player)+'">'+
-      '<div class="toys-score" aria-label="'+stars[player].size+' étoiles sur '+starGoal+'">'+
-      Array.from({length:starGoal},(_,i)=>'<span class="'+(i<stars[player].size?'earned':'')+'" aria-hidden="true">★</span>').join('')+'</div>'+
-      '<div class="toys-hand">'+hands[player].map((unit,i)=>'<button class="toys-unit unit-'+unit+'" data-hand="'+i+'" aria-label="'+toysUnits[unit].name+', '+(unit+1)+' points" aria-pressed="'+(isActive&&chosen===i)+'" '+(active&&legal(unit).length?'':'disabled')+'>'+toysCard(unit)+'</button>').join('')+'</div>'+
-      '<button class="toys-draw" data-draw="'+player+'" '+(active&&canDraw(player)?'':'disabled')+' aria-label="Piocher">'+
-      '<span aria-hidden="true">▤</span> Pioche</button></div>';
+  function playerArea(player,available) {
+    const current=player===turn;
+    const active=current&&phase==='pick';
+    const position=player===0?'south':'north';
+    return '<div class="toys-seat '+position+(current?' current':'')+'" data-team="'+player+'" aria-label="Équipe '+toysTeams[player]+'">'+
+      '<div class="toys-hand">'+hands[player].map((unit,i)=>{
+        const arrival=current&&added&&i>=hands[player].length-added;
+        return '<button class="toys-unit'+(arrival?' arriving':'')+'" data-hand="'+i+'" data-unit="'+unit+
+          '" aria-label="'+toysUnits[player*4+unit].name+', force '+(unit+1)+'" aria-pressed="'+(current&&chosen===i)+
+          '" '+(active&&available[unit].size?'':'disabled')+'>'+toysCard(player,unit)+'</button>';
+      }).join('')+'</div>'+
+      '<button class="toys-draw" data-draw="'+player+'" '+(active&&canDraw(player)?'':'disabled')+' aria-label="Piocher deux cartes">'+
+      '<span class="toys-deck" aria-hidden="true"><i></i><i></i><b>+2</b></span></button></div>';
   }
 
   function render() {
-    rulesButton.disabled = phase==='result';
-    const targets = chosen===-1 ? [] : legal(hands[turn][chosen]);
-    const connected=reach(turn);
-    const paths=toysLinks(map()).map(([a,b])=>{
-      const [x1,y1]=toysSites[a], [x2,y2]=toysSites[b];
-      const pathClass=connected.has(a)&&connected.has(b) ? 'linked' : '';
-      return '<line class="'+pathClass+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"></line>';
-    }).join('');
-    stage.innerHTML = '<div class="toys-board" style="--active-team:'+toysTeams[turn].color+'" data-world="'+map().id+'" data-turn="'+turn+'">'+playerArea(1)+
-      '<div class="toys-arena"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'+paths+'</svg>'+
+    rulesButton.disabled=phase==='result';
+    const connected=[reach(0),reach(1)];
+    const available=Array.from({length:4},(_,unit)=>legal(unit,connected[turn]));
+    const targets=chosen===-1?new Set():available[hands[turn][chosen]];
+    stage.innerHTML='<div class="toys-board" data-world="'+map().id+'" data-turn="'+turn+'">'+playerArea(1,available)+
+      '<div class="toys-arena"><img class="toys-map" src="./covers/toys-'+map().id+'.jpg" alt="" draggable="false">'+
       toysSites.map(([x,y],i)=>{
         const piece=pieces[i];
-        const base=i>=9;
-        const star=map().stars.includes(i);
-        const tint=piece ? toysTeams[piece.player].color : base ? toysTeams[i-9].color : '#f6e2ab';
-        const label=base ? 'Cabane '+team(i-9) : 'Base '+(i+1)+(star?', étoile':'')+(piece?', '+toysUnits[piece.unit].name+', '+(piece.unit+1)+' points, '+team(piece.player):'');
-        return '<button class="toys-site '+(base?'base ':'')+(piece?'occupied ':'')+(star?'star ':'')+(fresh===i?'fresh ':'')+
-          '" style="--x:'+x+'%;--y:'+y+'%;--team:'+tint+'" data-site="'+i+'" aria-label="'+label+'" '+(phase==='pick'&&targets.includes(i)?'':'disabled')+'>'+
-          (piece ? toysCard(piece.unit) : base ? '<span aria-hidden="true">⌂</span>' : star ? '<span aria-hidden="true">★</span>' : '')+
-          (piece&&star?'<span class="toys-star-mark" aria-hidden="true">★</span>':'')+'</button>';
-      }).join('')+
-      '<div class="toys-turn" style="--team:'+toysTeams[turn].color+'" role="status">'+
-      (message || (chosen===-1 ? 'Au tour des '+team(turn) : 'Touche une base allumée'))+'</div></div>'+playerArea(0)+'</div>';
-  }
-
-  function drawCards(amount) {
-    while(amount-- > 0 && canDraw(turn)) hands[turn].push(decks[turn].pop());
+        const label=i>=12?'Quartier général '+toysTeams[i-12]:'Case '+(i+1);
+        return '<button class="toys-site'+(i>=12?' base':'')+(fresh===i?' fresh':'')+(piece&&connected[piece.player].has(i)?' linked':'')+'" style="--x:'+x+'%;--y:'+y+
+          '%" data-site="'+i+'" aria-label="'+label+(piece?', '+toysUnits[piece.player*4+piece.unit].name+', force '+(piece.unit+1):'')+
+          '" '+(phase==='pick'&&targets.has(i)?'':'disabled')+'>'+(piece?toysCard(piece.player,piece.unit):'')+'</button>';
+      }).join('')+'</div>'+playerArea(0,available)+
+      '<span class="toys-sr" role="status">'+(message||(chosen===-1?'Au tour des '+toysTeams[turn]:'Touche une case accessible'))+'</span></div>';
   }
 
   function place(site) {
-    if(chosen===-1 || !legal(hands[turn][chosen]).includes(site)) return;
+    if(chosen===-1||!legal(hands[turn][chosen],reach(turn)).has(site)) return;
     const [unit]=hands[turn].splice(chosen,1);
+    const captured=Boolean(pieces[site]);
     pieces[site]={unit,player:turn};
-    const newStar=map().stars.includes(site)&&!stars[turn].has(site);
-    if(newStar) stars[turn].add(site);
-    if(unit===0) drawCards(1);
+    if(unit===0&&decks[turn].length){
+      hands[turn].push(decks[turn].pop());
+      added=1;
+    }
     fresh=site;
     passes=0;
-    sound(newStar?[523,659,784,1047]:[440,659]);
-    const victory=site===9+other() ? 'Cabane conquise !' : stars[turn].size===starGoal ? 'Trois étoiles !' : '';
-    endTurn(newStar?'★ Une étoile !':'',victory);
+    sound(captured?[330,523,659]:[440,659]);
+    endTurn(site===toysHome(1-turn));
   }
 
-  function endTurn(text,victory='') {
+  function endTurn(won=false) {
     chosen=-1;
     phase='result';
-    message=text;
     render();
     timer=setTimeout(()=>{
-      if(victory) return finish(turn,victory);
-      turn=other();
-      if(!canDraw(turn)&&!hands[turn].some(unit=>legal(unit).length)){
+      if(won){
+        finish(turn);
+        return;
+      }
+      turn=1-turn;
+      const connected=reach(turn);
+      if(!canDraw(turn)&&!hands[turn].some(unit=>legal(unit,connected).size)){
         passes++;
-        if(passes===2) return finish(stars[0].size===stars[1].size?-1:Number(stars[1].size>stars[0].size),'Dernier tour !');
-        endTurn('Les '+team(turn)+' passent leur tour.');
+        if(passes===2){
+          finish(-1);
+          return;
+        }
+        message='Les '+toysTeams[turn]+' passent leur tour.';
+        fresh=-1;
+        added=0;
+        endTurn();
         return;
       }
       phase='pick';
       fresh=-1;
+      added=0;
       message='';
       render();
-      focus('[data-hand]:enabled, [data-draw]:enabled');
-    }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 180 : 720);
+      focus('.toys-seat.current [data-hand]:enabled, .toys-seat.current [data-draw]:enabled');
+    },reduced.matches?160:720);
   }
 
-  function finish(winner,reason) {
+  function finish(winner) {
     phase='finished';
     rulesButton.disabled=false;
-    const art=winner===-1 ? [0,1,2,3] : [winner,2+winner];
-    stage.innerHTML='<div class="toys-finish"><div class="toys-winners">'+art.map(toysPortrait).join('')+'</div>'+
-      '<h1>'+(winner===-1?'Égalité !':'Les '+team(winner)+' gagnent !')+'</h1><p>'+reason+'</p>'+
-      '<div class="toys-end-actions"><button class="toys-action" data-start>↻ Rejouer</button><button class="secondary" data-setup>Changer de terrain</button></div></div>';
+    const art=winner===-1?[toysPortrait(0,3),toysPortrait(1,3)]:[0,1,2,3].map(unit=>toysPortrait(winner,unit));
+    stage.innerHTML='<div class="toys-finish"><div class="toys-winners">'+art.join('')+'</div><h1>'+
+      (winner===-1?'Égalité !':'Les '+toysTeams[winner]+' gagnent !')+'</h1><div class="toys-end-actions">'+
+      '<button class="toys-action" data-start aria-label="Rejouer">↻</button><button class="secondary" data-setup>Changer de terrain</button></div></div>';
     sound([523,659,784,1047]);
     focus('[data-start]');
   }
 
-  stage.addEventListener('click', event=>{
+  stage.addEventListener('click',event=>{
     const button=event.target.closest('button');
     if(!button||button.disabled||rules.open) return;
     if(button.hasAttribute('data-world')){
@@ -256,11 +255,13 @@ function toysGame() {
         render();
         focus('.toys-seat.current [data-hand="'+id+'"]');
       } else if(button.hasAttribute('data-site')) place(Number(button.dataset.site));
-      else if(button.hasAttribute('data-draw')){
-        drawCards(2);
+      else if(button.hasAttribute('data-draw')&&canDraw(turn)){
+        hands[turn].push(decks[turn].pop(),decks[turn].pop());
         passes=0;
-        sound([440,523]);
-        endTurn('De nouveaux jouets !');
+        added=2;
+        message='Deux nouveaux jouets !';
+        sound([440,523,659]);
+        endTurn();
       }
     }
   });
@@ -279,4 +280,3 @@ function toysGame() {
   };
   setup();
 }
-
