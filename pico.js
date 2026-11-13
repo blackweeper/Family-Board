@@ -194,7 +194,7 @@ function picoGame() {
     const nestSlots = shelters.flatMap(card => card.slots);
     const carried = ['choose','saved'].includes(phase) ? -1 : nestSlots.findIndex(slot => !slot.filled && slot.egg === selected);
     const remaining = goal() - total() - Number(carried >= 0);
-    stage.innerHTML = `<div class="pico-table" data-phase="${phase}" data-outcome="${outcome}" data-seat="${player}" style="--otter:${96 - 88 * threat / limit}%;--otter-step:${88 / limit}cqw">
+    stage.innerHTML = `<div class="pico-table" data-phase="${phase}" data-outcome="${outcome}" data-seat="${player}" style="--otter:${96 - 68 * threat / limit}%;--otter-step:${68 / limit}cqw">
       <div class="pico-hud">
         <div class="pico-turn" style="--player:${colors[player]}">● Joueur ${player + 1}</div>
         <div class="pico-progress" aria-label="${total()} œufs sauvés sur ${goal()}">🥚 ${total()} / ${goal()}</div>
@@ -214,7 +214,7 @@ function picoGame() {
         ${phase === 'aim' ? meter() : ''}
         <div class="pico-tools">
           ${active ? (phase === 'choose' ? picoEggs.map((name,i)=>`<button class="pico-choice" data-egg="${i}" aria-label="Œuf ${name}" ${!shelters.some(card => needs(card,i)) ? 'disabled' : ''}>${picoEgg(i)}</button>`).join('') :
-            '<button class="secondary" data-cancel>↶ Changer d’œuf</button><button class="pico-action" data-slide>➜ Glisser</button>') : ''}
+            '<button class="pico-action" data-slide>➜ Glisser</button>') : ''}
         </div>
       </div>
       <div class="pico-nests" aria-label="Cartes-cachettes">
@@ -355,13 +355,7 @@ function picoGame() {
       setup();
       focus(button.dataset.count ? `[data-count="${playerCount}"]` : `[data-mode="${mode}"]`);
     } else if (phase === 'choose' && button.hasAttribute('data-egg')) aim(Number(button.dataset.egg));
-    else if (phase === 'aim' && button.hasAttribute('data-cancel')) {
-      cancelAnimationFrame(meterFrame);
-      phase = 'choose';
-      selected = -1;
-      render();
-      focus('[data-egg]:enabled');
-    } else if (phase === 'aim' && button.hasAttribute('data-slide')) slide();
+    else if (phase === 'aim' && button.hasAttribute('data-slide')) slide();
   });
 
   app.querySelector('#pico-rules').onclick = () => {

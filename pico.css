@@ -20,7 +20,7 @@
   isolation:isolate;
   min-height:clamp(530px,76svh,700px);
   padding:clamp(10px,2.3vw,24px);
-  background:linear-gradient(#092b2312,#092b2345),url('./covers/pico-board.jpg') center/cover;
+  background:#173d32 url('./covers/pico-board.jpg') center/100% 100%;
 }
 .pico-hud { display:flex; gap:5px; align-items:center; justify-content:space-between; }
 .pico-turn,.pico-progress,.pico-threat {
@@ -31,30 +31,29 @@
 .pico-threat { display:flex; align-items:center; gap:4px; }
 .pico-threat i { width:8px; height:8px; background:#d4f8dc45; border-radius:50%; }
 .pico-threat i.filled { background:#ffb38e; box-shadow:0 0 9px #ffac8caa; }
-.pico-stream { position:absolute; z-index:1; container-type:inline-size; inset-inline:14%; top:46%; height:clamp(118px,19svh,175px); transform:translateY(-50%); pointer-events:none; }
+.pico-stream { position:absolute; z-index:1; container-type:inline-size; inset:0 14%; pointer-events:none; }
 .pico-start-nest {
-  position:absolute; z-index:1; left:25%; top:-15%; transform:translate(-50%,-50%);
+  position:absolute; z-index:1; left:28.5%; top:28.5%; transform:translate(-50%,-50%);
   display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr));
-  width:clamp(115px,19vw,222px); aspect-ratio:2.5; gap:1px 2px;
-  padding:clamp(6px,1vw,12px) clamp(17px,2.1vw,27px);
-  border:2px solid #c1935c; border-radius:50%;
-  background:#b68355 url('./covers/pico-shelter.jpg') center/100% 100%;
-  box-shadow:0 5px 12px #0e2a23b8;
+  width:clamp(110px,20vw,230px); aspect-ratio:2.45; gap:2px;
+  padding:clamp(8px,1.1vw,14px) clamp(18px,2.6vw,31px);
+  background:url('./covers/pico-nest.png') center/contain no-repeat;
+  filter:drop-shadow(0 4px 4px #302417a6);
 }
-.pico-start-nest[data-capacity="9"] { grid-template-columns:repeat(10,minmax(0,1fr)); width:clamp(105px,17vw,192px); }
+.pico-start-nest[data-capacity="9"] { grid-template-columns:repeat(10,minmax(0,1fr)); width:clamp(105px,18vw,207px); }
 .pico-start-nest[data-capacity="9"] .pico-start-slot { grid-column:span 2; }
 .pico-start-nest[data-capacity="9"] .pico-start-slot:nth-child(6) { grid-column:2 / span 2; }
 .pico-start-slot { min-width:0; min-height:0; display:grid; place-items:center; }
 .pico-start-slot .pico-egg { width:min(100%,23px); height:100%; min-height:0; }
 .pico-start-slot img { min-height:0; }
 .pico-bird,.pico-otter { position:absolute; transform:translate(-50%,-50%); }
-.pico-bird { z-index:2; width:clamp(105px,18vw,204px); left:31%; top:53%; }
-.pico-otter { z-index:1; width:clamp(96px,18vw,200px); left:var(--otter); top:73%; }
+.pico-bird { z-index:2; width:clamp(105px,18vw,204px); left:41%; top:48%; }
+.pico-otter { z-index:1; width:clamp(96px,18vw,200px); left:var(--otter); top:54%; }
 .pico-bird > img,.pico-otter > img,.pico-finish img { display:block; width:100%; filter:drop-shadow(0 8px 9px #10281b83); }
 .pico-bird > .pico-egg { position:absolute; left:65%; top:45%; width:26%; }
 .pico-otter > img { scale:-1 1; }
 .pico-otter > .pico-egg { position:absolute; left:3%; top:31%; width:27%; transform:rotate(-13deg); }
-.pico-table:is([data-phase=place],[data-phase=saved],[data-phase=steal],[data-phase=miss]) .pico-bird { left:66%; }
+.pico-table:is([data-phase=place],[data-phase=saved],[data-phase=steal],[data-phase=miss]) .pico-bird { left:73%; }
 .pico-table:is([data-phase=saved],[data-phase=miss]) .pico-bird > .pico-egg { visibility:hidden; }
 .pico-table[data-phase=slide] .pico-bird { animation:pico-ride .78s cubic-bezier(.2,.55,.34,1) both; }
 .pico-table[data-phase=aim] .pico-bird > img { animation:pico-bob 1.6s ease-in-out infinite; }
@@ -63,7 +62,7 @@
 .pico-splash { position:absolute; left:66%; top:66%; width:15%; height:23%; border:3px solid #e3fffbbd; border-radius:50%; opacity:0; }
 .pico-table[data-phase=slide] .pico-splash { animation:pico-ripple .5s .29s ease-out; }
 .pico-dock {
-  position:absolute; bottom:5%; left:50%; z-index:3; transform:translateX(-50%);
+  position:absolute; bottom:4%; left:50%; z-index:3; transform:translateX(-50%);
   display:grid; justify-items:center; gap:10px; width:min(90%,340px);
 }
 .pico-status {
@@ -84,7 +83,7 @@
 .pico-choice:active { transform:translateY(3px); box-shadow:0 1px 0 #0a2925; }
 .pico-choice:disabled { opacity:.36; cursor:default; }
 .pico-nests {
-  position:absolute; top:67%; left:50%; transform:translate(-50%,-50%);
+  position:absolute; top:68%; left:50%; transform:translate(-50%,-50%);
   display:flex; justify-content:center; gap:clamp(4px,1.2vw,14px); width:min(75%,690px);
 }
 .pico-nest {
@@ -105,7 +104,7 @@
 .pico-slot.filled .pico-egg { opacity:1; filter:none; }
 .pico-slot.just-saved { animation:pico-tuck .58s cubic-bezier(.2,.75,.25,1) both; }
 @keyframes pico-ride {
-  0% { left:31%; transform:translate(-50%,-50%) rotate(-8deg); }
+  0% { left:41%; transform:translate(-50%,-50%) rotate(-8deg); }
   45% { transform:translate(-50%,-62%) rotate(6deg); }
   78% { transform:translate(-50%,-42%) rotate(-5deg); }
   100% { left:66%; transform:translate(-50%,-50%); }
@@ -135,7 +134,7 @@
 }
 @media (max-width:700px) {
   .pico-stream { inset-inline:13%; }
-  .pico-start-nest { top:-6%; }
+  .pico-start-nest { left:29%; top:30%; }
   .pico-bird { width:clamp(78px,18vw,130px); }
   .pico-otter { width:clamp(76px,18vw,125px); }
   .pico-nests { width:96%; }
