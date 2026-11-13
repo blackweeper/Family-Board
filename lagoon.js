@@ -1,8 +1,8 @@
 const lagoonCrew = [
-  { icon: '🦦', name: 'Loutre', portrait: 'otter', color: '#73e0d4' },
-  { icon: '🦀', name: 'Crabe', portrait: 'crab', color: '#ffa18a' },
-  { icon: '🐙', name: 'Poulpe', portrait: 'octopus', color: '#c7aaff' },
-  { icon: '🐢', name: 'Tortue', portrait: 'turtle', color: '#f7d278' },
+  { name: 'Loutre', portrait: 'otter', color: '#73e0d4' },
+  { name: 'Crabe', portrait: 'crab', color: '#ffa18a' },
+  { name: 'Poulpe', portrait: 'octopus', color: '#c7aaff' },
+  { name: 'Tortue', portrait: 'turtle', color: '#f7d278' },
 ];
 const lagoonTreasures = [
   'Coquillage', 'Cristal', 'Pièce', 'Corail', 'Étoile de mer', 'Boussole',
@@ -81,7 +81,7 @@ function lagoonGame() {
           </fieldset>
           <fieldset><legend>Équipages</legend>
             <div class="lagoon-choices">
-              ${lineup.slice(0, count).map((crew, i) => `<button data-seat="${i}" aria-label="Joueur ${i + 1}, ${crew.name}" aria-pressed="${seat === i}">${i + 1} ${crew.icon}</button>`).join('')}
+              ${lineup.slice(0, count).map((crew, i) => `<button data-seat="${i}" aria-label="Joueur ${i + 1}, ${crew.name}" aria-pressed="${seat === i}">${i + 1} ${portrait(crew)}</button>`).join('')}
             </div>
             <div class="lagoon-crew" aria-label="Choisir l’animal du joueur ${seat + 1}">
               ${lagoonCrew.map((crew,i) => `<button data-crew="${i}" style="--crew:${crew.color}" aria-label="${crew.name}" aria-pressed="${lineup[seat] === crew}">${portrait(crew)}</button>`).join('')}
@@ -89,6 +89,7 @@ function lagoonGame() {
           </fieldset>
           <button class="lagoon-action" data-start>▶ Jouer</button>
         </div>
+        <img class="lagoon-intro-art" src="./covers/lagoon.jpg" alt="" draggable="false">
       </div>`;
   }
 
@@ -178,7 +179,7 @@ function lagoonGame() {
       <div class="lagoon-table" data-phase="${phase}">
         <div class="lagoon-fleet" style="--players:${count}">${fleet.map(raft).join('')}</div>
         <div class="lagoon-dock">
-          <div class="lagoon-turn" style="--crew:${crew.color}"><span aria-hidden="true">${crew.icon}</span> Tour de ${crew.name}</div>
+          <div class="lagoon-turn" style="--crew:${crew.color}">${portrait(crew)} Tour de ${crew.name}</div>
           <div class="lagoon-hand" aria-label="Trésors du tour">${Array.from({length:5}, (_, i) => {
             const id = haul[i];
             const treasure = lagoonTreasures[id];
@@ -189,7 +190,7 @@ function lagoonGame() {
           <div class="lagoon-actions">${phase === 'turn' ? `
             <button class="lagoon-action" data-draw ${haul.length >= 5 ? 'disabled' : ''}>▣ Piocher</button>
             <button class="lagoon-action bank" data-bank ${haul.length ? '' : 'disabled'}>◈ Encaisser ${haul.length ? bankValue() : ''}</button>` :
-            `<button class="lagoon-action" data-next>${fleet[(active + 1) % count].icon} Au suivant →</button>`}</div>
+            `<button class="lagoon-action" data-next>${portrait(fleet[(active + 1) % count])} Au suivant →</button>`}</div>
         </div>
       </div>`;
   }
