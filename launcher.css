@@ -73,3 +73,7 @@ button:focus-visible,a:focus-visible,select:focus-visible { outline:3px solid #f
 .arcade-bar #back { min-height:44px; }
 .arcade-game { display:block; width:min(100%, calc(max(240px, 100vh - 175px) * 5 / 3)); aspect-ratio:5/3; margin:auto; border:0; border-radius:16px; background:#181d32; }
 .arcade-credit { color:var(--muted); text-align:center; font-size:.85rem; }
+
+.arcade-help { width:fit-content; margin:12px auto; color:var(--muted); text-align:center; }
+.arcade-help summary { min-height:44px; padding:11px; cursor:pointer; }
+.arcade-help .secondary { display:inline-block; min-height:44px; color:#f5f7ff; text-decoration:none; margin:3px; }

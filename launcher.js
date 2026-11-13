@@ -135,6 +135,7 @@ details.addEventListener('close', () => {
 });
 
 function openArcade(game) {
+  const gameUrl = `https://cdn.htmlgames.com/${game.provider}/index.html?lang=fr`;
   app.innerHTML = `
     <section class="arcade" aria-labelledby="arcade-title">
       <div class="arcade-bar">
@@ -142,10 +143,19 @@ function openArcade(game) {
         <h1 id="arcade-title">${game.title}</h1>
       </div>
       ${navigator.onLine ?
-        `<iframe class="arcade-game" src="https://cdn.htmlgames.com/${game.provider}/index.html?lang=fr" title="${game.title}" allow="autoplay"></iframe>` :
+        `<iframe class="arcade-game" src="${gameUrl}" title="${game.title}" allow="autoplay; fullscreen" allowfullscreen></iframe>` :
         '<p class="empty" role="status">Ce jeu a besoin d’Internet. Reviens au catalogue pour jouer hors ligne.</p>'}
+      <div class="arcade-help">
+        <details>
+          <summary>Écran noir ?</summary>
+          <p>Relance le lecteur. Si l’écran reste noir, ouvre le jeu dans le navigateur.</p>
+          <button type="button" class="secondary" id="retry-arcade">↻ Relancer</button>
+          <a class="secondary" href="${gameUrl}" target="_blank" rel="noopener noreferrer">Ouvrir dans le navigateur ↗</a>
+        </details>
+      </div>
       <p class="arcade-credit">${game.description} · ${game.players} (repère) · HTMLGames / Zygomatic · Publicités possibles</p>
     </section>`;
+  app.querySelector('#retry-arcade').onclick = () => openArcade(game);
   app.querySelector('#back').onclick = () => home(`[data-arcade="${game.id}"]`);
   window.scrollTo(0, 0);
   app.querySelector('#back').focus({ preventScroll: true });
