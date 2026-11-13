@@ -1,4 +1,4 @@
-const safariAnimals = [['🐼','Panda'], ['🦊','Renard'], ['🐸','Grenouille'], ['🦁','Lion'], ['🐵','Singe']];
+const safariAnimals = [['🐼','Panda','panda'], ['🦊','Renard','fox'], ['🐸','Grenouille','frog'], ['🦁','Lion','lion']];
 const safariRules = `
   <h2>Comment jouer ?</h2>
   <ol>
@@ -8,6 +8,10 @@ const safariRules = `
     <li>Si tu tapes trop tôt ou sur deux animaux différents, ta zone se bloque pour ce tour.</li>
     <li>Le premier bon réflexe rapporte une étoile. Avec cinq étoiles, tu gagnes !</li>
   </ol>`;
+
+function safariPortrait(animal) {
+  return animal[2] ? `<img src="./covers/safari-${animal[2]}.jpg" alt="" draggable="false">` : animal[0];
+}
 
 function safariGame() {
   let playerCount = 4;
@@ -19,6 +23,9 @@ function safariGame() {
   let target, card, matches;
   let timer;
   let audio;
+  let musicTimer;
+  let musicBus;
+  let beat = 0;
   const pick = items => items[Math.floor(Math.random() * items.length)];
 
   app.innerHTML = `
@@ -37,30 +44,47 @@ function safariGame() {
   const stage = app.querySelector('#safari-stage');
   const rules = app.querySelector('dialog');
 
-  function silence() {
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  function note(frequency, delay, volume, duration, type = 'sine', destination = audio?.destination) {
+    if (!soundOn || audio?.state !== 'running' || !destination) return;
+    const start = audio.currentTime + delay;
+    const oscillator = audio.createOscillator();
+    const envelope = audio.createGain();
+    oscillator.type = type;
+    oscillator.frequency.value = frequency;
+    envelope.gain.setValueAtTime(.001, start);
+    envelope.gain.exponentialRampToValueAtTime(volume, start + .015);
+    envelope.gain.exponentialRampToValueAtTime(.001, start + duration);
+    oscillator.connect(envelope).connect(destination);
+    oscillator.start(start);
+    oscillator.stop(start + duration);
   }
 
-  function announce(word) {
-    if (!soundOn || !('speechSynthesis' in window)) return;
-    silence();
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = 'fr-FR';
-    window.speechSynthesis.speak(utterance);
+  function stopMusic() {
+    clearInterval(musicTimer);
+    musicTimer = undefined;
+    musicBus?.disconnect();
+    musicBus = undefined;
   }
 
-  function chime() {
-    if (!soundOn || audio?.state !== 'running') return;
-    [523, 659, 784].forEach((frequency, index) => {
-      const start = audio.currentTime + index * .07;
-      const note = audio.createOscillator();
-      const gain = audio.createGain();
-      note.frequency.value = frequency;
-      gain.gain.setValueAtTime(.09, start);
-      gain.gain.exponentialRampToValueAtTime(.001, start + .16);
-      note.connect(gain).connect(audio.destination);
-      note.start(start);
-      note.stop(start + .17);
+  function startMusic() {
+    if (!soundOn || !window.AudioContext || musicTimer !== undefined) return;
+    audio ??= new AudioContext();
+    audio.resume().catch(() => {});
+    musicBus = audio.createGain();
+    musicBus.connect(audio.destination);
+    const melody = [392, 440, 523, 0, 587, 523, 440, 0, 349, 392, 440, 0, 523, 440, 392, 0];
+    musicTimer = setInterval(() => {
+      const pitch = melody[beat % melody.length];
+      if (pitch) note(pitch, 0, .035, .31, 'triangle', musicBus);
+      if (beat % 4 === 0) note(beat % 16 < 8 ? 130.81 : 110, 0, .045, .28, 'sine', musicBus);
+      beat++;
+    }, 250);
+  }
+
+  function effect(kind) {
+    const notes = { reveal: [330, 440], miss: [233, 165], point: [523, 659, 784], win: [523, 659, 784, 1047] };
+    notes[kind].forEach((pitch, index) => {
+      note(pitch, index * .085, .09, kind === 'win' ? .32 : .16, 'triangle');
     });
   }
 
@@ -91,10 +115,8 @@ function safariGame() {
   }
 
   function begin() {
-    if (soundOn && window.AudioContext) {
-      audio ??= new AudioContext();
-      audio.resume().catch(() => {});
-    }
+    beat = 0;
+    startMusic();
     scores = Array(playerCount).fill(0);
     nextRound();
   }
@@ -108,9 +130,9 @@ function safariGame() {
     card = surprise ? ['⚡','Éclair'] : Math.random() < .56 ? target : pick(animals.filter(animal => animal !== target));
     matches = surprise || target === card;
     draw('Attends…');
-    announce(target[1]);
     schedule(() => {
       phase = 'reveal';
+      effect('reveal');
       draw(card[0] === '⚡' ? '⚡' : 'À toi de regarder !');
       schedule(() => endRound(blocked.size === playerCount ? 'Tour suivant' : matches ? 'Bien essayé !' : 'Bien vu !'), mode === 'little' ? 2450 : 1450);
     }, (mode === 'little' ? 1350 : 780) + Math.random() * 800);
@@ -118,18 +140,18 @@ function safariGame() {
 
   function draw(message) {
     stage.innerHTML = `
-      <div class="safari-table seats-${playerCount}">
+      <div class="safari-table seats-${playerCount}" data-phase="${phase}">
         <div class="safari-center">
           <div class="safari-cards">
-            <div class="safari-card" aria-label="${target[1]}">${target[0]}</div>
-            <div class="safari-card ${phase === 'ready' ? 'face-down' : ''}" aria-label="${phase === 'ready' ? 'Carte cachée' : card[1]}">${phase === 'ready' ? '✦' : card[0]}</div>
+            <div class="safari-card" aria-label="${target[1]}">${safariPortrait(target)}</div>
+            <div class="safari-card ${phase === 'ready' ? 'face-down' : ''}" aria-label="${phase === 'ready' ? 'Carte cachée' : card[1]}">${phase === 'ready' ? '✦' : safariPortrait(card)}</div>
           </div>
           <p class="safari-status" role="status">${message}</p>
         </div>
         ${scores.map((score, index) => `
           <button class="safari-seat seat-${index} ${blocked.has(index) ? 'seat-blocked' : ''}" data-seat="${index}"
             aria-label="${safariAnimals[index][1]}, ${score} étoiles${blocked.has(index) ? ', en pause pour ce tour' : ''}">
-            <span class="safari-mascot">${safariAnimals[index][0]}</span>
+            <span class="safari-mascot">${safariPortrait(safariAnimals[index])}</span>
             <span class="safari-stars" aria-hidden="true">${'★'.repeat(score)}${'☆'.repeat(5-score)}</span>
           </button>`).join('')}
       </div>`;
@@ -145,24 +167,26 @@ function safariGame() {
     if ((phase !== 'ready' && phase !== 'reveal') || blocked.has(index)) return;
     if (phase === 'ready' || !matches) {
       blocked.add(index);
+      effect('miss');
       button.classList.add('seat-blocked');
       button.setAttribute('aria-label', button.getAttribute('aria-label') + ', en pause pour ce tour');
       if (blocked.size === playerCount && phase === 'reveal') endRound('Tour suivant');
       return;
     }
     scores[index]++;
-    chime();
     const winner = safariAnimals[index];
     if (scores[index] < 5) {
+      effect('point');
       endRound(winner[0] + ' + ⭐');
       return;
     }
     clearTimeout(timer);
     phase = 'finished';
-    announce(winner[1] + ' gagne !');
+    stopMusic();
+    effect('win');
     stage.innerHTML = `
       <div class="safari-victory">
-        <span aria-hidden="true">${winner[0]}</span>
+        <span class="safari-winner" aria-hidden="true">${safariPortrait(winner)}</span>
         <h1>${winner[1]} gagne !</h1>
         <p aria-label="Cinq étoiles">★★★★★</p>
         <button class="safari-start" data-start>↻ Rejouer</button>
@@ -194,21 +218,25 @@ function safariGame() {
 
   app.querySelector('#safari-rules').onclick = () => {
     clearTimeout(timer);
-    silence();
+    stopMusic();
     rules.showModal();
   };
   rules.addEventListener('close', () => {
-    if (stage.isConnected && ['ready','reveal','result'].includes(phase)) nextRound();
+    if (stage.isConnected && ['ready','reveal','result'].includes(phase)) {
+      startMusic();
+      nextRound();
+    }
   });
   app.querySelector('#safari-sound').onclick = event => {
     soundOn = !soundOn;
-    if (!soundOn) silence();
+    if (!soundOn) stopMusic();
+    else if (['ready','reveal','result'].includes(phase)) startMusic();
     event.currentTarget.setAttribute('aria-pressed', soundOn);
     event.currentTarget.textContent = soundOn ? '🔊 Son' : '🔇 Son';
   };
   app.querySelector('#back').onclick = () => {
     clearTimeout(timer);
-    silence();
+    stopMusic();
     audio?.close().catch(() => {});
     home('[data-detail="safari"]');
   };
