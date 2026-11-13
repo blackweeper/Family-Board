@@ -1,6 +1,7 @@
 const catalog = [
   { id: 'slingshot', title: 'Family Slingshot', icon: '🐦', color: 'coral', type: 'home', category: 'Arcade', players: 'Solo', description: 'Tends l’élastique, vise et envoie tes héros faire tomber les forteresses.' },
   { id: 'safari', title: 'Boum Safari', icon: '🐾', color: 'mint', type: 'home', category: 'À plusieurs', players: '2 à 4 joueurs', description: 'Deux animaux identiques ? Tape ta zone avant les autres. Cinq étoiles pour gagner !' },
+  { id: 'lagoon', title: 'Lagon des Trésors', icon: '🐚', color: 'blue', type: 'home', category: 'À plusieurs', players: '2 à 4 joueurs', description: 'Pioche des trésors et mets tes perles à l’abri avant que ton radeau ne tangue.' },
   { id: 'crabapult', title: 'Crabapult!', icon: '🦀', color: 'coral', type: 'web', category: 'Arcade', players: 'Solo', description: 'Tire et relâche pour lancer les crabes. Touche l’écran pendant le vol pour déclencher leur pouvoir.', url: 'https://natanr123.itch.io/crabapult', artwork: 'https://img.itch.zone/aW1nLzMxMDcxOTgyLnBuZw==/315x250%23c/FoqlRs.png' },
   { id: 'memory', title: 'Memory Battle', icon: '🧠', color: 'violet', type: 'home', category: 'Réflexion', players: '2 joueurs', description: 'Retournez les cartes à tour de rôle et retrouvez le plus de paires.' },
   { id: 'connect', title: 'Puissance 4', icon: '🔴', color: 'blue', type: 'home', category: 'À plusieurs', players: '2 joueurs', description: 'Aligne quatre jetons avant l’autre joueur. Surveille aussi les diagonales !' },

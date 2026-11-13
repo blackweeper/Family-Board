@@ -1,0 +1,60 @@
+.lagoon { color:#f8ffec; }
+.lagoon-bar { display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px; }
+.lagoon-bar button { min-height:44px; }
+.lagoon-bar #back { margin-right:auto; }
+.lagoon-intro,.lagoon-victory,.lagoon-table { border-radius:28px; border:1px solid #b7ffed55; overflow:hidden; box-shadow:0 18px 44px #071a285a; }
+.lagoon-intro,.lagoon-victory { min-height:clamp(420px,54vw,640px); display:grid; align-items:center; background:linear-gradient(90deg,#062b32f5,#062b32c7 31%,#062b3221 76%),url('./covers/lagoon.jpg') center/cover; }
+.lagoon-intro-copy,.lagoon-victory-copy { padding:clamp(22px,5vw,64px); }
+.lagoon h1 { font:900 clamp(2.9rem,7vw,6rem)/.91 'DM Sans',system-ui; letter-spacing:-.07em; margin:0; }
+.lagoon-intro p,.lagoon-victory p { font-size:clamp(1rem,2vw,1.3rem); font-weight:700; }
+.lagoon fieldset { border:0; padding:0; margin:0 0 14px; }
+.lagoon legend { margin-bottom:7px; }
+.lagoon-choices,.lagoon-crew,.lagoon-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.lagoon-choices button,.lagoon-action { min-height:48px; min-width:48px; padding:10px 14px; border-radius:13px; border:1px solid #f5e3a06b; background:#133e47; color:#fff9dd; font-weight:800; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.lagoon-choices button[aria-pressed=true],.lagoon-action { background:#ffe2a0; color:#302a1c; }
+.lagoon-action.bank { background:#93ecd7; }
+.lagoon-action:disabled { opacity:.48; cursor:default; }
+.lagoon-crew { margin:12px 0 18px; }
+.lagoon-crew button,.lagoon-token span,.lagoon-winner { display:grid; place-items:center; overflow:hidden; border-radius:50%; border:3px solid var(--crew); background:#184752; aspect-ratio:1; box-shadow:0 5px 12px #071d266f; }
+.lagoon-crew button { width:clamp(48px,6vw,70px); padding:0; cursor:pointer; }
+.lagoon-crew button[aria-pressed=true] { outline:2px solid #fff1b6; outline-offset:3px; }
+.lagoon-crew img,.lagoon-token img,.lagoon-winner img { display:block; width:100%; height:100%; object-fit:cover; }
+.lagoon-table { min-height:clamp(450px,70svh,680px); padding:clamp(12px,3vw,32px); display:grid; align-content:space-evenly; gap:15px; background:linear-gradient(#062b3220,#062b324a),url('./covers/lagoon-board.jpg') center/cover; }
+.lagoon-fleet { display:grid; grid-template-columns:repeat(var(--players),minmax(0,1fr)); gap:clamp(4px,2vw,24px); justify-items:center; }
+.lagoon-raft { display:grid; justify-items:center; align-content:start; gap:4px; font-size:clamp(.7rem,1.6vw,1rem); text-shadow:0 2px 5px #00191e; }
+.lagoon-raft.current .lagoon-token span { outline:2px solid #fff5cd; outline-offset:3px; }
+.lagoon-token { position:relative; transform:rotate(var(--tilt)); transition:transform .25s ease; margin:6px 0 12px; }
+.lagoon-token::before { content:""; position:absolute; z-index:-1; bottom:-9px; left:-11%; width:122%; height:40%; border:2px solid #dfb779; border-radius:10px; background:repeating-linear-gradient(0deg,#ae7043 0 5px,#d5a469 5px 11px); box-shadow:0 5px 0 #3cc4c24d; }
+.lagoon-token span { width:clamp(48px,9vw,96px); font-size:clamp(1.6rem,5vw,3.3rem); }
+.lagoon-token.splash { animation:lagoon-splash .48s ease-out both; }
+@keyframes lagoon-splash { 35% { transform:rotate(29deg) translateY(9px); } 65% { transform:rotate(-11deg); } }
+.lagoon-bank,.lagoon-turn { color:#fff3bc; background:#092b35eb; border:1px solid #caffea50; border-radius:999px; padding:4px 10px; font-weight:800; }
+.lagoon-bank small { opacity:.8; }
+.lagoon-waves { display:flex; gap:3px; color:#e5fffaad; line-height:1; }
+.lagoon-waves .rough { color:#ffac85; font-weight:900; }
+.lagoon-dock { display:grid; justify-items:center; gap:12px; }
+.lagoon-turn { border-color:var(--crew); }
+.lagoon-hand { display:flex; gap:clamp(4px,1.5vw,16px); }
+.lagoon-card { display:grid; place-items:center; width:clamp(43px,11vw,128px); aspect-ratio:4/5; border-radius:clamp(8px,1.5vw,17px); font-size:clamp(1.25rem,5vw,3.5rem); border:2px solid #e2ffea75; box-shadow:0 5px 0 #093443,0 8px 14px #08232a7c; }
+.lagoon-card.empty-card { color:#b7fbec; background:repeating-linear-gradient(135deg,#1a5863 0 9px,#216471 9px 18px); }
+.lagoon-card.revealed { background:radial-gradient(ellipse at 50% 30%,#fff5d4,#eed49d); border-color:#ffefc8; }
+.lagoon-card.fresh { animation:lagoon-reveal .26s ease-out both; }
+.lagoon-table[data-phase=duplicate] .lagoon-card.fresh { background:#ffc2a2; border-color:#ff9676; }
+@keyframes lagoon-reveal { from { transform:scaleX(.55); opacity:.7; } }
+.lagoon-message { min-height:1.4em; font-weight:800; text-align:center; text-shadow:0 2px 5px #05212c,0 0 12px #05212c; margin:0; }
+.lagoon-dock .lagoon-actions { justify-content:center; }
+.lagoon-victory { background:linear-gradient(#082e3b86,#082e3b9c),url('./covers/lagoon-board.jpg') center/cover; place-content:center; text-align:center; }
+.lagoon-winner { width:clamp(75px,13vw,150px); margin:0 auto 16px; font-size:3rem; }
+.lagoon-victory .lagoon-actions { justify-content:center; }
+.lagoon-rules { width:min(520px,calc(100% - 28px)); max-height:calc(100% - 28px); border:1px solid #b7ffed; border-radius:22px; color:#f9fff0; background:#153e46; padding:24px; }
+.lagoon-rules::backdrop { background:#061b25db; }
+.lagoon-rules h2 { margin-top:0; }
+.lagoon-rules li { padding:4px; line-height:1.45; }
+.cover-open[data-detail=lagoon] .cover-art,#details[data-game=lagoon] .detail-art { background:#184952 url('./covers/lagoon.jpg') center/cover; color:transparent; text-shadow:none; }
+@media(max-width:520px) { .lagoon-bar button { padding-inline:9px; } }
+@media(prefers-reduced-motion:reduce) { .lagoon-card.fresh,.lagoon-token.splash { animation:none; } .lagoon-token { transition:none; } }
+
+.lagoon-treasure { display:block; width:92%; aspect-ratio:1; border-radius:10%; background:url('./covers/lagoon-treasures.jpg') var(--art-x) var(--art-y) / 300% 200%; }
+.lagoon-table[data-phase=banked] .lagoon-raft.current .lagoon-bank { animation:lagoon-pearl .44s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes lagoon-pearl { 45% { transform:scale(1.22); background:#d8ffe9; color:#11362a; } }
+@media(prefers-reduced-motion:reduce) { .lagoon-table[data-phase=banked] .lagoon-raft.current .lagoon-bank { animation:none; } }

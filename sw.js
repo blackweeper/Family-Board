@@ -1,4 +1,4 @@
-const CACHE = 'family-board-v13';
+const CACHE = 'family-board-v14';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
@@ -8,6 +8,8 @@ const ASSETS = [
   'covers/safari-giraffe.jpg', 'covers/safari-hippo.jpg',
   'covers/safari-toucan.jpg', 'covers/safari-monkey.jpg',
   'covers/safari-turtle.jpg', 'covers/safari-rhino.jpg',
+  'lagoon.js', 'lagoon.css', 'covers/lagoon.jpg', 'covers/lagoon-board.jpg', 'covers/lagoon-treasures.jpg',
+  'covers/lagoon-otter.jpg', 'covers/lagoon-crab.jpg', 'covers/lagoon-octopus.jpg', 'covers/lagoon-turtle.jpg',
   'safari.js', 'safari.css', 'covers/safari.jpg', 'covers/safari-board.jpg',
   'launcher.js', 'manifest.webmanifest', 'slingshot.jpg',
   'covers/BalloonMaze.jpg',

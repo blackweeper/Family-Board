@@ -85,6 +85,7 @@ function showDetails(game) {
       <p class="detail-meta">${game.players} · ${game.type === 'home' ? 'Hors ligne après le premier chargement' : game.type === 'web' ? 'Internet requis · Site externe' : game.purchase}</p>
       ${game.type === 'ipad' ? '<p class="detail-meta">Une fois le jeu installé, ouvre-le depuis l’App Store ou l’écran d’accueil de l’iPad.</p>' : ''}
       ${game.id === 'safari' ? `<details><summary>📖 Règles du jeu</summary>${safariRules}</details>` : ''}
+      ${game.id === 'lagoon' ? `<details><summary>📖 Règles du jeu</summary>${lagoonRules}</details>` : ''}
       <div class="detail-actions">
         ${game.type === 'home' ? '<button class="primary launch-button" data-play>▶ Jouer</button>' :
           `<a class="primary launch-button" href="${game.url}" target="_blank" rel="noopener noreferrer">${game.type === 'web' ? 'Jouer sur le Web' : 'Voir dans l’App Store'} ↗</a>`}
