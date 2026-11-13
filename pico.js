@@ -1,20 +1,25 @@
 const picoEggs = [
-  { name:'Menthe', symbol:'◆', color:'#83f2c3' },
+  { name:'Azur', symbol:'◆', color:'#8fd4ff' },
   { name:'Soleil', symbol:'☀', color:'#ffde75' },
   { name:'Prune', symbol:'✦', color:'#d6a8ff' },
+  { name:'Menthe', symbol:'♥', color:'#83f2c3' },
 ];
 const picoModes = {
-  little: { goal:6, limit:5, speed:1850, left:29, right:71, name:'Petits' },
-  family: { goal:9, limit:4, speed:1280, left:33, right:67, name:'Famille' },
+  little: { cards:3, limit:6, speed:1430, width:25, name:'Petits' },
+  family: { cards:4, limit:5, speed:1050, width:17, name:'Famille' },
 };
+const picoRecipes = [
+  [0,0,1], [1,1,2], [2,2,3], [3,3,0],
+  [0,2,2], [1,3,3], [0,1,3], [1,2,3],
+];
 const picoRules = `
   <h2>Comment jouer ?</h2>
   <ol>
     <li>Jouez chacun à votre tour. Choisis un œuf dans le nid.</li>
     <li>Sur la jauge, attends que le curseur soit dans la zone verte, puis touche <strong>Glisser</strong>. Pico descend la cascade avec l’œuf !</li>
-    <li>Si l’œuf arrive entier, touche une cachette avec le même symbole pour le mettre à l’abri.</li>
-    <li>Si l’œuf se fissure, la loutre avance d’un pas. Elle repart d’un pas en arrière quand vous sauvez les trois couleurs d’une rangée.</li>
-    <li>Gagnez ensemble en remplissant les cachettes avant que la loutre n’atteigne le nid.</li>
+    <li>Si l’œuf arrive entier, touche une carte-cachette qui demande ce symbole. Une carte peut demander plusieurs œufs identiques, par exemple deux bleus et un jaune.</li>
+    <li>Si l’œuf se fissure, la loutre avance d’un pas. Elle repart d’un pas en arrière à chaque carte-cachette complétée.</li>
+    <li>Gagnez ensemble en remplissant toutes les cartes-cachettes avant que la loutre n’atteigne le nid.</li>
   </ol>`;
 
 function picoEgg(index) {
@@ -27,14 +32,17 @@ function picoGame() {
   let mode = 'little';
   let player = 0;
   let phase = 'setup';
-  let saved = [0,0,0];
+  let shelters = [];
+  let filledCard = -1;
+  let filledSlot = -1;
   let threat = 0;
   let selected = -1;
   let timer;
   let meterFrame;
   let meterTime = 0;
   let lastFrame;
-  let position = 50;
+  let position = 0;
+  let targetLeft = 0;
   let muted = false;
   let audio;
   let outcome = '';
@@ -55,7 +63,20 @@ function picoGame() {
   const stage = app.querySelector('#pico-stage');
   const rules = app.querySelector('.pico-rules');
   const config = () => picoModes[mode];
-  const total = () => saved.reduce((sum, eggs) => sum + eggs, 0);
+  const goal = () => config().cards * 3;
+  const total = () => shelters.reduce((sum, card) => sum + card.slots.filter(slot => slot.filled).length, 0);
+  const needs = (card, egg) => card.slots.some(slot => !slot.filled && slot.egg === egg);
+
+  function dealShelters() {
+    const recipes = [...picoRecipes];
+    for (let i = recipes.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [recipes[i], recipes[j]] = [recipes[j], recipes[i]];
+    }
+    return recipes.slice(0, config().cards).map(recipe => ({
+      slots: recipe.map(egg => ({egg, filled:false})),
+    }));
+  }
   const focus = selector => stage.querySelector(selector)?.focus({ preventScroll:true });
   const actor = () => `<div class="pico-bird"><img src="./covers/pico-token.png" alt="Pico sur sa feuille" draggable="false">${selected >= 0 ? picoEgg(selected) : ''}</div>`;
 
@@ -90,14 +111,16 @@ function picoGame() {
         <fieldset><legend>Mode</legend><div class="pico-choices">
           ${Object.entries(picoModes).map(([id, settings]) => `<button data-mode="${id}" aria-pressed="${mode === id}">${settings.name}</button>`).join('')}
         </div></fieldset>
-        <p class="pico-mode">${config().goal} œufs à sauver · ${mode === 'little' ? 'Glissade tranquille' : 'Glissade plus rapide'}</p>
+        <p class="pico-mode">${config().cards} cartes-cachettes · ${goal()} œufs · ${mode === 'little' ? 'Glissade tranquille' : 'Glissade plus rapide'}</p>
         <button class="pico-action" data-start>▶ Jouer</button>
       </div>
     </div>`;
   }
 
   function start() {
-    saved = [0,0,0];
+    shelters = dealShelters();
+    filledCard = -1;
+    filledSlot = -1;
     threat = 0;
     player = 0;
     selected = -1;
@@ -110,41 +133,43 @@ function picoGame() {
   }
 
   function meter() {
-    const { left, right } = config();
-    return `<div class="pico-meter" role="img" aria-label="Zone verte au centre de la jauge" style="--left:${left}%;--width:${right-left}%"><span></span><i></i></div>`;
+    return `<div class="pico-meter" role="img" aria-label="Arrête le curseur dans la zone verte" style="--left:${targetLeft}%;--width:${config().width}%"><span></span><i></i></div>`;
   }
 
   function render() {
-    app.querySelector('#pico-rules').disabled = phase === 'slide';
-    const { goal, limit } = config();
+    app.querySelector('#pico-rules').disabled = phase === 'slide' || phase === 'saved';
+    const { limit } = config();
     const active = phase === 'choose' || phase === 'aim';
     const stageText = {
       choose: notice || 'Choisis un œuf.',
       aim: 'Appuie quand le curseur est dans le vert.',
       slide: 'Pico descend la cascade !',
       place: 'Œuf intact ! Choisis la cachette du même symbole.',
+      saved: notice,
       miss: 'Oups, l’œuf est fissuré. La loutre avance !',
     };
-    stage.innerHTML = `<div class="pico-table" data-phase="${phase}" data-outcome="${outcome}">
+    stage.innerHTML = `<div class="pico-table" data-phase="${phase}" data-outcome="${outcome}" data-seat="${player}">
       <div class="pico-hud">
         <div class="pico-turn" style="--player:${colors[player]}">● Joueur ${player + 1}</div>
-        <div class="pico-progress" aria-label="${total()} œufs sauvés sur ${goal}">🥚 ${total()} / ${goal}</div>
+        <div class="pico-progress" aria-label="${total()} œufs sauvés sur ${goal()}">🥚 ${total()} / ${goal()}</div>
         <div class="pico-threat" aria-label="La loutre est à ${limit-threat} pas du nid">
           <span aria-hidden="true">🦦</span>${Array.from({length:limit},(_,i)=>`<i class="${i < threat ? 'filled' : ''}"></i>`).join('')}<span aria-hidden="true">🪺</span>
         </div>
       </div>
-      <div class="pico-stream">${actor()}</div>
+      <div class="pico-stream">${actor()}<span class="pico-splash" aria-hidden="true"></span></div>
       <div class="pico-dock">
         <p class="pico-status" role="status">${stageText[phase]}</p>
         ${phase === 'aim' ? meter() : ''}
         <div class="pico-tools">
-          ${active ? (phase === 'choose' ? picoEggs.map((egg,i)=>`<button class="pico-choice" data-egg="${i}" aria-label="Œuf ${egg.name}" ${saved[i] >= goal/3 ? 'disabled' : ''}>${picoEgg(i)}</button>`).join('') :
+          ${active ? (phase === 'choose' ? picoEggs.map((egg,i)=>`<button class="pico-choice" data-egg="${i}" aria-label="Œuf ${egg.name}" ${!shelters.some(card => needs(card,i)) ? 'disabled' : ''}>${picoEgg(i)}</button>`).join('') :
             '<button class="secondary" data-cancel>↶ Changer d’œuf</button><button class="pico-action" data-slide>➜ Glisser</button>') : ''}
           ${phase === 'miss' ? '<button class="pico-action" data-next>Au suivant →</button>' : ''}
         </div>
-        <div class="pico-nests" aria-label="Cachettes">
-          ${picoEggs.map((egg,i)=>`<button class="pico-nest" data-nest="${i}" style="--egg:${egg.color}" aria-label="Cachette ${egg.name}, ${saved[i]} sur ${goal/3}" ${phase !== 'place' || saved[i] >= goal/3 ? 'disabled' : ''}>
-            <b aria-hidden="true">${egg.symbol}</b><span aria-hidden="true">${Array.from({length:goal/3},(_,slot)=>`<i class="${slot < saved[i] ? 'filled' : ''}">${slot < saved[i] ? egg.symbol : ''}</i>`).join('')}</span>
+        <div class="pico-nests" aria-label="Cartes-cachettes">
+          ${shelters.map((card,i) => `<button class="pico-nest ${card.slots.every(slot=>slot.filled) ? 'complete' : ''}" data-nest="${i}"
+            aria-label="Cachette ${i+1} : ${card.slots.map(slot=>picoEggs[slot.egg].name + (slot.filled ? ' sauvé' : ' attendu')).join(', ')}"
+            ${phase !== 'place' || card.slots.every(slot=>slot.filled) ? 'disabled' : ''}>
+            <span class="pico-recipe" aria-hidden="true">${card.slots.map((slot,j)=>`<span class="pico-slot ${slot.filled ? 'filled' : ''} ${filledCard === i && filledSlot === j ? 'just-saved' : ''}">${picoEgg(slot.egg)}</span>`).join('')}</span>
           </button>`).join('')}
         </div>
       </div>
@@ -166,6 +191,7 @@ function picoGame() {
     phase = 'aim';
     meterTime = 0;
     position = 0;
+    targetLeft = 18 + Math.random() * (64 - config().width);
     lastFrame = undefined;
     render();
     meterFrame = requestAnimationFrame(animateMeter);
@@ -174,8 +200,7 @@ function picoGame() {
 
   function slide() {
     cancelAnimationFrame(meterFrame);
-    const { left, right } = config();
-    outcome = position >= left && position <= right ? 'safe' : 'crack';
+    outcome = position >= targetLeft && position <= targetLeft + config().width ? 'safe' : 'crack';
     phase = 'slide';
     sound([392, 440, 523]);
     render();
@@ -201,21 +226,27 @@ function picoGame() {
   }
 
   function shelter(index) {
-    if (index !== selected) {
+    const card = shelters[index];
+    const slot = card.slots.findIndex(item => !item.filled && item.egg === selected);
+    if (slot === -1) {
       sound([294, 220]);
-      stage.querySelector('.pico-status').textContent = 'Cherche la cachette avec le même symbole.';
+      stage.querySelector('.pico-status').textContent = 'Cherche une place libre avec le même symbole.';
       return;
     }
-    const before = Math.min(...saved);
-    saved[index]++;
-    const complete = Math.min(...saved) > before;
-    if (complete) threat = Math.max(0, threat - 1);
-    if (total() === config().goal) {
-      finish(true);
-      return;
-    }
+    card.slots[slot].filled = true;
+    filledCard = index;
+    filledSlot = slot;
+    const complete = card.slots.every(item => item.filled);
+    const retreats = complete && threat > 0;
+    if (retreats) threat--;
+    notice = retreats ? 'Cachette complète ! La loutre recule.' : complete ? 'Cachette complète !' : 'Œuf sauvé !';
+    phase = 'saved';
     sound(complete ? [523, 659, 784, 1047] : [523, 659]);
-    next(complete ? 'Rangée complète ! La loutre recule si elle avait avancé.' : 'Œuf sauvé ! À toi de choisir.');
+    render();
+    timer = setTimeout(() => {
+      if (total() === goal()) finish(true);
+      else next();
+    }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 80 : 680);
   }
 
   function next(text = '') {
@@ -224,6 +255,8 @@ function picoGame() {
     outcome = '';
     phase = 'choose';
     notice = text;
+    filledCard = -1;
+    filledSlot = -1;
     render();
     focus('[data-egg]:enabled');
   }
@@ -235,7 +268,7 @@ function picoGame() {
     stage.innerHTML = `<div class="pico-finish">
       <img src="./covers/pico-token.png" alt="" draggable="false">
       <h1>${won ? 'Tous les œufs sont sauvés !' : 'La loutre a trouvé le nid !'}</h1>
-      <p>${total()} / ${config().goal} œufs à l’abri</p>
+      <p>${total()} / ${goal()} œufs à l’abri</p>
       <div class="pico-choices"><button class="pico-action" data-start>↻ Rejouer</button><button class="secondary" data-setup>Réglages</button></div>
     </div>`;
     focus('[data-start]');
@@ -266,7 +299,7 @@ function picoGame() {
   });
 
   app.querySelector('#pico-rules').onclick = () => {
-    if (phase === 'slide') return;
+    if (phase === 'slide' || phase === 'saved') return;
     cancelAnimationFrame(meterFrame);
     rules.showModal();
   };

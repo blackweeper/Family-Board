@@ -28,12 +28,14 @@ function tableGame() {
   let piles = [];
   let phase = 'setup';
   let last = null;
+  let topCard = null;
+  let discarded = 0;
   let timer;
   let soundOn = true;
   let audio;
   const players = [
-    { name:'Corail', color:'#ff9b9d' }, { name:'Lilas', color:'#cbb0ff' },
-    { name:'Menthe', color:'#90e1c5' }, { name:'Miel', color:'#ffda85' },
+    { name:'Goncalo', color:'#ff9b9d' }, { name:'Raphael', color:'#cbb0ff' },
+    { name:'Aurelie', color:'#90e1c5' }, { name:'Marius', color:'#ffda85' },
   ];
 
   app.innerHTML = `<section class="table-game">
@@ -89,6 +91,8 @@ function tableGame() {
     piles = tableDeal(count);
     active = 0;
     last = null;
+    topCard = null;
+    discarded = 0;
     phase = 'pick';
     sound([392, 523, 659]);
     render();
@@ -97,8 +101,33 @@ function tableGame() {
 
   function guess(id) {
     if (phase !== 'pick' || rules.open) return;
+    const source = stage.querySelector(`.table-seat-${active} .table-hand .table-stack:last-child`);
+    const origin = source.getBoundingClientRect();
     const card = piles[active].pop();
     last = { card, guess:id, correct:card === id };
+    phase = 'flight';
+    render();
+    const end = stage.querySelector('.table-card').getBoundingClientRect();
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const duration = reduced ? 0 : 460;
+    if (duration && source.animate) {
+      const moving = document.createElement('div');
+      moving.className = 'table-card table-back table-flying';
+      moving.setAttribute('aria-hidden', 'true');
+      moving.textContent = '✦';
+      Object.assign(moving.style, { left: end.left + 'px', top: end.top + 'px', width: end.width + 'px', height: end.height + 'px' });
+      stage.querySelector('.table-board').append(moving);
+      moving.animate([
+        { transform: `translate(${origin.x + origin.width/2 - end.x - end.width/2}px, ${origin.y + origin.height/2 - end.y - end.height/2}px) scale(.27) rotate(-16deg)` },
+        { transform: 'translate(0,0) scale(1) rotate(0)' },
+      ], {duration, easing:'cubic-bezier(.2,.75,.25,1)', fill:'forwards'});
+    }
+    timer = setTimeout(reveal, duration);
+  }
+
+  function reveal() {
+    topCard = last.card;
+    discarded++;
     phase = 'reveal';
     sound(last.correct ? [523, 659, 784] : [349, 262]);
     render();
@@ -120,31 +149,35 @@ function tableGame() {
   function seats() {
     return piles.map((pile, i) => {
       const player = players[i];
-      return `<div class="table-player ${i === active ? 'current' : ''}" style="--player:${player.color}" role="group"
-        aria-label="${player.name}, ${pile.length} ${pile.length === 1 ? 'carte' : 'cartes'}"${i === active ? ' aria-current="true"' : ''}>
-        <span class="table-stack" aria-hidden="true">✦</span><div><strong>${player.name}</strong><small>${pile.length} / ${tableHandSize}</small></div>
+      return `<div class="table-player table-seat-${i} ${i === active ? 'current' : ''}" style="--player:${player.color}" role="group"
+        aria-label="Joueur ${i+1} ${player.name}, ${pile.length} ${pile.length === 1 ? 'carte' : 'cartes'}"${i === active ? ' aria-current="true"' : ''}>
+        <div class="table-player-label"><strong>${i+1} · ${player.name}</strong><small>${pile.length} / ${tableHandSize}</small></div>
+        <div class="table-hand" aria-hidden="true">${pile.map(()=>'<span class="table-stack">✦</span>').join('')}</div>
       </div>`;
     }).join('');
   }
 
   function render() {
-    rulesButton.disabled = phase === 'reveal' && !piles[active].length;
+    rulesButton.disabled = phase === 'flight' || (phase === 'reveal' && !piles[active].length);
     const player = players[active];
     const revealed = phase === 'reveal';
     const nextPlayer = players[(active + 1) % count];
-    const status = !revealed ? 'Choisis une image pour retourner ta carte.' :
+    const status = phase === 'flight' ? 'La carte rejoint la pile…' : !revealed ? 'Choisis une image pour retourner ta carte.' :
       !piles[active].length ? 'Plus aucune carte dans ta pile !' :
       last.correct ? 'Bien deviné ! Tu rejoues.' : `Tu avais choisi ${tableMenu[last.guess]}. À ${nextPlayer.name} de jouer.`;
     stage.innerHTML = `<div class="table-board" data-phase="${phase}">
-      <div class="table-players" style="--players:${count}">${seats()}</div>
+      ${seats()}
       <div class="table-center">
         <span class="table-turn" style="--player:${player.color}">● Tour de ${player.name}</span>
-        ${last ? `<figure class="table-card ${revealed ? 'fresh' : ''}" aria-label="Carte révélée : ${tableMenu[last.card]}">${tableImage(last.card)}<figcaption>${tableMenu[last.card]}</figcaption></figure>` :
-          '<div class="table-card table-back" role="img" aria-label="Carte face cachée">✦</div>'}
+        <div class="table-discard" data-count="${discarded}">
+          ${topCard !== null ? `<figure class="table-card ${revealed ? 'fresh' : ''}" aria-label="Carte révélée : ${tableMenu[topCard]}">${tableImage(topCard)}<figcaption>${tableMenu[topCard]}</figcaption></figure>` :
+            '<div class="table-card table-back" role="img" aria-label="Carte face cachée">✦</div>'}
+          <small aria-label="${discarded} cartes jouées">${discarded} ${discarded === 1 ? 'carte jouée' : 'cartes jouées'}</small>
+        </div>
         <p class="table-status" role="status">${status}</p>
       </div>
       <div class="table-dock">
-        ${revealed ? `<button class="table-primary" data-next ${piles[active].length ? '' : 'disabled'}>
+        ${phase === 'flight' ? '' : revealed ? `<button class="table-primary" data-next ${piles[active].length ? '' : 'disabled'}>
           ${!piles[active].length ? 'Dernière carte !' : last.correct ? '↻ Rejouer' : `→ Au tour de ${nextPlayer.name}`}</button>` :
           `<div class="table-guesses" aria-label="Choisis la prochaine carte">${tableMenu.map((name,id)=>`<button data-guess="${id}">${tableImage(id)}<span>${name}</span></button>`).join('')}</div>`}
       </div>

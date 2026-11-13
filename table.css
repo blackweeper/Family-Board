@@ -14,24 +14,23 @@
 .table-options button,.table-primary { cursor:pointer; min-height:48px; min-width:48px; padding:9px 16px; border:1px solid #ffdfb276; border-radius:13px; background:#41294c; font-weight:800; }
 .table-options button[aria-pressed=true],.table-game .table-primary { background:#ffe0a0; color:#33243c; }
 .table-primary:disabled { opacity:.75; cursor:default; }
-.table-board { display:grid; grid-template-rows:auto 1fr auto; align-items:center; gap:14px; padding:clamp(12px,3vw,32px); min-height:clamp(430px,69svh,650px); background:linear-gradient(#25112f22,#25112f66),url('./covers/table-board.jpg') center/cover; }
-.table-players { display:grid; grid-template-columns:repeat(var(--players),minmax(0,1fr)); gap:clamp(5px,2vw,20px); }
-.table-player { display:flex; justify-content:center; align-items:center; gap:9px; padding:8px; min-width:0; border:1px solid #f4dbff3d; border-radius:15px; background:#291b39e8; }
+.table-board { display:grid; grid-template: "top top top" auto "left center right" 1fr "left controls right" auto "bottom bottom bottom" auto / minmax(75px,1fr) minmax(0,2.7fr) minmax(75px,1fr); align-items:center; gap:14px; padding:clamp(12px,3vw,32px); min-height:clamp(430px,69svh,650px); background:linear-gradient(#25112f22,#25112f66),url('./covers/table-board.jpg') center/cover; }
+.table-player { display:grid; justify-items:center; justify-content:center; align-items:center; gap:9px; padding:8px; min-width:0; border:1px solid #f4dbff3d; border-radius:15px; background:#291b39e8; }
 .table-player.current { border-color:var(--player); box-shadow:0 0 15px color-mix(in srgb,var(--player),transparent 64%); }
 .table-player strong,.table-player small { display:block; }
 .table-player strong { color:var(--player); font-size:clamp(.72rem,1.55vw,1rem); }
 .table-player small { color:#fbefd6; font-variant-numeric:tabular-nums; }
-.table-stack { display:grid; place-items:center; width:25px; height:32px; border:1px solid var(--player); border-radius:5px; color:var(--player); background:#472d5b; box-shadow:2px 2px #1a1028,4px 4px #6e4b77; }
-.table-center { display:grid; justify-items:center; align-content:center; gap:9px; }
+.table-stack { display:grid; place-items:center; width:clamp(14px,2.1vw,25px); aspect-ratio:3/4; border:1px solid var(--player); border-radius:5px; color:var(--player); background:#472d5b; box-shadow:1px 2px #1a1028; font-size:.7rem; }
+.table-center { grid-area:center; display:grid; justify-items:center; align-content:center; gap:9px; }
 .table-turn { border:1px solid var(--player); border-radius:999px; color:var(--player); background:#2b1b39; padding:5px 12px; font-weight:800; }
-.table-card { margin:0; width:clamp(110px,16vw,184px); aspect-ratio:4/5; overflow:hidden; display:grid; grid-template-rows:1fr auto; border:3px solid #ffe5b1; border-radius:18px; background:#392648; box-shadow:0 6px #1a0f25,0 10px 22px #160c247f; }
+.table-card { margin:0; width:clamp(84px,18svh,154px); aspect-ratio:4/5; overflow:hidden; display:grid; grid-template-rows:1fr auto; border:3px solid #ffe5b1; border-radius:18px; background:#392648; box-shadow:0 6px #1a0f25,0 10px 22px #160c247f; }
 .table-card img,.table-guesses img { display:block; width:100%; height:100%; min-height:0; object-fit:cover; }
 .table-card figcaption { padding:5px; text-align:center; font-weight:900; color:#3a283e; background:#ffe7b4; }
 .table-back { display:grid; place-items:center; color:#ffe0a2; font-size:clamp(2rem,6vw,4rem); background:repeating-linear-gradient(135deg,#352354 0 12px,#493161 12px 24px); }
 .table-card.fresh { animation:table-flip .33s ease-out both; }
 @keyframes table-flip { from { transform:perspective(600px) rotateY(-85deg) scale(.92); opacity:.6; } }
 .table-status { min-height:2.15em; margin:0; text-align:center; font-weight:800; text-shadow:0 2px 6px #150a22; }
-.table-dock { display:grid; place-items:center; min-height:clamp(98px,14vw,153px); }
+.table-dock { grid-area:controls; display:grid; place-items:center; min-height:clamp(98px,14vw,153px); }
 .table-guesses { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(6px,1.5vw,14px); width:min(100%,440px); }
 .table-guesses button { display:grid; grid-template-rows:1fr auto; aspect-ratio:1/1.12; border:2px solid #ffddb49a; border-radius:14px; overflow:hidden; min-width:0; min-height:60px; padding:0; cursor:pointer; color:#fff1d4; background:#382747; font-weight:800; -webkit-tap-highlight-color:transparent; }
 .table-guesses button span { padding:4px; }
@@ -47,7 +46,25 @@
 .cover-open[data-detail=table] .cover-art,#details[data-game=table] .detail-art { background:#37253f url('./covers/table.jpg') center/cover; }
 @media(max-width:460px) {
   .table-bar .secondary { padding-inline:7px; font-size:.8rem; }
-  .table-player { gap:2px; flex-direction:column; }
-  .table-stack { width:19px; height:25px; }
 }
 @media(prefers-reduced-motion:reduce) { .table-card.fresh { animation:none; } }
+
+.table-seat-0 { grid-area:bottom; }
+.table-seat-1 { grid-area:right; }
+.table-seat-2 { grid-area:top; }
+.table-seat-3 { grid-area:left; }
+.table-seat-0,.table-seat-2 { justify-self:center; width:min(100%,390px); }
+.table-player-label { display:flex; align-items:center; gap:7px; }
+.table-hand { display:flex; gap:3px; justify-content:center; flex-wrap:wrap; }
+.table-seat-1 .table-hand,.table-seat-3 .table-hand { display:grid; grid-template-columns:repeat(2,auto); }
+.table-discard { display:grid; position:relative; justify-items:center; gap:8px; }
+.table-discard:not([data-count="0"]) .table-card { box-shadow:0 4px #34254c,0 6px #ffd99b,0 9px #463559,0 11px #d6ae78,0 14px 19px #1a0b2399; }
+.table-discard small { color:#f8dfaf; }
+.table-flying { position:fixed; z-index:5; pointer-events:none; }
+@media(max-width:540px) {
+  .table-board { grid-template-columns:minmax(64px,1fr) minmax(0,2.45fr) minmax(64px,1fr); gap:7px; padding:9px; }
+  .table-player { padding:5px 3px; }
+  .table-player-label { flex-wrap:wrap; justify-content:center; gap:3px; text-align:center; }
+  .table-guesses button { min-height:44px; font-size:.7rem; }
+  .table-status { font-size:.85rem; }
+}
