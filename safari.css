@@ -1,0 +1,38 @@
+.safari { color:#fff8e7; }
+.safari-bar { display:flex; gap:8px; justify-content:flex-end; margin-bottom:12px; }
+.safari-bar #back { margin-right:auto; }
+.safari-bar button { min-height:44px; }
+.safari-intro,.safari-victory { min-height:clamp(425px,54vw,640px); display:grid; align-items:center; border-radius:28px; overflow:hidden; background:linear-gradient(90deg,#092923fa 0%,#092923e6 26%,#09292328 63%),url('./covers/safari.jpg') center/cover; border:1px solid #9bf4ba55; }
+.safari-config { padding:clamp(18px,5vw,60px); }
+.safari h1 { margin:0; font:900 clamp(2.8rem,7vw,6rem)/.94 'DM Sans',system-ui; letter-spacing:-.07em; }
+.safari-config p { font-weight:800; }
+.safari fieldset { border:0; padding:0; margin:12px 0; }
+.safari legend { margin-bottom:5px; font-size:.87rem; }
+.safari-choices { display:flex; gap:6px; }
+.safari-choices button,.safari-start { min-height:48px; min-width:48px; border:1px solid #e9ffca62; border-radius:14px; padding:10px 14px; background:#183e37; font-weight:800; cursor:pointer; }
+.safari-choices button[aria-pressed=true],.safari-start { background:#ffdc85; color:#302414; }
+.safari-start { margin-top:8px; min-width:128px; }
+.safari-table { display:grid; grid-template-columns:1fr 2fr 1fr; grid-template-rows:1fr 2.25fr 1fr; gap:8px; padding:10px; min-height:clamp(340px,72svh,680px); border:2px solid #589778; border-radius:25px; background:radial-gradient(ellipse,#29664b,#102f2a 72%); }
+.safari-center { grid-area:2/2; display:grid; place-content:center; text-align:center; }
+.safari-cards { display:flex; justify-content:center; gap:clamp(8px,2vw,24px); }
+.safari-card { width:clamp(66px,12vw,156px); aspect-ratio:4/5; display:grid; place-items:center; border:4px solid #fff2c9; border-radius:18px; background:#ffe9a6; color:#fff7d4; font-size:clamp(35px,7vw,90px); box-shadow:0 6px 0 #122921; }
+.safari-card.face-down { background:repeating-linear-gradient(135deg,#266b64 0 14px,#328078 14px 28px); }
+.safari-status { min-height:1.5em; margin:.75rem 0 0; font-weight:800; }
+.safari-seat { min-width:0; border:2px solid #ffffff99; border-radius:18px; display:grid; place-content:center; gap:4px; background:var(--seat); color:#24231a; cursor:pointer; touch-action:none; user-select:none; }
+.safari-mascot { font-size:clamp(26px,5vw,60px); line-height:1; }
+.safari-stars { font-size:clamp(11px,1.8vw,24px); font-weight:900; white-space:nowrap; }
+.seat-0 { grid-area:3/2; --seat:#f9d981; }
+.seat-1 { grid-area:1/2; --seat:#ff9d81; }
+.seat-1 span { transform:rotate(180deg); }
+.seat-2 { grid-area:2/1; --seat:#92e4b2; }
+.seat-3 { grid-area:2/3; --seat:#a8caff; }
+.seat-blocked { opacity:.38; }
+.safari-victory { text-align:center; place-content:center; background:radial-gradient(ellipse,#266449,#102e26); gap:12px; }
+.safari-victory span { font-size:clamp(64px,14vw,145px); }
+.safari-victory p { margin:0; color:#ffda72; font-size:2rem; }
+.safari-rules { width:min(520px,calc(100% - 28px)); max-height:calc(100% - 28px); border:1px solid #abedac; border-radius:22px; color:#fff8e7; background:#153b32; padding:24px; }
+.safari-rules::backdrop { background:#061b17dd; }
+.safari-rules h2 { margin-top:0; }
+.safari-rules li { padding:4px; line-height:1.45; }
+.cover-open[data-detail=safari] .cover-art,#details[data-game=safari] .detail-art { background:#234a31 url('./covers/safari.jpg') center/cover; color:transparent; text-shadow:none; }
+@media(max-width:600px) { .safari-intro { background-position:58% center; } .safari-bar button { padding-inline:10px; } }
