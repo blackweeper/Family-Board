@@ -68,19 +68,33 @@ function safariGame() {
     musicBus = undefined;
   }
 
+  function playKalimba(pitch, volume) {
+    note(pitch, 0, volume, .46, 'sine', musicBus);
+    note(pitch * 2.01, 0, volume * .23, .16, 'sine', musicBus);
+    note(pitch * 3.97, 0, volume * .08, .07, 'sine', musicBus);
+  }
+
   function startMusic() {
     if (!soundOn || !window.AudioContext || musicTimer !== undefined) return;
     audio ??= new AudioContext();
     audio.resume().catch(() => {});
     musicBus = audio.createGain();
     musicBus.connect(audio.destination);
-    const melody = [392, 440, 523, 0, 587, 523, 440, 0, 349, 392, 440, 0, 523, 440, 392, 0];
+    musicBus.gain.value = .65;
+    const melody = [
+      329.63, 0, 440, 523.25, 0, 392, 0, 0,
+      349.23, 0, 440, 0, 523.25, 0, 659.25, 0,
+      293.66, 0, 392, 440, 0, 523.25, 0, 0,
+      329.63, 0, 392, 0, 440, 0, 0, 0,
+    ];
+    const bass = [110, 87.31, 98, 82.41];
     musicTimer = setInterval(() => {
-      const pitch = melody[beat % melody.length];
-      if (pitch) note(pitch, 0, .035, .31, 'triangle', musicBus);
-      if (beat % 4 === 0) note(beat % 16 < 8 ? 130.81 : 110, 0, .045, .28, 'sine', musicBus);
+      const step = beat % melody.length;
+      if (melody[step]) playKalimba(melody[step], .065);
+      if (step % 8 === 0) note(bass[step / 8], 0, .038, .55, 'sine', musicBus);
+      if (step % 8 === 3 || step % 8 === 6) note(142, 0, .023, .10, 'sine', musicBus);
       beat++;
-    }, 250);
+    }, 325);
   }
 
   function effect(kind) {

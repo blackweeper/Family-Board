@@ -18,9 +18,9 @@
 .safari-card { width:clamp(66px,12vw,156px); aspect-ratio:4/5; display:grid; place-items:center; border:4px solid #fff2c9; border-radius:18px; background:#ffe9a6; color:#fff7d4; font-size:clamp(35px,7vw,90px); box-shadow:0 6px 0 #122921; }
 .safari-card.face-down { background:repeating-linear-gradient(135deg,#266b64 0 14px,#328078 14px 28px); }
 .safari-status { min-height:1.5em; margin:.75rem 0 0; font-weight:800; }
-.safari-seat { min-width:0; border:2px solid #ffffff99; border-radius:18px; display:grid; place-content:center; gap:4px; background:var(--seat); color:#24231a; cursor:pointer; touch-action:none; user-select:none; }
+.safari-seat { min-width:0; border:0; border-radius:18px; display:grid; place-content:center; gap:5px; background:transparent; color:#fff8d9; cursor:pointer; touch-action:none; user-select:none; }
 .safari-mascot { font-size:clamp(26px,5vw,60px); line-height:1; }
-.safari-stars { font-size:clamp(11px,1.8vw,24px); font-weight:900; white-space:nowrap; }
+.safari-stars { font-size:clamp(11px,1.8vw,24px); font-weight:900; white-space:nowrap; text-shadow:0 2px 3px #081a12,0 0 6px #081a12; }
 .seat-0 { grid-area:3/2; --seat:#f9d981; }
 .seat-1 { grid-area:1/2; --seat:#ff9d81; }
 .seat-1 span { transform:rotate(180deg); }
@@ -48,10 +48,6 @@
   align-self:center;
   min-width:0;
   padding:12px 4px 8px;
-  border:1px solid #f2cf8c86;
-  border-radius:22px;
-  background:radial-gradient(ellipse at 50% 0%,#2a4637e8,#101f19f2);
-  box-shadow:0 8px 22px #091710ae,inset 0 0 0 3px #e1c08120;
 }
 .safari-card {
   overflow:hidden;
@@ -65,15 +61,13 @@
 .safari-card:not(.face-down):last-child { color:#813700; }
 .safari-table[data-phase=reveal] .safari-card:last-child { animation:safari-reveal .19s ease-out; }
 @keyframes safari-reveal { from { opacity:.65; transform:scaleX(.74); } }
-.safari-seat {
-  background:linear-gradient(160deg,#ffffff63,transparent 65%),var(--seat);
-  box-shadow:inset 0 -5px #0003,0 4px 11px #0008;
-  border-color:#fff3cd;
-}
 .safari-mascot,.safari-winner { display:block; overflow:hidden; border:3px solid #fff4d0; box-shadow:0 2px 9px #24261966; border-radius:50%; }
-.safari-mascot { width:clamp(36px,6vw,76px); aspect-ratio:1; margin:auto; }
+.safari-mascot { width:clamp(38px,7vw,88px); aspect-ratio:1; margin:auto; border-color:var(--seat); box-shadow:0 4px 12px #05190dd9; }
+.safari-status { text-shadow:0 2px 4px #061a10,0 0 8px #061a10; }
 .safari-winner { width:clamp(88px,17vw,170px); aspect-ratio:1; margin:auto; }
-.safari-seat:active { filter:brightness(1.15); }
+.safari-seat:active .safari-mascot { filter:brightness(1.2); }
+.safari-seat:focus-visible { outline:0; }
+.safari-seat:focus-visible .safari-mascot { outline:3px solid #fff3cd; outline-offset:4px; }
 @media(prefers-reduced-motion:reduce) { .safari-table[data-phase=reveal] .safari-card:last-child { animation:none; } }
 
 .safari-lobby {
