@@ -16,44 +16,90 @@
 .pico-choices button[aria-pressed=true],.pico .pico-action { background:#ffe08f; color:#362a19; }
 .pico-mode { font-size:.9rem; }
 .pico-table {
-  display:grid; grid-template-rows:auto minmax(130px,1fr) auto; min-height:clamp(460px,70svh,660px);
-  padding:clamp(10px,2.3vw,28px);
-  background:linear-gradient(#092b231c,#092b235b),url('./covers/pico-board.jpg') center/cover;
+  position:relative;
+  isolation:isolate;
+  min-height:clamp(530px,76svh,700px);
+  padding:clamp(10px,2.3vw,24px);
+  background:linear-gradient(#092b2312,#092b2345),url('./covers/pico-board.jpg') center/cover;
 }
-.pico-hud { display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
-.pico-turn,.pico-progress,.pico-threat { border:1px solid #c7efc457; border-radius:999px; background:#112f29ed; padding:7px 10px; font-weight:800; white-space:nowrap; }
+.pico-hud { display:flex; gap:5px; align-items:center; justify-content:space-between; }
+.pico-turn,.pico-progress,.pico-threat {
+  border:1px solid #c7efc457; border-radius:999px; background:#112f29ed;
+  padding:7px 10px; font-weight:800; white-space:nowrap;
+}
 .pico-turn { color:var(--player); }
 .pico-threat { display:flex; align-items:center; gap:4px; }
-.pico-threat i,.pico-nest i { display:inline-block; width:9px; height:9px; background:#d4f8dc45; border-radius:50%; }
+.pico-threat i { width:8px; height:8px; background:#d4f8dc45; border-radius:50%; }
 .pico-threat i.filled { background:#ffb38e; box-shadow:0 0 9px #ffac8caa; }
-.pico-stream { position:relative; min-height:150px; }
-.pico-bird { position:absolute; width:clamp(104px,19vw,216px); left:13%; top:52%; transform:translate(-50%,-50%); }
-.pico-bird img,.pico-finish img { display:block; width:100%; filter:drop-shadow(0 8px 11px #10281b83); }
-.pico-bird > .pico-egg { position:absolute; left:68%; top:48%; width:21%; }
-.pico-table:is([data-phase=place],[data-phase=miss]) .pico-bird { left:84%; }
+.pico-stream { position:absolute; z-index:1; inset-inline:12%; top:41%; height:clamp(118px,19svh,175px); transform:translateY(-50%); pointer-events:none; }
+.pico-bird,.pico-otter { position:absolute; transform:translate(-50%,-50%); }
+.pico-bird { z-index:2; width:clamp(105px,18vw,204px); left:13%; top:32%; }
+.pico-otter { z-index:1; width:clamp(96px,18vw,200px); left:var(--otter); top:84%; }
+.pico-bird > img,.pico-otter > img,.pico-finish img { display:block; width:100%; filter:drop-shadow(0 8px 9px #10281b83); }
+.pico-bird > .pico-egg { position:absolute; left:65%; top:45%; width:26%; }
+.pico-otter > .pico-egg { position:absolute; left:72%; top:31%; width:27%; transform:rotate(13deg); }
+.pico-table:is([data-phase=place],[data-phase=saved],[data-phase=steal],[data-phase=miss]) .pico-bird { left:84%; }
+.pico-table:is([data-phase=saved],[data-phase=miss]) .pico-bird > .pico-egg { visibility:hidden; }
 .pico-table[data-phase=slide] .pico-bird { animation:pico-ride .78s cubic-bezier(.2,.55,.34,1) both; }
-.pico-table[data-outcome=crack]:is([data-phase=slide],[data-phase=miss]) .pico-bird > .pico-egg { animation:pico-crack .78s ease both; }
+.pico-table[data-phase=aim] .pico-bird > img { animation:pico-bob 1.6s ease-in-out infinite; }
+.pico-table[data-phase=steal] .pico-otter > img { animation:pico-lunge .4s cubic-bezier(.24,.65,.36,1) both; }
+.pico-table[data-phase=steal] .pico-otter > .pico-egg { animation:pico-reveal .01s .43s both; }
+.pico-splash { position:absolute; left:84%; top:64%; width:15%; height:23%; border:3px solid #e3fffbbd; border-radius:50%; opacity:0; }
+.pico-table[data-phase=slide] .pico-splash { animation:pico-ripple .5s .29s ease-out; }
+.pico-dock {
+  position:absolute; bottom:5%; left:50%; z-index:3; transform:translateX(-50%);
+  display:grid; justify-items:center; gap:10px; width:min(90%,340px);
+}
+.pico-status {
+  margin:0; padding:5px 12px; border-radius:999px; background:#14332ce8;
+  font-weight:850; text-align:center; box-shadow:0 2px 8px #0c2c2060;
+}
+.pico-tools:empty { display:none; }
+.pico-meter { position:relative; width:min(95%,315px); height:25px; border:2px solid #fff1b9; border-radius:999px; background:#1e4140; box-shadow:0 3px 12px #0b261c91; }
+.pico-meter span { position:absolute; inset-block:0; left:var(--left); width:var(--width); background:#75ec9c; border-inline:2px solid #e7ffbf; }
+.pico-meter i { position:absolute; top:-4px; bottom:-4px; left:0; width:6px; transform:translateX(-50%); background:#fff6cb; border:1px solid #42362b; border-radius:5px; }
+.pico-egg { display:grid; width:clamp(28px,4.1vw,47px); aspect-ratio:4/5; place-items:center; }
+.pico-egg img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 3px 2px #171e1880); }
+.pico-choice {
+  display:grid; place-items:center; width:clamp(51px,7vw,64px); height:clamp(54px,8vw,73px); padding:3px;
+  border:1px solid #d3f2c68c; border-radius:17px; background:linear-gradient(#315b45,#183e35);
+  box-shadow:0 4px 0 #0a2925; cursor:pointer; touch-action:manipulation;
+}
+.pico-choice:active { transform:translateY(3px); box-shadow:0 1px 0 #0a2925; }
+.pico-choice:disabled { opacity:.36; cursor:default; }
+.pico-nests {
+  position:absolute; top:67%; left:50%; transform:translate(-50%,-50%);
+  display:flex; justify-content:center; gap:clamp(4px,1.2vw,14px); width:min(75%,690px);
+}
+.pico-nest {
+  position:relative; flex:1 1 0; min-width:0; max-width:167px; aspect-ratio:1.83;
+  display:grid; place-items:center; overflow:hidden;
+  border:1px solid #ffe8a5; border-radius:clamp(7px,1.4vw,16px);
+  background:#a5744d url('./covers/pico-shelter.jpg') center 59%/cover;
+  box-shadow:0 3px 0 #603f2b,0 5px 14px #142a20c9,inset 0 0 7px #fff0b298;
+}
+.pico-nest.complete { border-color:#e7ffbf; box-shadow:0 3px 0 #597641,0 0 15px #c3fb8ba3; }
+.pico-nest:has(.just-saved)::after {
+  content:''; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+  animation:pico-shelter-light .65s ease-out both;
+}
+.pico-recipe { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:79%; gap:2%; margin-top:7%; }
+.pico-slot { display:grid; place-items:center; }
+.pico-slot .pico-egg { width:100%; max-width:38px; opacity:.47; filter:saturate(.65); }
+.pico-slot.filled .pico-egg { opacity:1; filter:none; }
+.pico-slot.just-saved { animation:pico-tuck .58s cubic-bezier(.2,.75,.25,1) both; }
 @keyframes pico-ride {
   0% { left:13%; transform:translate(-50%,-50%) rotate(-8deg); }
-  45% { transform:translate(-50%,-61%) rotate(6deg); }
-  78% { transform:translate(-50%,-43%) rotate(-5deg); }
+  45% { transform:translate(-50%,-62%) rotate(6deg); }
+  78% { transform:translate(-50%,-42%) rotate(-5deg); }
   100% { left:84%; transform:translate(-50%,-50%); }
 }
-@keyframes pico-crack { 65% { opacity:1; } 100% { opacity:0; transform:translate(50%,-70%) rotate(40deg); } }
-.pico-dock { display:grid; justify-items:center; gap:9px; }
-.pico-status { margin:0; font-weight:850; text-align:center; text-shadow:0 2px 4px #102e20,0 0 10px #0c2c20; }
-.pico-meter { position:relative; width:min(90%,390px); height:24px; border:2px solid #fff1b9; border-radius:999px; background:#1e4140; box-shadow:0 3px 12px #0b261c91; }
-.pico-meter span { position:absolute; top:0; bottom:0; left:var(--left); width:var(--width); background:#75ec9c; border-inline:2px solid #e7ffbf; }
-.pico-meter i { position:absolute; top:-4px; bottom:-4px; left:0; width:6px; transform:translateX(-50%); background:#fff6cb; border:1px solid #42362b; border-radius:5px; }
-.pico-egg { width:clamp(26px,4vw,44px); aspect-ratio:4/5; display:inline-grid; place-items:center; border-radius:50% 50% 45% 45% / 61% 61% 39% 39%; color:#24362a; background:radial-gradient(ellipse at 32% 23%,#ffffffb5,transparent 58%),var(--egg); box-shadow:inset 0 -4px 6px #3c3e294a,0 3px 4px #12322c65; font-size:clamp(.9rem,2vw,1.35rem); }
-.pico-choice { min-width:54px; min-height:56px; padding:5px 9px; border:1px solid #d3f2c681; border-radius:15px; background:#183e35e8; cursor:pointer; }
-.pico-choice:disabled { opacity:.38; cursor:default; }
-.pico-nests { display:flex; justify-content:center; gap:8px; }
-.pico-nest { min-width:clamp(66px,9vw,110px); min-height:48px; display:grid; place-items:center; gap:2px; padding:5px 8px; border:1px solid #b9e3ad6e; border-radius:16px; background:linear-gradient(#346849,#204635); color:var(--egg); }
-.pico-nest:not(:disabled) { border-color:var(--egg); box-shadow:0 0 12px #c9ffbf85; cursor:pointer; }
-.pico-nest span { display:flex; gap:4px; }
-.pico-nest i { width:12px; height:15px; border-radius:50% 50% 45% 45% / 61% 61% 39% 39%; }
-.pico-nest i.filled { display:grid; place-items:center; background:var(--egg); color:#24362a; font:800 8px/1 system-ui; }
+@keyframes pico-bob { 50% { transform:translateY(-5px) rotate(-3deg); } }
+@keyframes pico-ripple { from { opacity:.9; transform:translate(-50%,-50%) scale(.35); } to { opacity:0; transform:translate(-50%,-50%) scale(1.45); } }
+@keyframes pico-lunge { from { transform:translate(-13%,9%) rotate(-9deg) scale(.9); } }
+@keyframes pico-reveal { from { opacity:0; } to { opacity:1; } }
+@keyframes pico-tuck { from { transform:scale(.82); } 38% { transform:translateY(-5px) scale(1.21); } }
+@keyframes pico-shelter-light { from { box-shadow:inset 0 0 25px 4px #fff5b6; } to { box-shadow:inset 0 0 0 transparent; } }
 .pico-finish { display:grid; place-content:center; justify-items:center; gap:12px; padding:22px; min-height:clamp(405px,53vw,620px); text-align:center; background:linear-gradient(#082e2f87,#082e2fd9),url('./covers/pico-board.jpg') center/cover; }
 .pico-finish img { width:clamp(110px,19vw,200px); }
 .pico-finish h1 { font-size:clamp(2rem,5.5vw,4rem); }
@@ -63,50 +109,28 @@
 .pico-rules h2 { margin-top:0; }
 .pico-rules li { padding:4px; line-height:1.45; }
 .cover-open[data-detail=pico] .cover-art,#details[data-game=pico] .detail-art { background:#123f32 url('./covers/pico.jpg') center/cover; }
-@media(max-width:460px) {
+@media (orientation:landscape) and (min-width:700px) {
+  .pico-table[data-seat="2"] .pico-dock { top:12%; bottom:auto; transform:translateX(-50%) rotate(180deg); }
+  .pico-table:is([data-seat="1"],[data-seat="3"]) .pico-dock {
+    top:47%; bottom:auto; width:min(45svh,340px);
+  }
+  .pico-table[data-seat="1"] .pico-dock { left:auto; right:clamp(55px,7vw,80px); transform:translate(50%,-50%) rotate(-90deg); }
+  .pico-table[data-seat="3"] .pico-dock { left:clamp(55px,7vw,80px); transform:translate(-50%,-50%) rotate(90deg); }
+}
+@media (max-width:700px) {
+  .pico-stream { inset-inline:10%; }
+  .pico-nests { width:96%; }
+}
+@media (max-width:460px) {
   .pico-bar .secondary { padding-inline:7px; font-size:.8rem; }
-  .pico-hud { font-size:.82rem; }
-  .pico-bird { left:17%; }
+  .pico-hud { font-size:.77rem; }
+  .pico-turn,.pico-progress,.pico-threat { padding:5px 7px; }
+  .pico-threat { gap:3px; }
+  .pico-threat i { width:6px; height:6px; }
 }
-@media(prefers-reduced-motion:reduce) {
+@media (prefers-reduced-motion:reduce) {
   .pico-table[data-phase=slide] .pico-bird { animation:none; left:84%; }
-  .pico-table[data-outcome=crack] .pico-bird > .pico-egg { animation:none!important; opacity:0; }
-}
-
-.pico-table { grid-template-rows:auto minmax(150px,1fr) auto; }
-.pico-stream { grid-area:2/1; }
-.pico-dock { grid-area:3/1; z-index:1; }
-.pico-table[data-seat="2"] { grid-template-rows:auto auto minmax(150px,1fr); }
-.pico-table[data-seat="2"] .pico-dock { grid-area:2/1; }
-.pico-table[data-seat="2"] .pico-stream { grid-area:3/1; }
-.pico-recipe { display:flex; gap:4px; justify-content:center; }
-.pico-nests { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:min(100%,360px); }
-.pico-nest { min-width:0; padding:5px; border-radius:12px; min-height:51px; background:linear-gradient(#fbdf9e,#d7aa63); border-color:#fff0c4; box-shadow:0 3px #715234; }
-.pico-nest.complete { background:linear-gradient(#d0f7ad,#8fc97f); border-color:#efffcb; }
-.pico-slot { display:grid; place-items:center; }
-.pico-slot .pico-egg { width:clamp(17px,2.7vw,29px); font-size:.75rem; opacity:.46; }
-.pico-slot.filled .pico-egg { opacity:1; }
-.pico-slot.just-saved { animation:pico-tuck .56s cubic-bezier(.2,.75,.25,1) both; }
-.pico-table[data-phase=aim] .pico-bird img { animation:pico-bob 1.6s ease-in-out infinite; }
-.pico-table[data-phase=saved] .pico-bird { left:84%; }
-.pico-table[data-phase=saved] .pico-bird > .pico-egg { visibility:hidden; }
-.pico-splash { position:absolute; left:84%; top:59%; width:15%; height:19%; border:3px solid #e3fffbbd; border-radius:50%; opacity:0; pointer-events:none; }
-.pico-table[data-phase=slide] .pico-splash { animation:pico-ripple .45s .32s ease-out; }
-.pico-table[data-phase=miss] .pico-threat .filled:not(:has(+ .filled)) { animation:pico-tuck .56s ease-out; }
-@keyframes pico-tuck { from { transform:translateY(-9px) scale(.65); } 55% { transform:scale(1.28); } }
-@keyframes pico-bob { 50% { transform:translateY(-5px) rotate(-3deg); } }
-@keyframes pico-ripple { from { opacity:.9; transform:translate(-50%,-50%) scale(.35); } to { opacity:0; transform:translate(-50%,-50%) scale(1.45); } }
-@media(min-width:700px) {
-  .pico-table:is([data-seat="1"],[data-seat="3"]) { grid-template: "hud hud" auto "stream dock" 1fr / minmax(0,1fr) minmax(208px,26%); }
-  .pico-table[data-seat="3"] { grid-template: "hud hud" auto "dock stream" 1fr / minmax(208px,26%) minmax(0,1fr); }
-  .pico-table:is([data-seat="1"],[data-seat="3"]) .pico-hud { grid-area:hud; }
-  .pico-table:is([data-seat="1"],[data-seat="3"]) .pico-stream { grid-area:stream; }
-  .pico-table:is([data-seat="1"],[data-seat="3"]) .pico-dock { grid-area:dock; align-self:center; }
-}
-@media(max-width:699px) {
-  .pico-table[data-seat="1"] .pico-dock { justify-self:end; }
-  .pico-table[data-seat="3"] .pico-dock { justify-self:start; }
-}
-@media(prefers-reduced-motion:reduce) {
-  .pico-slot.just-saved,.pico-table[data-phase=aim] .pico-bird img,.pico-table[data-phase=slide] .pico-splash,.pico-table[data-phase=miss] .pico-threat .filled { animation:none; }
+  .pico-table[data-phase=aim] .pico-bird > img,.pico-table[data-phase=steal] .pico-otter > img,
+  .pico-table[data-phase=steal] .pico-otter > .pico-egg,.pico-table[data-phase=slide] .pico-splash,
+  .pico-slot.just-saved,.pico-nest:has(.just-saved)::after { animation:none; }
 }
