@@ -1,7 +1,7 @@
 const app = document.querySelector('#app');
 
 function openGame(id) {
-  const games = { safari: safariGame, lagoon: lagoonGame, prism: prismGame, pico: picoGame, table: tableGame, coop: coopGame };
+  const games = { safari: safariGame, lagoon: lagoonGame, prism: prismGame, pico: picoGame, table: tableGame, coop: coopGame, toys: toysGame };
   (games[id] || home)();
 }
 
