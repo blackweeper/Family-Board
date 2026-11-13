@@ -56,7 +56,16 @@
 .table-seat-0,.table-seat-2 { justify-self:center; width:min(100%,390px); }
 .table-player-label { display:flex; align-items:center; gap:7px; }
 .table-hand { display:flex; gap:3px; justify-content:center; flex-wrap:wrap; }
-.table-seat-1 .table-hand,.table-seat-3 .table-hand { display:grid; grid-template-columns:repeat(2,auto); }
+@media (orientation:landscape) and (min-width:700px) {
+  .table-player { justify-self:center; width:min(320px,43svh); }
+  .table-hand { flex-wrap:nowrap; min-height:calc(clamp(14px,2.1vw,25px) * 4 / 3); }
+  .table-seat-1 { rotate:-90deg; }
+  .table-seat-2 { rotate:180deg; }
+  .table-seat-3 { rotate:90deg; }
+}
+@media (orientation:portrait), (max-width:699px) {
+  .table-seat-1 .table-hand,.table-seat-3 .table-hand { display:grid; grid-template-columns:repeat(2,auto); }
+}
 .table-discard { display:grid; position:relative; justify-items:center; gap:8px; }
 .table-discard:not([data-count="0"]) .table-card { box-shadow:0 4px #34254c,0 6px #ffd99b,0 9px #463559,0 11px #d6ae78,0 14px 19px #1a0b2399; }
 .table-discard small { color:#f8dfaf; }

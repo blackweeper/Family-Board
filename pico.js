@@ -1,7 +1,7 @@
 const picoEggs = ['Azur', 'Soleil', 'Prune', 'Menthe'];
 const picoModes = {
-  little: { cards:3, limit:6, speed:1360, width:25, name:'Petits' },
-  family: { cards:4, limit:5, speed:1070, width:19, name:'Famille' },
+  little: { cards:3, limit:5, speed:1080, width:19, name:'Petits' },
+  family: { cards:4, limit:4, speed:840, width:15, name:'Famille' },
 };
 const picoRecipes = [
   [0,0,1], [1,1,2], [2,2,3], [3,3,0],
@@ -13,7 +13,7 @@ const picoRules = `
     <li>Jouez chacun à votre tour. Choisis un œuf dans le nid.</li>
     <li>Sur la jauge, attends que le curseur soit dans la zone verte, puis touche <strong>Glisser</strong>. Pico descend la cascade avec l’œuf !</li>
     <li>Un œuf intact rejoint automatiquement une carte-cachette de son motif. À chaque œuf sauvé, la zone verte rétrécit et le curseur accélère.</li>
-    <li>Si l’œuf se fissure, la loutre l’emporte et avance d’un pas. Elle repart d’un pas en arrière à chaque carte-cachette complétée.</li>
+    <li>Si l’œuf se fissure, la loutre l’emporte et avance vers le nid. Un œuf du même motif le remplace au tour suivant. Chaque cachette complétée fait reculer la loutre.</li>
     <li>Gagnez ensemble en remplissant toutes les cartes-cachettes avant que la loutre n’atteigne le nid.</li>
   </ol>`;
 
@@ -191,7 +191,10 @@ function picoGame() {
       steal: 'Attention, la loutre attrape l’œuf !',
       miss: 'La loutre emporte l’œuf fissuré !',
     };
-    stage.innerHTML = `<div class="pico-table" data-phase="${phase}" data-outcome="${outcome}" data-seat="${player}" style="--otter:${17 + 60*threat/limit}%">
+    const nestSlots = shelters.flatMap(card => card.slots);
+    const carried = ['choose','saved'].includes(phase) ? -1 : nestSlots.findIndex(slot => !slot.filled && slot.egg === selected);
+    const remaining = goal() - total() - Number(carried >= 0);
+    stage.innerHTML = `<div class="pico-table" data-phase="${phase}" data-outcome="${outcome}" data-seat="${player}" style="--otter:${96 - 88 * threat / limit}%;--otter-step:${88 / limit}cqw">
       <div class="pico-hud">
         <div class="pico-turn" style="--player:${colors[player]}">● Joueur ${player + 1}</div>
         <div class="pico-progress" aria-label="${total()} œufs sauvés sur ${goal()}">🥚 ${total()} / ${goal()}</div>
@@ -199,7 +202,11 @@ function picoGame() {
           <span aria-hidden="true">🦦</span>${Array.from({length:limit},(_,i)=>`<i class="${i < threat ? 'filled' : ''}"></i>`).join('')}<span aria-hidden="true">🪺</span>
         </div>
       </div>
-      <div class="pico-stream">${actor()}<span class="pico-splash" aria-hidden="true"></span>
+      <div class="pico-stream">
+        <div class="pico-start-nest" role="img" aria-label="Nid de départ, ${remaining} œufs">
+          ${nestSlots.map((slot, i) => `<span class="pico-start-slot">${!slot.filled && i !== carried ? picoEgg(slot.egg) : ''}</span>`).join('')}
+        </div>
+        ${actor()}<span class="pico-splash" aria-hidden="true"></span>
         <div class="pico-otter"><img src="./covers/pico-otter.png" alt="La loutre" draggable="false">${phase === 'steal' || phase === 'miss' ? picoEgg(selected) : ''}</div>
       </div>
       <div class="pico-dock">
@@ -236,8 +243,8 @@ function picoGame() {
     meterTime = 0;
     position = 0;
     const progress = total() / (goal() - 1);
-    targetWidth = config().width * (1 - .47 * progress);
-    meterSpeed = config().speed * (1 - .35 * progress);
+    targetWidth = config().width * (1 - .56 * progress);
+    meterSpeed = config().speed * (1 - .42 * progress);
     targetLeft = 14 + Math.random() * (72 - targetWidth);
     lastFrame = undefined;
     render();
