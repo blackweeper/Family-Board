@@ -77,3 +77,6 @@ button:focus-visible,a:focus-visible,select:focus-visible { outline:3px solid #f
 .arcade-help { width:fit-content; margin:12px auto; color:var(--muted); text-align:center; }
 .arcade-help summary { min-height:44px; padding:11px; cursor:pointer; }
 .arcade-help .secondary { display:inline-block; min-height:44px; color:#f5f7ff; text-decoration:none; margin:3px; }
+
+a.cover-open { color:inherit; text-decoration:none; }
+a.cover-open .cover-art { aspect-ratio:3/2; overflow:hidden; }

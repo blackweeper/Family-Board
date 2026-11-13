@@ -24,6 +24,16 @@ function favoriteButton(game) {
   return `<button class="star" type="button" data-star="${game.id}" aria-label="Favori · ${game.title}" aria-pressed="${isFavorite(game)}">${isFavorite(game) ? '★' : '☆'}</button>`;
 }
 
+function coverLink(game) {
+  const art = game.artwork || (game.provider ? `./covers/${game.provider}.jpg` : '');
+  const content = `
+    <span class="cover-art" aria-hidden="true">${art ? `<img src="${art}" alt="" loading="lazy">` : game.icon}</span>
+    ${art ? `<span class="cover-play" aria-hidden="true">${game.artwork ? '↗' : '▶'}</span>` : ''}
+    <span class="cover-copy"><small>${game.artwork ? 'itch.io · Sans pub' : `${sourceLabels[game.type]} · ${game.category}`}</small><strong>${game.title}</strong></span>`;
+  if (game.artwork) return `<a class="cover-open" href="${game.url}" target="_blank" rel="noopener noreferrer">${content}</a>`;
+  return `<button class="cover-open" ${game.provider ? 'data-arcade' : 'data-detail'}="${game.id}">${content}</button>`;
+}
+
 function home(focusSelector) {
   const games = catalog.filter(game =>
     (shelf === 'all' || (shelf === 'favorites' ? isFavorite(game) : game.type === shelf)) &&
@@ -54,11 +64,7 @@ function home(focusSelector) {
       </nav>
       <div class="covers">${games.map(game => `
         <article class="cover ${game.color}">
-          <button class="cover-open" ${game.provider ? 'data-arcade' : 'data-detail'}="${game.id}">
-            <span class="cover-art" aria-hidden="true">${game.provider ? `<img src="./covers/${game.provider}.jpg" alt="" loading="lazy">` : game.icon}</span>
-            ${game.provider ? '<span class="cover-play" aria-hidden="true">▶</span>' : ''}
-            <span class="cover-copy"><small>${sourceLabels[game.type]} · ${game.category}</small><strong>${game.title}</strong></span>
-          </button>
+          ${coverLink(game)}
           ${favoriteButton(game)}
         </article>`).join('')}</div>
       ${games.length ? '' : `<p class="empty">${shelf === 'favorites' && !category ? 'Touche l’étoile d’un jeu pour l’ajouter ici.' : 'Aucun jeu dans cette catégorie.'}</p>`}

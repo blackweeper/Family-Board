@@ -1,5 +1,6 @@
 const catalog = [
   { id: 'slingshot', title: 'Family Slingshot', icon: '🐦', color: 'coral', type: 'home', category: 'Arcade', players: 'Solo', description: 'Tends l’élastique, vise et envoie tes héros faire tomber les forteresses.' },
+  { id: 'crabapult', title: 'Crabapult!', icon: '🦀', color: 'coral', type: 'web', category: 'Arcade', players: 'Solo', description: 'Tire et relâche pour lancer les crabes. Touche l’écran pendant le vol pour déclencher leur pouvoir.', url: 'https://natanr123.itch.io/crabapult', artwork: 'https://img.itch.zone/aW1nLzMxMDcxOTgyLnBuZw==/315x250%23c/FoqlRs.png' },
   { id: 'memory', title: 'Memory Battle', icon: '🧠', color: 'violet', type: 'home', category: 'Réflexion', players: '2 joueurs', description: 'Retournez les cartes à tour de rôle et retrouvez le plus de paires.' },
   { id: 'connect', title: 'Puissance 4', icon: '🔴', color: 'blue', type: 'home', category: 'À plusieurs', players: '2 joueurs', description: 'Aligne quatre jetons avant l’autre joueur. Surveille aussi les diagonales !' },
   { id: 'dice', title: 'Dé magique', icon: '🎲', color: 'mint', type: 'home', category: 'À plusieurs', players: 'À partager', description: 'Un dé numérique pour vos jeux de table, à lancer du bout du doigt.' },
