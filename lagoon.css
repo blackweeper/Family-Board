@@ -24,28 +24,27 @@
 .lagoon-crew button { width:100%; max-width:70px; padding:0; cursor:pointer; }
 .lagoon-crew button[aria-pressed=true] { outline:2px solid #fff1b6; outline-offset:3px; }
 .lagoon-crew img,.lagoon-token img,.lagoon-winner img { display:block; width:100%; height:100%; object-fit:cover; }
-.lagoon-table { min-height:clamp(450px,70svh,680px); padding:clamp(12px,3vw,32px); display:grid; align-content:space-evenly; gap:15px; background:linear-gradient(#062b3220,#062b324a),url('./covers/lagoon-board.jpg') center/cover; }
-.lagoon-fleet { display:grid; grid-template-columns:repeat(var(--players),minmax(0,1fr)); gap:clamp(4px,2vw,24px); justify-items:center; }
+.lagoon-table { min-height:clamp(520px,75svh,690px); padding:clamp(12px,3vw,32px); display:grid; grid-template: "north north north" auto "west dock east" minmax(0,1fr) "south south south" auto / minmax(60px,1fr) minmax(0,6fr) minmax(60px,1fr); place-items:center; gap:9px; background:linear-gradient(#062b3220,#062b324a),url('./covers/lagoon-board.jpg') center/cover; }
 .lagoon-raft { display:grid; justify-items:center; align-content:start; gap:4px; font-size:clamp(.7rem,1.6vw,1rem); text-shadow:0 2px 5px #00191e; }
 .lagoon-raft.current .lagoon-token span { outline:2px solid #fff5cd; outline-offset:3px; }
 .lagoon-token { position:relative; transform:rotate(var(--tilt)); transition:transform .25s ease; margin:6px 0 12px; }
 .lagoon-token::before { content:""; position:absolute; z-index:-1; bottom:-9px; left:-11%; width:122%; height:40%; border:2px solid #dfb779; border-radius:10px; background:repeating-linear-gradient(0deg,#ae7043 0 5px,#d5a469 5px 11px); box-shadow:0 5px 0 #3cc4c24d; }
-.lagoon-token span { width:clamp(48px,9vw,96px); font-size:clamp(1.6rem,5vw,3.3rem); }
+.lagoon-token span { width:clamp(48px,11svh,108px); font-size:clamp(1.6rem,5vw,3.3rem); }
 .lagoon-token.splash { animation:lagoon-splash .48s ease-out both; }
 @keyframes lagoon-splash { 35% { transform:rotate(29deg) translateY(9px); } 65% { transform:rotate(-11deg); } }
 .lagoon-bank,.lagoon-turn { color:#fff3bc; background:#092b35eb; border:1px solid #caffea50; border-radius:999px; padding:4px 10px; font-weight:800; }
 .lagoon-bank small { opacity:.8; }
 .lagoon-waves { display:flex; gap:3px; color:#e5fffaad; line-height:1; }
 .lagoon-waves .rough { color:#ffac85; font-weight:900; }
-.lagoon-dock { display:grid; justify-items:center; gap:12px; }
+.lagoon-dock { grid-area:dock; display:grid; justify-items:center; gap:9px; transform:rotate(var(--turn)); }
 .lagoon-turn { border-color:var(--crew); }
 .lagoon-hand { display:flex; gap:clamp(4px,1.5vw,16px); }
-.lagoon-card { display:grid; place-items:center; width:clamp(43px,11vw,128px); aspect-ratio:4/5; border-radius:clamp(8px,1.5vw,17px); font-size:clamp(1.25rem,5vw,3.5rem); border:2px solid #e2ffea75; box-shadow:0 5px 0 #093443,0 8px 14px #08232a7c; }
+.lagoon-card { display:grid; place-items:center; width:clamp(38px,min(10.8vw,14svh),148px); aspect-ratio:4/5; border-radius:clamp(8px,1.5vw,17px); font-size:clamp(1.25rem,5vw,3.5rem); border:2px solid #e2ffea75; box-shadow:0 5px 0 #093443,0 8px 14px #08232a7c; }
 .lagoon-card.empty-card { color:#b7fbec; background:repeating-linear-gradient(135deg,#1a5863 0 9px,#216471 9px 18px); }
 .lagoon-card.revealed { background:radial-gradient(ellipse at 50% 30%,#fff5d4,#eed49d); border-color:#ffefc8; }
-.lagoon-card.fresh { animation:lagoon-reveal .26s ease-out both; }
+.lagoon-card.fresh { animation:lagoon-reveal .34s cubic-bezier(.19,.85,.34,1.2) both; }
 .lagoon-table[data-phase=duplicate] .lagoon-card.fresh { background:#ffc2a2; border-color:#ff9676; }
-@keyframes lagoon-reveal { from { transform:scaleX(.55); opacity:.7; } }
+@keyframes lagoon-reveal { from { transform:perspective(400px) rotateY(-70deg) translateY(-12px); opacity:.45; } }
 .lagoon-message { min-height:1.4em; font-weight:800; text-align:center; text-shadow:0 2px 5px #05212c,0 0 12px #05212c; margin:0; }
 .lagoon-dock .lagoon-actions { justify-content:center; }
 .lagoon-victory { background:linear-gradient(#082e3b86,#082e3b9c),url('./covers/lagoon-board.jpg') center/cover; place-content:center; text-align:center; }
@@ -68,5 +67,48 @@
 @keyframes lagoon-pearl { 45% { transform:scale(1.22); background:#d8ffe9; color:#11362a; } }
 @media(prefers-reduced-motion:reduce) { .lagoon-table[data-phase=banked] .lagoon-raft.current .lagoon-bank { animation:none; } }
 
-.lagoon-choices [data-seat],.lagoon-action[data-next],.lagoon-turn { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
-.lagoon-choices [data-seat] img,.lagoon-action[data-next] img,.lagoon-turn img { width:24px; height:24px; object-fit:cover; border-radius:50%; }
+.lagoon-choices [data-seat],.lagoon-turn { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+.lagoon-choices [data-seat] img,.lagoon-turn img { width:24px; height:24px; object-fit:cover; border-radius:50%; }
+
+.lagoon-seat-0 { grid-area:south; }
+.lagoon-seat-1 { grid-area:east; }
+.lagoon-seat-2 { grid-area:north; }
+.lagoon-seat-3 { grid-area:west; }
+.lagoon-raft { align-self:center; position:relative; z-index:1; text-align:center; }
+.lagoon-table[data-new-turn] .lagoon-raft.current { animation:lagoon-arrive .33s ease-out; }
+.lagoon-table[data-phase=turn] .lagoon-raft.current .lagoon-token { animation:lagoon-float 2.5s ease-in-out infinite; }
+.lagoon-table[data-new-turn] .lagoon-dock { animation:lagoon-dock-enter .27s ease-out; }
+.lagoon-table[data-phase=duplicate] .lagoon-card.fresh { animation:lagoon-duplicate .46s ease-out; }
+.lagoon-table[data-phase=duplicate] .lagoon-raft.current .lagoon-token:not(.splash) { animation:lagoon-rock .53s ease-out; }
+.lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-card { width:clamp(36px,min(7.5svh,9vw),88px); }
+.lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-hand { gap:clamp(4px,.65svh,7px); }
+@media(min-width:681px) {
+  .lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-dock { --side-offset:clamp(20px,4vw,55px); transform:translateX(var(--side-offset)) rotate(var(--turn)); }
+  .lagoon-table[data-active="3"] .lagoon-dock { --side-offset:clamp(-55px,-4vw,-20px); }
+}
+.lagoon-message { max-width:31ch; }
+.lagoon-dock .lagoon-actions { flex-wrap:nowrap; }
+.lagoon-winner { animation:lagoon-arrive .45s ease-out; }
+@keyframes lagoon-arrive { from { opacity:.65; scale:.91; } }
+@keyframes lagoon-dock-enter { from { opacity:.6; scale:.95; } }
+@keyframes lagoon-float { 50% { transform:translateY(-4px) rotate(calc(var(--tilt) + 2deg)); } }
+@keyframes lagoon-duplicate { 25% { transform:translateX(-6px) rotate(-6deg); } 55% { transform:translateX(5px) rotate(4deg); } }
+@keyframes lagoon-rock { 25% { transform:rotate(calc(var(--tilt) + 14deg)); } 58% { transform:rotate(calc(var(--tilt) - 8deg)); } }
+@media(max-height:680px) and (min-width:681px) {
+  .lagoon-table { padding:10px; }
+  .lagoon-token span { width:clamp(44px,9svh,68px); }
+  .lagoon-raft { gap:2px; }
+  .lagoon-card { width:clamp(38px,12svh,85px); }
+}
+@media(max-width:680px) {
+  .lagoon-table { grid-template: "north east west" auto "dock dock dock" 1fr "south south south" auto / repeat(3,minmax(0,1fr)); padding:10px; }
+  .lagoon-dock { transform:none; width:100%; }
+  .lagoon-token span { width:clamp(43px,11vw,70px); }
+  .lagoon-card,.lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-card { width:clamp(28px,13vw,74px); }
+  .lagoon-bar .secondary { padding-inline:8px; font-size:.85rem; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .lagoon-table .lagoon-dock,.lagoon-table .lagoon-raft.current,
+  .lagoon-table[data-phase] .lagoon-raft.current .lagoon-token,
+  .lagoon-table[data-phase] .lagoon-card.fresh,.lagoon-winner { animation:none; }
+}

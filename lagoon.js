@@ -16,7 +16,7 @@ const lagoonRules = `
   <h2>Comment jouer ?</h2>
   <ol>
     <li>À ton tour, touche <strong>Piocher</strong>. Tu peux révéler jusqu’à cinq trésors.</li>
-    <li><strong>Encaisser</strong> rapporte une perle par trésor différent : 1, 2, 3 ou 4 perles selon le nombre de cartes révélées.</li>
+    <li><strong>Encaisser</strong> rapporte une perle par trésor différent : 1, 2, 3 ou 4 perles selon le nombre de cartes révélées. La main passe ensuite automatiquement.</li>
     <li>Un trésor en double fait tanguer ton radeau. Tu perds les trouvailles de ce tour et la main passe au suivant.</li>
     <li>Au troisième tangage, plouf ! Tu perds deux perles en réserve, avec un minimum de zéro. Ton radeau repart droit.</li>
     <li><strong>Cinq trésors différents dans le même tour</strong> donnent la victoire immédiate. Tu peux aussi gagner en mettant dix perles à l’abri au fil des tours.</li>
@@ -35,6 +35,11 @@ function lagoonGame() {
   let fullChest = false;
   let muted = false;
   let audio;
+  let musicTimer;
+  let turnTimer;
+  let beat = 0;
+  const directions = ['en bas', 'à droite', 'en haut', 'à gauche'];
+  const rotation = [0, -90, 180, 90];
 
   app.innerHTML = `
     <section class="lagoon">
@@ -54,23 +59,60 @@ function lagoonGame() {
   const focus = selector => stage.querySelector(selector)?.focus({ preventScroll: true });
   const portrait = crew => `<img src="./covers/lagoon-${crew.portrait}.jpg" alt="" draggable="false">`;
 
-  function sound(notes) {
+  function note(frequency, delay, volume, duration, type) {
+    const start = audio.currentTime + delay;
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+    oscillator.type = type;
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(.001, start);
+    gain.gain.exponentialRampToValueAtTime(volume, start + .018);
+    gain.gain.exponentialRampToValueAtTime(.001, start + duration);
+    oscillator.connect(gain).connect(audio.destination);
+    oscillator.start(start);
+    oscillator.stop(start + duration + .01);
+  }
+
+  function sound(notes, type = 'triangle') {
     if (muted || !window.AudioContext) return;
     audio ??= new AudioContext();
     if (audio.state === 'suspended') audio.resume().catch(() => {});
-    notes.forEach((frequency, i) => {
-      const start = audio.currentTime + i * .075;
-      const oscillator = audio.createOscillator();
-      const gain = audio.createGain();
-      oscillator.type = 'sine';
-      oscillator.frequency.value = frequency;
-      gain.gain.setValueAtTime(.001, start);
-      gain.gain.exponentialRampToValueAtTime(.11, start + .018);
-      gain.gain.exponentialRampToValueAtTime(.001, start + .18);
-      oscillator.connect(gain).connect(audio.destination);
-      oscillator.start(start);
-      oscillator.stop(start + .19);
-    });
+    notes.forEach((pitch, i) => note(pitch, i * .095, .10, .25, type));
+  }
+
+  function stopMusic() {
+    clearInterval(musicTimer);
+    musicTimer = undefined;
+  }
+
+  function startMusic() {
+    if (muted || !window.AudioContext || musicTimer !== undefined) return;
+    audio ??= new AudioContext();
+    audio.resume().catch(() => {});
+    // A quiet six-beat jig, with a plucked bass on the first and fourth beats.
+    const melody = [
+      294, 440, 349, 440, 523, 440, 392, 466, 392, 349, 330, 294,
+      262, 392, 330, 392, 466, 392, 440, 349, 330, 294, 0, 0,
+    ];
+    const bass = [147, 98, 131, 110];
+    musicTimer = setInterval(() => {
+      if (audio.state !== 'running') return;
+      const step = beat % melody.length;
+      if (melody[step]) {
+        note(melody[step], 0, .025, .22, 'triangle');
+        note(melody[step] * 2, 0, .008, .10, 'sine');
+      }
+      if (step % 3 === 0) note(bass[Math.floor(step / 6)], 0, .036, .32, 'sine');
+      beat++;
+    }, 230);
+  }
+
+  function passTurn() {
+    render();
+    turnTimer = setTimeout(() => {
+      active = (active + 1) % count;
+      startTurn();
+    }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 180 : 620);
   }
 
   function setup() {
@@ -85,7 +127,7 @@ function lagoonGame() {
           </fieldset>
           <fieldset><legend>Équipages</legend>
             <div class="lagoon-choices">
-              ${lineup.slice(0, count).map((crew, i) => `<button data-seat="${i}" aria-label="Joueur ${i + 1}, ${crew.name}" aria-pressed="${seat === i}">${i + 1} ${portrait(crew)}</button>`).join('')}
+              ${lineup.slice(0, count).map((crew, i) => `<button data-seat="${i}" aria-label="Joueur ${i + 1} ${directions[i]}, ${crew.name}" aria-pressed="${seat === i}">${i + 1} ${portrait(crew)}</button>`).join('')}
             </div>
             <div class="lagoon-crew" aria-label="Choisir l’animal du joueur ${seat + 1}">
               ${lagoonCrew.map((crew,i) => `<button data-crew="${i}" style="--crew:${crew.color}" aria-label="${crew.name}" aria-pressed="${lineup[seat] === crew}">${portrait(crew)}</button>`).join('')}
@@ -100,6 +142,8 @@ function lagoonGame() {
   function start() {
     fleet = lineup.slice(0, count).map(crew => ({ ...crew, bank: 0, tilt: 0 }));
     active = 0;
+    beat = 0;
+    startMusic();
     startTurn();
     sound([392, 523, 659]);
   }
@@ -109,8 +153,9 @@ function lagoonGame() {
     phase = 'turn';
     splashed = false;
     fullChest = false;
-    message = `À ${fleet[active].name} de jouer !`;
+    message = `Joueur ${active + 1} · À ${fleet[active].name} de jouer !`;
     render();
+    stage.querySelector('.lagoon-table').setAttribute('data-new-turn', '');
     focus('[data-draw]');
   }
 
@@ -142,9 +187,8 @@ function lagoonGame() {
       splashed = true;
       message = lost ? `Plouf ! −${lost} ${lost === 1 ? 'perle' : 'perles'} en réserve.` : 'Plouf ! Le radeau repart droit.';
     }
-    sound(splashed ? [330, 196, 110] : [349, 247]);
-    render();
-    focus('[data-next]');
+    sound(splashed ? [330, 196, 110] : [392, 311, 196]);
+    passTurn();
   }
 
   function bank() {
@@ -158,23 +202,23 @@ function lagoonGame() {
     }
     phase = 'banked';
     message = `+${award} ${award === 1 ? 'perle' : 'perles'} à l’abri !`;
-    sound([523, 659, 784]);
-    render();
-    focus('[data-next]');
+    sound([523, 659, 784, 1047]);
+    passTurn();
   }
 
   function win() {
     phase = 'won';
+    stopMusic();
     sound([523, 659, 784, 1047]);
     render();
     focus('[data-start]');
   }
 
   function raft(crew, index) {
-    return `<div role="group" class="lagoon-raft ${index === active ? 'current' : ''}" style="--crew:${crew.color}"
-      aria-label="${crew.name}, ${crew.bank} perles, ${crew.tilt} tangages"${index === active ? ' aria-current="true"' : ''}>
+    return `<div role="group" class="lagoon-raft lagoon-seat-${index} ${index === active ? 'current' : ''}" style="--crew:${crew.color}"
+      aria-label="Joueur ${index+1} ${directions[index]}, ${crew.name}, ${crew.bank} perles, ${crew.tilt} tangages"${index === active ? ' aria-current="true"' : ''}>
       <div class="lagoon-token ${index === active && splashed ? 'splash' : ''}" style="--tilt:${crew.tilt * 8}deg" aria-hidden="true"><span>${portrait(crew)}</span></div>
-      <strong>${crew.name}</strong>
+      <strong>${index+1} · ${crew.name}</strong>
       <span class="lagoon-bank" aria-hidden="true">◈ ${crew.bank}<small>/${lagoonGoal}</small></span>
       <div class="lagoon-waves" aria-hidden="true">${[0,1,2].map(n => `<span class="${n < crew.tilt ? 'rough' : ''}">≈</span>`).join('')}</div>
     </div>`;
@@ -182,6 +226,7 @@ function lagoonGame() {
 
   function render() {
     const crew = fleet[active];
+    app.querySelector('#lagoon-rules').disabled = phase === 'banked' || phase === 'duplicate';
     if (phase === 'won') {
       stage.innerHTML = `<div class="lagoon-victory" style="--crew:${crew.color}">
         <div class="lagoon-victory-copy">
@@ -197,10 +242,10 @@ function lagoonGame() {
       return;
     }
     stage.innerHTML = `
-      <div class="lagoon-table" data-phase="${phase}">
-        <div class="lagoon-fleet" style="--players:${count}">${fleet.map(raft).join('')}</div>
-        <div class="lagoon-dock">
-          <div class="lagoon-turn" style="--crew:${crew.color}">${portrait(crew)} Tour de ${crew.name}</div>
+      <div class="lagoon-table" data-phase="${phase}" data-active="${active}">
+        ${fleet.map(raft).join('')}
+        <div class="lagoon-dock" style="--turn:${rotation[active]}deg">
+          <div class="lagoon-turn" style="--crew:${crew.color}">${portrait(crew)} Joueur ${active+1} · ${crew.name}</div>
           <div class="lagoon-hand" aria-label="Trésors du tour">${Array.from({length:5}, (_, i) => {
             const id = haul[i];
             const treasure = lagoonTreasures[id];
@@ -208,10 +253,10 @@ function lagoonGame() {
               '<div class="lagoon-card empty-card" aria-hidden="true">✧</div>';
           }).join('')}</div>
           <p class="lagoon-message" role="status">${message}</p>
-          <div class="lagoon-actions">${phase === 'turn' ? `
-            <button class="lagoon-action" data-draw ${haul.length >= 5 ? 'disabled' : ''}>▣ Piocher</button>
-            <button class="lagoon-action bank" data-bank ${haul.length ? '' : 'disabled'}>◈ Encaisser${haul.length ? ' ' + haul.length : ''}</button>` :
-            `<button class="lagoon-action" data-next>${portrait(fleet[(active + 1) % count])} Au suivant →</button>`}</div>
+          <div class="lagoon-actions">
+            <button class="lagoon-action" data-draw ${phase === 'turn' ? '' : 'disabled'}>▣ Piocher</button>
+            <button class="lagoon-action bank" data-bank ${phase === 'turn' && haul.length ? '' : 'disabled'}>◈ Encaisser${haul.length ? ' ' + haul.length : ''}</button>
+          </div>
         </div>
       </div>`;
   }
@@ -241,21 +286,24 @@ function lagoonGame() {
       focus('[data-start]');
     } else if (button.hasAttribute('data-draw')) draw();
     else if (button.hasAttribute('data-bank')) bank();
-    else if (button.hasAttribute('data-next') && ['duplicate', 'banked'].includes(phase)) {
-      active = (active + 1) % count;
-      startTurn();
-    }
   });
 
   app.querySelector('#lagoon-rules').onclick = () => rules.showModal();
   app.querySelector('#lagoon-sound').onclick = event => {
     muted = !muted;
-    if (muted) audio?.suspend().catch(() => {});
-    else audio?.resume().catch(() => {});
+    if (muted) {
+      stopMusic();
+      audio?.suspend().catch(() => {});
+    } else {
+      audio?.resume().catch(() => {});
+      if (['turn', 'banked', 'duplicate'].includes(phase)) startMusic();
+    }
     event.currentTarget.setAttribute('aria-pressed', !muted);
     event.currentTarget.textContent = muted ? '🔇 Son' : '🔊 Son';
   };
   app.querySelector('#back').onclick = () => {
+    clearTimeout(turnTimer);
+    stopMusic();
     audio?.close().catch(() => {});
     home('[data-detail="lagoon"]');
   };
