@@ -83,6 +83,8 @@
 .lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-card { width:clamp(36px,min(7.5svh,9vw),88px); }
 .lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-hand { gap:clamp(4px,.65svh,7px); }
 @media(min-width:681px) {
+  .lagoon-seat-1 .lagoon-token { rotate:-90deg; }
+  .lagoon-seat-3 .lagoon-token { rotate:90deg; }
   .lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-dock { --side-offset:clamp(20px,4vw,55px); transform:translateX(var(--side-offset)) rotate(var(--turn)); }
   .lagoon-table[data-active="3"] .lagoon-dock { --side-offset:clamp(-55px,-4vw,-20px); }
 }
