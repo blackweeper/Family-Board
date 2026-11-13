@@ -1,7 +1,7 @@
 const picoEggs = ['Azur', 'Soleil', 'Prune', 'Menthe'];
 const picoModes = {
-  little: { cards:3, limit:5, speed:1080, width:19, name:'Petits' },
-  family: { cards:4, limit:4, speed:840, width:15, name:'Famille' },
+  little: { cards:3, limit:5, speed:1160, width:22, name:'Petits' },
+  family: { cards:4, limit:4, speed:910, width:17, name:'Famille' },
 };
 const picoRecipes = [
   [0,0,1], [1,1,2], [2,2,3], [3,3,0],
@@ -179,7 +179,7 @@ function picoGame() {
   }
 
   function render() {
-    app.querySelector('#pico-rules').disabled = ['slide','place','saved','steal'].includes(phase);
+    app.querySelector('#pico-rules').disabled = ['slide','place','saved','steal','miss'].includes(phase);
     const { limit } = config();
     const active = phase === 'choose' || phase === 'aim';
     const stageText = {
@@ -203,7 +203,7 @@ function picoGame() {
         </div>
       </div>
       <div class="pico-stream">
-        <div class="pico-start-nest" role="img" aria-label="Nid de départ, ${remaining} œufs">
+        <div class="pico-start-nest" data-capacity="${goal()}" role="img" aria-label="Nid de départ, ${remaining} œufs">
           ${nestSlots.map((slot, i) => `<span class="pico-start-slot">${!slot.filled && i !== carried ? picoEgg(slot.egg) : ''}</span>`).join('')}
         </div>
         ${actor()}<span class="pico-splash" aria-hidden="true"></span>
@@ -215,7 +215,6 @@ function picoGame() {
         <div class="pico-tools">
           ${active ? (phase === 'choose' ? picoEggs.map((name,i)=>`<button class="pico-choice" data-egg="${i}" aria-label="Œuf ${name}" ${!shelters.some(card => needs(card,i)) ? 'disabled' : ''}>${picoEgg(i)}</button>`).join('') :
             '<button class="secondary" data-cancel>↶ Changer d’œuf</button><button class="pico-action" data-slide>➜ Glisser</button>') : ''}
-          ${phase === 'miss' ? '<button class="pico-action" data-next>Au suivant →</button>' : ''}
         </div>
       </div>
       <div class="pico-nests" aria-label="Cartes-cachettes">
@@ -243,8 +242,8 @@ function picoGame() {
     meterTime = 0;
     position = 0;
     const progress = total() / (goal() - 1);
-    targetWidth = config().width * (1 - .56 * progress);
-    meterSpeed = config().speed * (1 - .42 * progress);
+    targetWidth = config().width * (1 - .52 * progress);
+    meterSpeed = config().speed * (1 - .38 * progress);
     targetLeft = 14 + Math.random() * (72 - targetWidth);
     lastFrame = undefined;
     render();
@@ -277,12 +276,9 @@ function picoGame() {
       render();
       flyEgg(stage.querySelector('.pico-otter > .pico-egg'), reduced ? 0 : 430);
       timer = setTimeout(() => {
-        if (threat >= config().limit) finish(false);
-        else {
-          phase = 'miss';
-          render();
-          focus('[data-next]');
-        }
+        phase = 'miss';
+        render();
+        timer = setTimeout(threat >= config().limit ? () => finish(false) : next, 800);
       }, reduced ? 0 : 640);
     }
   }
@@ -366,7 +362,6 @@ function picoGame() {
       render();
       focus('[data-egg]:enabled');
     } else if (phase === 'aim' && button.hasAttribute('data-slide')) slide();
-    else if (phase === 'miss' && button.hasAttribute('data-next')) next();
   });
 
   app.querySelector('#pico-rules').onclick = () => {
