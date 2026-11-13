@@ -16,7 +16,7 @@ const lagoonRules = `
   <h2>Comment jouer ?</h2>
   <ol>
     <li>À ton tour, touche <strong>Piocher</strong>. Tu peux révéler jusqu’à cinq trésors.</li>
-    <li><strong>Encaisser</strong> rapporte 1 perle avec 2 trésors, 2 perles avec 3 trésors et 3 perles avec 4 trésors. Avec un seul trésor, tu peux passer sans marquer.</li>
+    <li><strong>Encaisser</strong> rapporte une perle par trésor différent : 1, 2, 3 ou 4 perles selon le nombre de cartes révélées.</li>
     <li>Un trésor en double fait tanguer ton radeau. Tu perds les trouvailles de ce tour et la main passe au suivant.</li>
     <li>Au troisième tangage, plouf ! Tu perds deux perles en réserve, avec un minimum de zéro. Ton radeau repart droit.</li>
     <li><strong>Cinq trésors différents dans le même tour</strong> donnent la victoire immédiate. Tu peux aussi gagner en mettant dix perles à l’abri au fil des tours.</li>
@@ -53,7 +53,6 @@ function lagoonGame() {
   const rules = app.querySelector('.lagoon-rules');
   const focus = selector => stage.querySelector(selector)?.focus({ preventScroll: true });
   const portrait = crew => `<img src="./covers/lagoon-${crew.portrait}.jpg" alt="" draggable="false">`;
-  const bankValue = () => Math.max(0, haul.length - 1);
 
   function sound(notes) {
     if (muted || !window.AudioContext) return;
@@ -126,7 +125,7 @@ function lagoonGame() {
         win();
         return;
       }
-      message = haul.length === 1 ? 'Encore un trésor ou je passe ?' : 'Encore ou j’encaisse ?';
+      message = 'Encore ou j’encaisse ?';
       sound([523, 659]);
       render();
       focus(haul.length < 5 ? '[data-draw]' : '[data-bank]');
@@ -151,15 +150,15 @@ function lagoonGame() {
   function bank() {
     if (phase !== 'turn' || !haul.length) return;
     const crew = fleet[active];
-    const award = bankValue();
+    const award = haul.length;
     crew.bank += award;
     if (crew.bank >= lagoonGoal) {
       win();
       return;
     }
     phase = 'banked';
-    message = award ? `+${award} ${award === 1 ? 'perle' : 'perles'} à l’abri !` : 'Tour passé.';
-    if (award) sound([523, 659, 784]);
+    message = `+${award} ${award === 1 ? 'perle' : 'perles'} à l’abri !`;
+    sound([523, 659, 784]);
     render();
     focus('[data-next]');
   }
@@ -211,7 +210,7 @@ function lagoonGame() {
           <p class="lagoon-message" role="status">${message}</p>
           <div class="lagoon-actions">${phase === 'turn' ? `
             <button class="lagoon-action" data-draw ${haul.length >= 5 ? 'disabled' : ''}>▣ Piocher</button>
-            <button class="lagoon-action bank" data-bank ${haul.length ? '' : 'disabled'}>${haul.length === 1 ? 'Passer' : `◈ Encaisser${haul.length ? ' ' + bankValue() : ''}`}</button>` :
+            <button class="lagoon-action bank" data-bank ${haul.length ? '' : 'disabled'}>◈ Encaisser${haul.length ? ' ' + haul.length : ''}</button>` :
             `<button class="lagoon-action" data-next>${portrait(fleet[(active + 1) % count])} Au suivant →</button>`}</div>
         </div>
       </div>`;
