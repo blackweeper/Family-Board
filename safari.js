@@ -1,4 +1,21 @@
-const safariAnimals = [['🐼','Panda','panda'], ['🦊','Renard','fox'], ['🐸','Grenouille','frog'], ['🦁','Lion','lion']];
+const safariAnimals = [
+  ['🐼', 'Panda', 'panda'],
+  ['🦊', 'Renard', 'fox'],
+  ['🐸', 'Grenouille', 'frog'],
+  ['🦁', 'Lion', 'lion'],
+  ['🐘', 'Éléphant', 'elephant'],
+  ['🦓', 'Zèbre', 'zebra'],
+  ['🦒', 'Girafe', 'giraffe'],
+  ['🦛', 'Hippopotame', 'hippo', 'Hippo'],
+  ['🐦', 'Toucan', 'toucan'],
+  ['🐵', 'Singe', 'monkey'],
+  ['🐢', 'Tortue', 'turtle'],
+  ['🦏', 'Rhinocéros', 'rhino', 'Rhino'],
+];
+const safariPace = {
+  little: { wait: 820, variation: 520, react: 1950, result: 660 },
+  family: { wait: 510, variation: 430, react: 1180, result: 560 },
+};
 const safariRules = `
   <h2>Comment jouer ?</h2>
   <ol>
@@ -16,13 +33,14 @@ function safariPortrait(animal) {
 function safariGame() {
   let playerCount = 4;
   let selectedSeat = 0;
-  const players = [...safariAnimals];
+  const players = safariAnimals.slice(0, 4);
   let mode = 'little';
   let soundOn = true;
   let scores = [];
   let blocked = new Set();
   let phase = 'setup';
   let target, card, matches;
+  let deck = [];
   let timer;
   let audio;
   let musicTimer;
@@ -140,9 +158,9 @@ function safariGame() {
           </div>
           <div class="safari-pickers safari-animal-options" aria-label="Animaux pour le joueur ${selectedSeat + 1}">
             ${safariAnimals.map((animal, index) => `
-              <button class="safari-picker" data-animal="${index}" aria-pressed="${players[selectedSeat] === animal}">
+              <button class="safari-picker" data-animal="${index}" aria-label="${animal[1]}" aria-pressed="${players[selectedSeat] === animal}">
                 <span class="safari-picker-portrait">${safariPortrait(animal)}</span>
-                <span>${animal[1]}</span>
+                <span>${animal[3] || animal[1]}</span>
               </button>`).join('')}
           </div>
         </section>
@@ -153,28 +171,35 @@ function safariGame() {
     beat = 0;
     startMusic();
     scores = Array(playerCount).fill(0);
+    deck = [];
     nextRound();
   }
 
   function nextRound() {
     blocked = new Set();
     phase = 'ready';
-    const animals = safariAnimals.slice(0, mode === 'little' ? 3 : 5);
-    target = pick(animals);
+    const pace = safariPace[mode];
+    if (!deck.length) deck = [...safariAnimals];
+    target = pick(deck.filter(animal => animal !== target));
+    deck.splice(deck.indexOf(target), 1);
     const surprise = mode === 'family' && Math.random() < .12;
-    card = surprise ? ['⚡','Éclair'] : Math.random() < .56 ? target : pick(animals.filter(animal => animal !== target));
+    card = surprise ? ['⚡','Éclair'] : Math.random() < .56 ? target : pick(safariAnimals.filter(animal => animal !== target));
     matches = surprise || target === card;
     draw('Attends…');
     schedule(() => {
       phase = 'reveal';
       effect('reveal');
       draw(card[0] === '⚡' ? '⚡' : 'À toi de regarder !');
-      schedule(() => endRound(blocked.size === playerCount ? 'Tour suivant' : matches ? 'Bien essayé !' : 'Bien vu !'), mode === 'little' ? 2450 : 1450);
-    }, (mode === 'little' ? 1350 : 780) + Math.random() * 800);
+      schedule(() => endRound(blocked.size === playerCount ? 'Tour suivant' : matches ? 'Bien essayé !' : 'Bien vu !'), pace.react);
+    }, pace.wait + Math.random() * pace.variation);
   }
 
-  function stars(score) {
-    return '★'.repeat(score) + '☆'.repeat(5 - score);
+  function stars(score, earned = false) {
+    return Array.from({ length: 5 }, (_, index) => {
+      const filled = index < score ? ' is-filled' : '';
+      const pop = earned && index === score - 1 ? ' is-earned' : '';
+      return `<span class="safari-star${filled}${pop}"></span>`;
+    }).join('');
   }
 
   function seatLabel(index) {
@@ -182,7 +207,7 @@ function safariGame() {
     return `${players[index][1]}, ${score} ${score === 1 ? 'étoile' : 'étoiles'}${blocked.has(index) ? ', en pause pour ce tour' : ''}`;
   }
 
-  function draw(message) {
+  function draw(message, scorer = -1) {
     stage.innerHTML = `
       <div class="safari-table seats-${playerCount}" data-phase="${phase}">
         <div class="safari-center">
@@ -196,15 +221,15 @@ function safariGame() {
           <button class="safari-seat seat-${index} ${blocked.has(index) ? 'seat-blocked' : ''}" data-seat="${index}"
             aria-label="${seatLabel(index)}">
             <span class="safari-mascot">${safariPortrait(players[index])}</span>
-            <span class="safari-stars" aria-hidden="true">${stars(score)}</span>
+            <span class="safari-stars" aria-hidden="true">${stars(score, scorer === index)}</span>
           </button>`).join('')}
       </div>`;
   }
 
-  function endRound(message) {
+  function endRound(message, scorer = -1) {
     phase = 'result';
-    draw(message);
-    schedule(nextRound, 1050);
+    draw(message, scorer);
+    schedule(nextRound, safariPace[mode].result);
   }
 
   function react(index, button) {
@@ -214,7 +239,7 @@ function safariGame() {
       scores[index] = Math.max(0, scores[index] - 1);
       effect('miss');
       button.classList.add('seat-blocked');
-      button.querySelector('.safari-stars').textContent = stars(scores[index]);
+      button.querySelector('.safari-stars').innerHTML = stars(scores[index]);
       button.setAttribute('aria-label', seatLabel(index));
       if (blocked.size === playerCount && phase === 'reveal') endRound('Tour suivant');
       return;
@@ -223,7 +248,7 @@ function safariGame() {
     const winner = players[index];
     if (scores[index] < 5) {
       effect('point');
-      endRound(winner[0] + ' + ⭐');
+      endRound('Une étoile gagnée !', index);
       return;
     }
     clearTimeout(timer);
@@ -234,7 +259,7 @@ function safariGame() {
       <div class="safari-victory">
         <span class="safari-winner" aria-hidden="true">${safariPortrait(winner)}</span>
         <h1>${winner[1]} gagne !</h1>
-        <p aria-label="Cinq étoiles">★★★★★</p>
+        <p class="safari-stars" aria-label="Cinq étoiles">${stars(5, true)}</p>
         <button class="safari-start" data-start>↻ Rejouer</button>
         <button class="secondary" data-setup>Changer les joueurs</button>
       </div>`;
@@ -262,7 +287,8 @@ function safariGame() {
     if (button.hasAttribute('data-animal')) {
       const animal = safariAnimals[Number(button.dataset.animal)];
       const previousSeat = players.indexOf(animal);
-      [players[selectedSeat], players[previousSeat]] = [animal, players[selectedSeat]];
+      if (previousSeat !== -1) players[previousSeat] = players[selectedSeat];
+      players[selectedSeat] = animal;
       setup();
       stage.querySelector(`[data-animal="${button.dataset.animal}"]`).focus({ preventScroll: true });
     }

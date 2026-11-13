@@ -20,16 +20,56 @@
 .safari-status { min-height:1.5em; margin:.75rem 0 0; font-weight:800; }
 .safari-seat { min-width:0; border:0; border-radius:18px; display:grid; place-content:center; gap:5px; background:transparent; color:#fff8d9; cursor:pointer; touch-action:none; user-select:none; -webkit-tap-highlight-color:transparent; appearance:none; }
 .safari-mascot { font-size:clamp(26px,5vw,60px); line-height:1; }
-.safari-stars { font-size:clamp(11px,1.8vw,24px); font-weight:900; white-space:nowrap; text-shadow:0 2px 3px #081a12,0 0 6px #081a12; }
+.safari-stars {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:clamp(3px,.4vw,6px);
+}
+.safari-star {
+  position:relative;
+  width:clamp(10px,1.55vw,18px);
+  aspect-ratio:1;
+  flex:none;
+}
+.safari-star::before,.safari-star.is-earned::after {
+  content:"";
+  position:absolute;
+  inset:0;
+}
+.safari-star::before {
+  background:#fff4d7;
+  opacity:.63;
+  clip-path:polygon(50% 5%,63% 35%,96% 39%,72% 61%,78% 94%,50% 78%,22% 94%,28% 61%,4% 39%,37% 35%);
+}
+.safari-star.is-filled::before { background:#ffda52; opacity:1; }
+.safari-star.is-earned { z-index:1; }
+.safari-star.is-earned::before { animation:safari-star-pop .49s cubic-bezier(.16,1,.3,1) both; }
+.safari-star.is-earned::after {
+  border:1.5px solid #ffdc72;
+  border-radius:50%;
+  animation:safari-star-ring .49s ease-out both;
+}
+@keyframes safari-star-pop {
+  0% { transform:scale(.5) rotate(-23deg); }
+  44% { transform:scale(1.65) rotate(12deg); }
+  73% { transform:scale(.94) rotate(-4deg); }
+  100% { transform:scale(1); }
+}
+@keyframes safari-star-ring {
+  from { transform:scale(.55); opacity:.9; }
+  to { transform:scale(2.2); opacity:0; }
+}
+.safari-victory .safari-star { width:clamp(23px,4vw,38px); }
 .seat-0 { grid-area:3/2; --seat:#f9d981; }
 .seat-1 { grid-area:1/2; --seat:#ff9d81; }
-.seat-1 span { transform:rotate(180deg); }
+.seat-1 > span { transform:rotate(180deg); }
 .seat-2 { grid-area:2/1; --seat:#92e4b2; }
 .seat-3 { grid-area:2/3; --seat:#a8caff; }
 .seat-blocked { opacity:.38; }
 .safari-victory { text-align:center; place-content:center; background:radial-gradient(ellipse,#266449,#102e26); gap:12px; }
 .safari-victory span { font-size:clamp(64px,14vw,145px); }
-.safari-victory p { margin:0; color:#ffda72; font-size:2rem; }
+.safari-victory p { margin:0; }
 .safari-rules { width:min(520px,calc(100% - 28px)); max-height:calc(100% - 28px); border:1px solid #abedac; border-radius:22px; color:#fff8e7; background:#153b32; padding:24px; }
 .safari-rules::backdrop { background:#061b17dd; }
 .safari-rules h2 { margin-top:0; }
@@ -67,7 +107,10 @@
 .safari-winner { width:clamp(88px,17vw,170px); aspect-ratio:1; margin:auto; }
 .safari-seat:focus-visible { outline:0; }
 .safari-seat:focus-visible .safari-mascot { outline:3px solid #fff3cd; outline-offset:4px; }
-@media(prefers-reduced-motion:reduce) { .safari-table[data-phase=reveal] .safari-card:last-child { animation:none; } }
+@media(prefers-reduced-motion:reduce) {
+  .safari-table[data-phase=reveal] .safari-card:last-child,.safari-star.is-earned::before { animation:none; }
+  .safari-star.is-earned::after { display:none; }
+}
 
 .safari-lobby {
   grid-template-columns:minmax(250px,.8fr) minmax(0,1.2fr);
@@ -85,6 +128,7 @@
 .safari-selection h2 { margin:0; font-size:clamp(1.4rem,2.7vw,2rem); }
 .safari-selection p { margin:.5rem 0 1rem; color:#e5edcc; line-height:1.35; }
 .safari-pickers { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(4px,1vw,12px); }
+.safari-animal-options { grid-template-columns:repeat(6,minmax(0,1fr)); }
 .safari-pickers + .safari-pickers { border-top:1px solid #eacf8a45; margin-top:14px; padding-top:14px; }
 .safari-picker {
   display:grid;
@@ -98,7 +142,8 @@
   border:2px solid transparent;
   border-radius:13px;
   font-weight:700;
-  font-size:clamp(.7rem,1.45vw,.95rem);
+  font-size:clamp(.68rem,1.2vw,.9rem);
+  overflow-wrap:anywhere;
   cursor:pointer;
 }
 .safari-picker[aria-pressed=true] { border-color:#ffdc85; background:#ffdc8526; }
@@ -111,4 +156,5 @@
 @media(max-width:690px) {
   .safari-lobby { grid-template-columns:1fr; }
   .safari-selection { margin-top:0; }
+  .safari-animal-options { grid-template-columns:repeat(4,minmax(0,1fr)); }
 }
