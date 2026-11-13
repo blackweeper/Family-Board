@@ -162,7 +162,7 @@ function tableGame() {
       const player = players[i];
       return `<div class="table-player table-seat-${i} ${i === active ? 'current' : ''}" style="--player:${player.color}" role="group"
         aria-label="Joueur ${i+1} ${player.name}, ${pile.length} ${pile.length === 1 ? 'carte' : 'cartes'}"${i === active ? ' aria-current="true"' : ''}>
-        <div class="table-player-label"><strong>${i+1} · ${player.name}</strong><small>${pile.length} / ${tableHandSize}</small></div>
+        <div class="table-player-label"><strong>${i+1} · ${player.name}</strong><span class="table-count" aria-hidden="true"><i></i>${pile.length}</span></div>
         <div class="table-hand" aria-hidden="true">${pile.map(()=>'<span class="table-stack">✦</span>').join('')}</div>
       </div>`;
     }).join('');
@@ -182,17 +182,17 @@ function tableGame() {
       <div class="table-center">
         <span class="table-turn" style="--player:${player.color}">● Tour de ${player.name}</span>
         <div class="table-discard" data-count="${discarded}">
-          ${topCard !== null ? `<figure class="table-card ${revealed ? 'fresh' : ''}" aria-label="Carte révélée : ${tableMenu[topCard]}">${tableImage(topCard)}<figcaption>${tableMenu[topCard]}</figcaption></figure>` :
+          ${topCard !== null ? `<figure class="table-card ${revealed ? 'fresh' : ''}" aria-label="Carte révélée : ${tableMenu[topCard]}">${tableImage(topCard)}</figure>` :
             '<div class="table-card table-back" role="img" aria-label="Carte face cachée">✦</div>'}
           ${revealed ? `<span class="table-result" aria-hidden="true">${last.correct ? '✓' : '×'}</span>` : ''}
-          <small aria-label="${discarded} cartes jouées">${discarded} ${discarded === 1 ? 'carte jouée' : 'cartes jouées'}</small>
+          <span class="table-count table-discard-count" role="img" aria-label="${discarded} cartes jouées"><i></i>${discarded}</span>
         </div>
         <p class="table-status" role="status">${status}</p>
       </div>
       <div class="table-dock">
         <div class="table-guesses" aria-label="Choisis la prochaine carte">
-          ${tableMenu.map((name,id) => `<button data-guess="${id}" ${phase === 'pick' ? '' : 'disabled'}
-            class="${revealed && id === last.card ? 'match' : revealed && id === last.guess ? 'wrong' : ''}">${tableImage(id)}<span>${name}</span></button>`).join('')}
+          ${tableMenu.map((name,id) => `<button data-guess="${id}" aria-label="${name}" ${phase === 'pick' ? '' : 'disabled'}
+            class="${revealed && id === last.card ? 'match' : revealed && id === last.guess ? 'wrong' : ''}">${tableImage(id)}</button>`).join('')}
         </div>
       </div>
     </div>`;
@@ -204,7 +204,7 @@ function tableGame() {
     const player = players[active];
     sound([523, 659, 784, 1047]);
     stage.innerHTML = `<div class="table-finish" style="--player:${player.color}">
-      <figure class="table-card fresh">${tableImage(last.card)}<figcaption>${tableMenu[last.card]}</figcaption></figure>
+      <figure class="table-card fresh" aria-label="${tableMenu[last.card]}">${tableImage(last.card)}</figure>
       <h1>${player.name} gagne !</h1>
       <p>Ses dix cartes ont été jouées.</p>
       <div class="table-options"><button class="table-primary" data-start>↻ Nouvelle partie</button><button class="secondary" data-setup>Réglages</button></div>

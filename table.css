@@ -14,31 +14,39 @@
 .table-options button,.table-primary { cursor:pointer; min-height:48px; min-width:48px; padding:9px 16px; border:1px solid #ffdfb276; border-radius:13px; background:#41294c; font-weight:800; }
 .table-options button[aria-pressed=true],.table-game .table-primary { background:#ffe0a0; color:#33243c; }
 .table-primary:disabled { opacity:.75; cursor:default; }
-.table-board { display:grid; grid-template: "top top top" auto "left center right" 1fr "left controls right" auto "bottom bottom bottom" auto / minmax(75px,1fr) minmax(0,2.7fr) minmax(75px,1fr); align-items:center; gap:14px; padding:clamp(12px,3vw,32px); min-height:clamp(430px,69svh,650px); background:linear-gradient(#25112f22,#25112f66),url('./covers/table-board.jpg') center/cover; }
+.table-board { display:grid; grid-template: "top top top" auto "left center right" 1fr "left controls right" auto "bottom bottom bottom" auto / minmax(75px,1fr) minmax(0,2.7fr) minmax(75px,1fr); align-items:center; gap:14px; padding:clamp(12px,3vw,32px); min-height:clamp(430px,69svh,650px); background:#0c4747 url('./covers/table-board.jpg') center/100% 100%; }
 .table-player { display:grid; justify-items:center; justify-content:center; align-items:center; gap:7px; min-width:0; }
 .table-player.current .table-stack { box-shadow:0 2px 0 #190e24,0 0 9px color-mix(in srgb,var(--player),transparent 54%); }
-.table-player strong,.table-player small { display:block; }
 .table-player strong { color:var(--player); font-size:clamp(.72rem,1.55vw,1rem); }
-.table-player small { color:#fbefd6; font-variant-numeric:tabular-nums; }
-.table-stack { display:grid; place-items:center; width:var(--hand-card,clamp(16px,2.4vw,28px)); aspect-ratio:3/4; border:1px solid var(--player); border-radius:5px; color:var(--player); background:linear-gradient(135deg,#57376a,#301d41); box-shadow:0 2px 0 #190e24; font-size:.7rem; }
+.table-count {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:43px;
+  padding:3px 7px; border:1px solid color-mix(in srgb,var(--player,#fbe4ab),transparent 42%);
+  border-radius:999px; color:var(--player,#fbe4ab); background:#123738;
+  box-shadow:0 2px 5px #0625268c; font:800 .8rem/1.2 system-ui; font-variant-numeric:tabular-nums;
+}
+.table-count i {
+  width:8px; height:11px; border:1px solid currentColor; border-radius:2px;
+  transform:rotate(-14deg); box-shadow:2px 1px #123738,3px 2px currentColor;
+}
+.table-discard-count { padding:3px 10px; }
+.table-stack { display:grid; place-items:center; width:var(--hand-card,clamp(16px,2.4vw,28px)); aspect-ratio:3/4; border:1px solid var(--player); border-radius:5px; color:var(--player); background:linear-gradient(145deg,#255c61,#143337); box-shadow:0 2px 0 #190e24; font-size:.7rem; }
 .table-center { grid-area:center; display:grid; justify-items:center; align-content:center; gap:9px; }
-.table-turn { border:1px solid var(--player); border-radius:999px; color:var(--player); background:#2b1b39; padding:5px 12px; font-weight:800; }
-.table-card { margin:0; width:clamp(84px,18svh,154px); aspect-ratio:4/5; overflow:hidden; display:grid; grid-template-rows:1fr auto; border:3px solid #ffe5b1; border-radius:18px; background:#392648; box-shadow:0 6px #1a0f25,0 10px 22px #160c247f; }
-.table-card img,.table-guesses img { display:block; width:100%; height:100%; min-height:0; object-fit:cover; }
-.table-card figcaption { padding:5px; text-align:center; font-weight:900; color:#3a283e; background:#ffe7b4; }
-.table-back { display:grid; place-items:center; color:#ffe0a2; font-size:clamp(2rem,6vw,4rem); background:repeating-linear-gradient(135deg,#352354 0 12px,#493161 12px 24px); }
+.table-turn { border:1px solid var(--player); border-radius:999px; color:var(--player); background:#143a3b; padding:5px 12px; font-weight:800; }
+.table-card { margin:0; width:clamp(84px,18svh,154px); aspect-ratio:1; overflow:hidden; display:grid; border:3px solid #ffe5b1; border-radius:18px; background:#123738; box-shadow:0 5px #153133,0 9px 22px #09252780; }
+.table-card img,.table-guesses img { display:block; width:100%; height:100%; min-height:0; object-fit:contain; object-position:center; }
+
+.table-back { display:grid; place-items:center; color:#ffe0a2; font-size:clamp(2rem,6vw,4rem); background:repeating-linear-gradient(135deg,#123b40 0 12px,#1a4c4e 12px 24px); }
 .table-card.fresh { animation:table-flip .33s ease-out both; }
 @keyframes table-flip { from { transform:perspective(600px) rotateY(-85deg) scale(.92); opacity:.6; } }
 .table-status { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 .table-dock { grid-area:controls; display:grid; place-items:center; min-height:clamp(98px,14vw,153px); }
 .table-guesses { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(6px,1.5vw,14px); width:min(100%,440px); }
-.table-guesses button { display:grid; grid-template-rows:1fr auto; aspect-ratio:1/1.12; border:2px solid #ffddb49a; border-radius:14px; overflow:hidden; min-width:0; min-height:60px; padding:0; cursor:pointer; color:#fff1d4; background:#382747; font-weight:800; -webkit-tap-highlight-color:transparent; }
+.table-guesses button { display:grid; aspect-ratio:1; border:2px solid #ffddb49a; border-radius:14px; overflow:hidden; min-width:0; min-height:60px; padding:0; cursor:pointer; background:#123738; box-shadow:0 4px #0b2f33,0 7px 12px #071e2266; -webkit-tap-highlight-color:transparent; }
 .table-guesses button:disabled { opacity:1; cursor:default; }
 .table-guesses button.match { border-color:#adf3b2; box-shadow:0 0 15px #8feea68a; }
 .table-guesses button.wrong { border-color:#ffa497; opacity:.62; }
-.table-guesses button span { padding:4px; }
 .table-guesses button:focus-visible { outline-offset:3px; }
-.table-finish { display:grid; place-content:center; justify-items:center; gap:13px; padding:20px; min-height:clamp(435px,54vw,630px); text-align:center; background:radial-gradient(ellipse,#3e244bdd,#27142ac2),url('./covers/table-board.jpg') center/cover; }
+.table-finish { display:grid; place-content:center; justify-items:center; gap:13px; padding:20px; min-height:clamp(435px,54vw,630px); text-align:center; background:radial-gradient(ellipse,#103e3e88,#07292dd2),url('./covers/table-board.jpg') center/cover; }
 .table-finish h1 { color:var(--player); font-size:clamp(2.1rem,5.3vw,4.6rem); }
 .table-finish p { margin:0; font-weight:800; }
 .table-finish .table-options { justify-content:center; }
@@ -62,27 +70,25 @@
 @media (orientation:landscape) and (min-width:700px) {
   .table-board { position:relative; display:block; min-height:clamp(490px,calc(100svh - 157px),700px); }
   .table-player,.table-center,.table-dock { position:absolute; left:50%; translate:-50% -50%; }
-  .table-player { --hand-card:clamp(20px,min(3vw,4.7svh),36px); z-index:1; }
+  .table-player { --hand-card:clamp(20px,min(3.5vw,5.1svh),41px); z-index:1; }
   .table-hand { flex-wrap:nowrap; gap:clamp(3px,.4vw,5px); min-height:calc(var(--hand-card) * 4 / 3); }
   .table-player-label { white-space:nowrap; }
-  .table-seat-0 { top:90%; }
+  .table-seat-0 { top:92%; }
   .table-seat-1 { left:93%; top:50%; rotate:-90deg; }
-  .table-seat-2 { top:10%; rotate:180deg; }
+  .table-seat-2 { top:8%; rotate:180deg; }
   .table-seat-3 { left:7%; top:50%; rotate:90deg; }
   .table-center { top:50%; gap:8px; }
-  .table-center .table-card { width:clamp(82px,min(14vw,14svh),132px); }
-  .table-dock { z-index:2; width:clamp(188px,min(30vw,42svh),310px); top:74%; min-height:0; rotate:0deg; }
+  .table-center .table-card { width:clamp(82px,min(16vw,17.2svh),153px); }
+  .table-dock { z-index:2; width:clamp(188px,min(33vw,44svh),348px); top:75.5%; min-height:0; rotate:0deg; }
   .table-board[data-active="1"] .table-dock { left:79%; top:50%; rotate:-90deg; }
-  .table-board[data-active="2"] .table-dock { top:26%; rotate:180deg; }
+  .table-board[data-active="2"] .table-dock { top:24.5%; rotate:180deg; }
   .table-board[data-active="3"] .table-dock { left:21%; top:50%; rotate:90deg; }
-  .table-guesses button { aspect-ratio:1.16; }
 }
 @media (orientation:portrait), (max-width:699px) {
   .table-seat-1 .table-hand,.table-seat-3 .table-hand { display:grid; grid-template-columns:repeat(2,auto); }
 }
 .table-discard { display:grid; position:relative; justify-items:center; gap:8px; }
-.table-discard:not([data-count="0"]) .table-card { box-shadow:0 4px #34254c,0 6px #ffd99b,0 9px #463559,0 11px #d6ae78,0 14px 19px #1a0b2399; }
-.table-discard small { color:#f8dfaf; }
+.table-discard:not([data-count="0"]) .table-card { box-shadow:0 3px #23474a,0 5px #ffd99b,0 7px #23474a,0 9px #d6ae78,0 12px 19px #09252799; }
 .table-flying { position:fixed; z-index:5; pointer-events:none; }
 .table-result {
   position:absolute; z-index:1; top:8px; right:5px; translate:33% -38%;
@@ -104,5 +110,5 @@
   .table-board { grid-template-columns:minmax(64px,1fr) minmax(0,2.45fr) minmax(64px,1fr); gap:7px; padding:9px; }
   .table-player { padding:5px 3px; }
   .table-player-label { flex-wrap:wrap; justify-content:center; gap:3px; text-align:center; }
-  .table-guesses button { min-height:44px; font-size:.7rem; }
+  .table-guesses button { min-height:44px; }
 }
