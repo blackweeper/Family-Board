@@ -4,4 +4,5 @@ const catalog = [
   { id: 'prism', title: 'Prisme Express', icon: '🤖', color: 'violet', type: 'home', category: 'À plusieurs', players: '2 à 4 joueurs', description: 'Repère les robots qui ont gardé leur couleur et attrape-les dans ta zone avant les autres.' },
   { id: 'pico', title: 'Pico et la Cascade', icon: '🥚', color: 'mint', type: 'home', category: 'À plusieurs', players: '2 à 4 joueurs', description: 'Fais glisser Pico et sauve les œufs avec ton équipe avant que la loutre ne trouve le nid.' },
   { id: 'table', title: 'À table !', color: 'coral', players: '2 à 4 joueurs', description: 'Taco, chaton ou pizza ? Devine ta prochaine carte et sois le premier à vider ta pile.' },
+  { id: 'coop', title: 'La Ronde du Poulailler', color: 'mint', players: '1 à 4 joueurs', description: 'Tourne la girouette et remplis les trois nids avant que le renard n’arrive au poulailler.' },
 ];

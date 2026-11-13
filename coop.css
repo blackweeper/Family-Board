@@ -1,0 +1,59 @@
+.coop { color:#fff8de; }
+.coop-bar { display:flex; gap:8px; justify-content:flex-end; margin-bottom:12px; }
+.coop-bar #back { margin-right:auto; }
+.coop-bar button { min-height:44px; }
+.coop-bar button:disabled { opacity:.5; }
+.coop-intro,.coop-board,.coop-finish { border:1px solid #e4c78b80; border-radius:27px; overflow:hidden; box-shadow:0 14px 40px #1829147a; }
+.coop-intro { display:grid; align-items:center; min-height:clamp(420px,53vw,620px); background:linear-gradient(90deg,#192d18f5,#233420cf 29%,#26391a22 75%),url('./covers/coop.jpg') center/cover; }
+.coop-intro-copy { padding:clamp(22px,5vw,60px); }
+.coop h1 { margin:0; font:900 clamp(2.45rem,6.5vw,5.75rem)/.94 'DM Sans',system-ui; letter-spacing:-.065em; }
+.coop-intro p { font-weight:800; }
+.coop fieldset { border:0; padding:0; margin:14px 0; }
+.coop legend { margin-bottom:6px; }
+.coop-options { display:flex; flex-wrap:wrap; gap:8px; }
+.coop-options button,.coop-primary { min-height:48px; min-width:48px; border:1px solid #ffe2a875; border-radius:13px; background:#365135; color:#fff8df; padding:8px 14px; font-weight:800; cursor:pointer; }
+.coop-options button[aria-pressed=true],.coop .coop-primary { background:#ffe1a0; color:#352d21; }
+.coop-primary:disabled { opacity:.52; cursor:default; }
+.coop-mode { font-size:.9rem; }
+.coop-board { display:grid; grid-template-rows:auto 1fr auto; gap:12px; padding:clamp(12px,2.7vw,30px); min-height:clamp(535px,72svh,690px); background:linear-gradient(#34452c14,#25391551),url('./covers/coop-board.jpg') center/cover; }
+.coop-hud { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; }
+.coop-pill,.coop-track { min-height:35px; padding:5px 10px; border-radius:999px; border:1px solid #fff1b750; background:#263c28ed; color:#fff6d8; }
+.coop-track { display:flex; align-items:center; gap:5px; font-weight:800; }
+.coop-track img { width:25px; height:25px; border-radius:50%; object-fit:cover; }
+.coop-track i { width:9px; height:9px; border-radius:50%; background:#e7ecb45e; }
+.coop-track i.reached { background:#ffad7f; box-shadow:0 0 8px #ff9c6c99; }
+.coop-center { display:grid; justify-items:center; align-content:center; gap:10px; }
+.coop-wheel { position:relative; isolation:isolate; width:clamp(150px,26svh,242px); aspect-ratio:1; border:7px solid #ce9c59; border-radius:50%; background:radial-gradient(#67502f 3%,transparent 5%),#806340; box-shadow:0 7px #675032,0 12px 21px #21351dc0,inset 0 0 12px #3a301a; }
+.coop-sector { position:absolute; inset:0; border-radius:50%; transform:rotate(var(--sector)); clip-path:polygon(50% 50%,21.13% 0,78.87% 0); background:#d9c68a; }
+.coop-sector.egg { background:radial-gradient(circle at 50% 36%,#ffe9ac,#e9b972); }
+.coop-sector.shield { background:radial-gradient(circle at 50% 36%,#d2f4af,#87b96c); }
+.coop-sector.fox { background:radial-gradient(circle at 50% 36%,#ffb48c,#dd875d); }
+.coop-sector b { position:absolute; top:9%; left:50%; transform:translateX(-50%) rotate(calc(0deg - var(--sector))); font-size:clamp(1.1rem,3svh,1.85rem); }
+.coop-needle { position:absolute; inset:3%; transform:rotate(var(--angle)); z-index:1; pointer-events:none; }
+.coop-board[data-phase=spinning] .coop-needle { transition:transform .94s cubic-bezier(.13,.6,.16,1); }
+.coop-needle::before { content:""; position:absolute; left:50%; top:3%; width:clamp(18px,4svh,30px); height:49%; transform:translateX(-50%); clip-path:polygon(50% 0,100% 35%,67% 35%,67% 100%,33% 100%,33% 35%,0 35%); background:#542e34; }
+.coop-needle::after { content:""; position:absolute; left:50%; top:50%; width:22px; aspect-ratio:1; transform:translate(-50%,-50%); border:3px solid #ffe6a5; border-radius:50%; background:#815c3d; }
+.coop-controls { display:grid; justify-items:center; gap:6px; }
+.coop-status { margin:0; min-height:1.4em; text-align:center; font-weight:900; text-shadow:0 2px 5px #162a1a,0 0 12px #162a1a; }
+.coop-nests { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(5px,2vw,18px); width:min(100%,660px); margin:auto; }
+.coop-nest { display:grid; justify-items:center; align-content:center; gap:4px; position:relative; padding:7px 4px; min-height:88px; border:2px solid #ebdfb555; border-radius:16px; background:#243e2be8; color:var(--hen); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.coop-nest:disabled { cursor:default; }
+.coop-nest.full { border-color:#b6de87; }
+.coop-nest[aria-pressed=true] { border-color:var(--hen); box-shadow:0 0 14px color-mix(in srgb,var(--hen),transparent 50%); }
+.coop-nest img,.coop-finale-art img { display:block; width:clamp(43px,8svh,77px); aspect-ratio:1; object-fit:cover; border:2px solid var(--hen,#ffe4a3); border-radius:50%; }
+.coop-eggs { display:flex; justify-content:center; gap:5px; }
+.coop-eggs i { display:block; width:12px; height:16px; border:1px solid #f9ebbc67; border-radius:50% 50% 46% 46% / 60% 60% 40% 40%; background:#f7eac51a; }
+.coop-eggs i.filled { background:radial-gradient(at 30% 23%,#fff6cc,#e6b778); box-shadow:0 2px 3px #14251a; }
+.coop-shield { position:absolute; right:7px; top:6px; }
+.coop-finish { display:grid; place-content:center; justify-items:center; text-align:center; gap:12px; padding:22px; min-height:clamp(430px,53vw,620px); background:linear-gradient(#24342194,#23341adc),url('./covers/coop-board.jpg') center/cover; }
+.coop-finish h1 { font-size:clamp(2rem,5.5vw,4rem); }
+.coop-finish p { margin:0; font-weight:800; }
+.coop-finish .coop-options { justify-content:center; }
+.coop-finale-art { display:flex; gap:8px; }
+.coop-rules { width:min(540px,calc(100% - 28px)); max-height:calc(100% - 28px); border:1px solid #ede2ae; border-radius:22px; padding:24px; color:#fff9e6; background:#30482c; }
+.coop-rules::backdrop { background:#18281cdb; }
+.coop-rules h2 { margin-top:0; }
+.coop-rules li { padding:4px; line-height:1.45; }
+.cover-open[data-detail=coop] .cover-art,#details[data-game=coop] .detail-art { background:#29462e url('./covers/coop.jpg') center/cover; }
+@media(max-width:460px) { .coop-bar .secondary { padding-inline:7px; font-size:.8rem; } .coop-hud,.coop-nest { font-size:.83rem; } }
+@media(prefers-reduced-motion:reduce) { .coop-board[data-phase=spinning] .coop-needle { transition:none; } }

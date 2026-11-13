@@ -2,7 +2,7 @@
 
 Console familiale en français, pensée pour l’iPad en paysage. [Ouvrir Family Board](https://blackweeper.github.io/Family-Board/).
 
-Cinq jeux pour 2 à 4 personnes autour du même iPad : Boum Safari, Lagon des Trésors, Prisme Express, Pico et la Cascade et À table !
+Six jeux pour jouer ensemble autour du même iPad : Boum Safari, Lagon des Trésors, Prisme Express, Pico et la Cascade, À table ! et La Ronde du Poulailler. Ce dernier se joue aussi en solo.
 
 Les jeux fonctionnent hors ligne après le premier chargement. Les favoris restent sur l’appareil. Le bouton **Plein écran** agrandit chaque jeu et utilise le plein écran natif si le navigateur le permet.
 

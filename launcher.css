@@ -13,7 +13,7 @@ body { background:radial-gradient(ellipse at 25% 0%,#262447,transparent 65%),var
 .shelves button { padding:8px 14px; }
 .shelves { margin-bottom:18px; }
 .shelves button[aria-pressed="true"] { background:#d0bfff; color:#251940; font-weight:800; }
-.covers { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+.covers { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
 .cover { position:relative; min-width:0; overflow:hidden; border:1px solid var(--line); border-radius:20px; background:#1e233a; }
 .coral { --light:#fa936e; --dark:#7e2b61; }
 .violet { --light:#be96ff; --dark:#49298c; }
@@ -44,7 +44,6 @@ button:focus-visible,a:focus-visible,select:focus-visible { outline:3px solid #f
 @media (hover:hover) {
   .shelves button:hover,.star:hover,.close-detail:hover { border-color:#c4b3ff; }
 }
-@media (min-width:1050px) { .covers { grid-template-columns:repeat(5,minmax(0,1fr)); } }
 @media (min-width:601px) and (max-width:900px) { .covers { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:600px) {
   .shell { padding-inline:max(14px,env(safe-area-inset-left),env(safe-area-inset-right)); }
@@ -62,7 +61,7 @@ button:focus-visible,a:focus-visible,select:focus-visible { outline:3px solid #f
   padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
 }
 .game-theater .topbar,.game-theater footer { display:none; }
-.game-theater :is(.prism-table,.safari-table,.lagoon-table,.prism-intro,.safari-intro,.lagoon-intro,.prism-finish,.safari-victory,.lagoon-victory,.pico-table,.pico-intro,.pico-finish,.table-board,.table-intro,.table-finish) {
+.game-theater :is(.prism-table,.safari-table,.lagoon-table,.prism-intro,.safari-intro,.lagoon-intro,.prism-finish,.safari-victory,.lagoon-victory,.pico-table,.pico-intro,.pico-finish,.table-board,.table-intro,.table-finish,.coop-board,.coop-intro,.coop-finish) {
   min-height:calc(100dvh - max(8px,env(safe-area-inset-top)) - max(8px,env(safe-area-inset-bottom)) - 56px);
 }
 [data-fullscreen] { white-space:nowrap; }
