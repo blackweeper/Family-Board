@@ -5,7 +5,7 @@ const tableRules = `
   <ol>
     <li>Chacun reçoit dix cartes face cachée.</li>
     <li>À ton tour, touche Taco, Chaton ou Pizza pour retourner la première carte de ta pile.</li>
-    <li>Si tu as deviné, tu rejoues. Sinon, la main passe au joueur suivant. La carte retournée quitte ta pile dans les deux cas.</li>
+    <li>Si tu as deviné, tu rejoues. Sinon, la main passe automatiquement au joueur suivant. La carte retournée quitte ta pile dans les deux cas.</li>
     <li>Si c’était ta dernière carte, tu gagnes, même si tu avais choisi une autre image.</li>
   </ol>`;
 
@@ -31,6 +31,7 @@ function tableGame() {
   let topCard = null;
   let discarded = 0;
   let timer;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let soundOn = true;
   let audio;
   const players = [
@@ -108,8 +109,7 @@ function tableGame() {
     phase = 'flight';
     render();
     const end = stage.querySelector('.table-card').getBoundingClientRect();
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const duration = reduced ? 0 : 460;
+    const duration = reducedMotion.matches ? 0 : 420;
     if (duration && source.animate) {
       const moving = document.createElement('div');
       moving.className = 'table-card table-back table-flying';
@@ -131,18 +131,29 @@ function tableGame() {
     phase = 'reveal';
     sound(last.correct ? [523, 659, 784] : [349, 262]);
     render();
-    if (!piles[active].length) {
-      timer = setTimeout(finish, 900);
-      return;
-    }
-    focus('[data-next]');
+    timer = setTimeout(piles[active].length ? advance : finish, 1250);
   }
 
   function advance() {
-    if (phase !== 'reveal' || !piles[active].length) return;
+    const outgoing = stage.querySelector('.table-dock');
+    const previousDock = outgoing.getBoundingClientRect();
+    const previousAngle = parseFloat(getComputedStyle(outgoing).rotate) || 0;
+    const previous = active;
     if (!last.correct) active = (active + 1) % count;
     phase = 'pick';
     render();
+    const dock = stage.querySelector('.table-dock');
+    if (active !== previous && !reducedMotion.matches && dock.animate && getComputedStyle(dock).rotate !== 'none') {
+      const currentDock = dock.getBoundingClientRect();
+      const x = previousDock.x + previousDock.width / 2 - currentDock.x - currentDock.width / 2;
+      const y = previousDock.y + previousDock.height / 2 - currentDock.y - currentDock.height / 2;
+      const currentAngle = parseFloat(getComputedStyle(dock).rotate) || 0;
+      const offset = (previousAngle - currentAngle + 540) % 360 - 180;
+      dock.animate([
+        { translate: `calc(-50% + ${x}px) calc(-50% + ${y}px)`, rotate: `${currentAngle + offset}deg`, opacity: .6 },
+        { translate: '-50% -50%', rotate: `${currentAngle}deg`, opacity: 1 },
+      ], { duration: 320, easing: 'cubic-bezier(.2,.75,.25,1)' });
+    }
     focus('[data-guess]:enabled');
   }
 
@@ -158,28 +169,31 @@ function tableGame() {
   }
 
   function render() {
-    rulesButton.disabled = phase === 'flight' || (phase === 'reveal' && !piles[active].length);
+    rulesButton.disabled = phase !== 'pick';
     const player = players[active];
     const revealed = phase === 'reveal';
     const nextPlayer = players[(active + 1) % count];
+    const result = revealed ? (last.correct ? 'hit' : 'miss') : '';
     const status = phase === 'flight' ? 'La carte rejoint la pile…' : !revealed ? 'Choisis une image pour retourner ta carte.' :
       !piles[active].length ? 'Plus aucune carte dans ta pile !' :
       last.correct ? 'Bien deviné ! Tu rejoues.' : `Tu avais choisi ${tableMenu[last.guess]}. À ${nextPlayer.name} de jouer.`;
-    stage.innerHTML = `<div class="table-board" data-phase="${phase}">
+    stage.innerHTML = `<div class="table-board" data-phase="${phase}" data-active="${active}" data-result="${result}">
       ${seats()}
       <div class="table-center">
         <span class="table-turn" style="--player:${player.color}">● Tour de ${player.name}</span>
         <div class="table-discard" data-count="${discarded}">
           ${topCard !== null ? `<figure class="table-card ${revealed ? 'fresh' : ''}" aria-label="Carte révélée : ${tableMenu[topCard]}">${tableImage(topCard)}<figcaption>${tableMenu[topCard]}</figcaption></figure>` :
             '<div class="table-card table-back" role="img" aria-label="Carte face cachée">✦</div>'}
+          ${revealed ? `<span class="table-result" aria-hidden="true">${last.correct ? '✓' : '×'}</span>` : ''}
           <small aria-label="${discarded} cartes jouées">${discarded} ${discarded === 1 ? 'carte jouée' : 'cartes jouées'}</small>
         </div>
         <p class="table-status" role="status">${status}</p>
       </div>
       <div class="table-dock">
-        ${phase === 'flight' ? '' : revealed ? `<button class="table-primary" data-next ${piles[active].length ? '' : 'disabled'}>
-          ${!piles[active].length ? 'Dernière carte !' : last.correct ? '↻ Rejouer' : `→ Au tour de ${nextPlayer.name}`}</button>` :
-          `<div class="table-guesses" aria-label="Choisis la prochaine carte">${tableMenu.map((name,id)=>`<button data-guess="${id}">${tableImage(id)}<span>${name}</span></button>`).join('')}</div>`}
+        <div class="table-guesses" aria-label="Choisis la prochaine carte">
+          ${tableMenu.map((name,id) => `<button data-guess="${id}" ${phase === 'pick' ? '' : 'disabled'}
+            class="${revealed && id === last.card ? 'match' : revealed && id === last.guess ? 'wrong' : ''}">${tableImage(id)}<span>${name}</span></button>`).join('')}
+        </div>
       </div>
     </div>`;
   }
@@ -210,7 +224,6 @@ function tableGame() {
       setup();
       focus('[data-start]');
     } else if (button.hasAttribute('data-guess')) guess(Number(button.dataset.guess));
-    else if (button.hasAttribute('data-next')) advance();
   });
 
   rulesButton.onclick = () => rules.showModal();
