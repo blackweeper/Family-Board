@@ -1,35 +1,32 @@
-const prismRobots = ['Bulle', 'Cube', 'Fusée', 'Roue'];
-const prismColors = [
-  { name: 'bleu', mark: '●', paint: '#4484ee' },
-  { name: 'or', mark: '◆', paint: '#e6a42e' },
-  { name: 'menthe', mark: '▲', paint: '#38c89e' },
-  { name: 'rose', mark: '✦', paint: '#e65b9c' },
+const prismCharacters = [
+  { name:'Cochon', color:'rose', paint:'#ffabc0' },
+  { name:'Fantôme', color:'blanc', paint:'#f3efff' },
+  { name:'Poule', color:'jaune', paint:'#ffdf76' },
+  { name:'Grenouille', color:'verte', paint:'#aee779' },
 ];
 const prismModes = {
   little: { rounds: 8, time: 9000, pause: 1200 },
   family: { rounds: 12, time: 6500, pause: 1000 },
 };
 
-function prismRobot(id, color = id) {
-  const { name, mark, paint } = prismColors[color];
-  return `<span class="prism-robot" role="img" aria-label="${prismRobots[id]}, ${name}" style="--paint:${paint}">
-    <img src="./covers/prism-robot-${id}.jpg" alt="" draggable="false">
-    <span class="prism-mark" aria-hidden="true">${mark}</span>
+function prismPortrait(id, color = id) {
+  const character = prismCharacters[id];
+  return `<span class="prism-portrait" role="img" aria-label="${character.name}, ${prismCharacters[color].color}"${color === id ? '' : ` data-tint="${color}"`}>
+    <img src="./covers/prism-character-${id}.png" alt="" draggable="false">
   </span>`;
 }
 
 const prismRules = `
   <h2>Comment jouer ?</h2>
   <ol>
-    <li>Chacun choisit une zone du plateau. Les quatre robots de référence y gardent toujours leur couleur et leur symbole.</li>
-    <li>Regarde les robots au centre. Touche dans ta zone le robot qui a la même forme et le même symbole.</li>
-    <li>Le premier à trouver un robot correct gagne un éclat. Sur chaque carte, un à trois robots peuvent être corrects. Un robot déjà trouvé ne rapporte plus de point.</li>
-    <li>Une erreur bloque tes boutons jusqu’à la carte suivante. À la fin, le plus grand nombre d’éclats gagne. En cas d’égalité, la victoire est partagée.</li>
+    <li>Choisis ton personnage et installe-toi devant sa place.</li>
+    <li>Au milieu, cherche le cochon rose, le fantôme blanc, la poule jaune ou la grenouille verte. Si tu en vois un avec sa vraie couleur, touche son image dans ta rangée.</li>
+    <li>Chaque bonne réponse rapporte un éclat au premier qui la trouve. Il peut y avoir une, deux ou trois bonnes réponses.</li>
+    <li>Si tu te trompes, attends la carte suivante. Celui qui a le plus d’éclats à la fin gagne.</li>
   </ol>
   <div class="prism-example">
-    <strong>Exemple</strong>
-    <div>${prismRobot(0)}${prismRobot(0, 3)}</div>
-    <p>Bulle porte toujours le rond bleu. Avec l’étoile rose, cette Bulle est un piège.</p>
+    <div>${prismPortrait(0)}${prismPortrait(0, 3)}</div>
+    <p>Touche le cochon si tu le vois en rose. En vert, c’est un piège.</p>
   </div>`;
 
 function prismShuffle(items) {
@@ -59,7 +56,9 @@ function prismGame() {
   let soundOn = true;
   let audio;
   const ids = [0, 1, 2, 3];
-  const seats = ['Corail', 'Lilas', 'Azur', 'Miel'];
+  const lineup = [...ids];
+  let selectedSeat = 0;
+  const mascot = player => prismCharacters[lineup[player]];
 
   app.innerHTML = `
     <section class="prism">
@@ -102,10 +101,18 @@ function prismGame() {
       <div class="prism-intro">
         <div class="prism-intro-copy">
           <h1>Prisme<br>Express</h1>
-          <p>Repère les robots qui ont gardé leur couleur !</p>
+          <p>Retrouve les personnages dans leur vraie couleur !</p>
           <fieldset><legend>Joueurs</legend><div class="prism-choices">
             ${[2,3,4].map(n => `<button data-count="${n}" aria-pressed="${count === n}">${n}</button>`).join('')}
           </div></fieldset>
+          <fieldset><legend>Choisis ton personnage</legend>
+            <div class="prism-lineup" aria-label="Places des joueurs">
+              ${lineup.slice(0,count).map((id,i) => `<button data-seat="${i}" aria-label="Joueur ${i + 1}, ${mascot(i).name}" aria-pressed="${i === selectedSeat}">${prismPortrait(id)}<span>${i + 1}</span></button>`).join('')}
+            </div>
+            <div class="prism-picker" aria-label="Personnage du joueur ${selectedSeat + 1}">
+              ${ids.map(id => `<button data-character="${id}" aria-label="${prismCharacters[id].name}" aria-pressed="${id === lineup[selectedSeat]}">${prismPortrait(id)}</button>`).join('')}
+            </div>
+          </fieldset>
           <fieldset><legend>Mode</legend><div class="prism-choices">
             <button data-mode="little" aria-pressed="${mode === 'little'}">Petits</button>
             <button data-mode="family" aria-pressed="${mode === 'family'}">Famille</button>
@@ -132,18 +139,18 @@ function prismGame() {
     if (deck[0].key === previousCard) deck.push(deck.shift());
     sound([392, 523, 659]);
     stage.innerHTML = `
-      <div class="prism-table">
+      <div class="prism-table" data-count="${count}">
         <div class="prism-challenge">
           <p class="prism-round"></p>
-          <div class="prism-clues" aria-label="Robots de la carte"></div>
+          <div class="prism-clues" aria-label="Personnages à observer"></div>
           <div class="prism-timer" aria-hidden="true"><span></span></div>
           <p class="prism-status" role="status"></p>
         </div>
         ${scores.map((_, i) => `
-          <section class="prism-seat prism-seat-${i}" aria-label="Joueur ${i + 1}, ${seats[i]}">
-            <div class="prism-seat-label"><strong>${seats[i]}</strong><span class="prism-score" aria-label="0 éclat">✦ 0</span></div>
+          <section class="prism-seat prism-seat-${i}" style="--seat:${mascot(i).paint}" aria-label="Joueur ${i + 1}, ${mascot(i).name}">
+            <div class="prism-seat-label">${prismPortrait(lineup[i])}<span class="prism-score" aria-label="0 éclat">✦ 0</span></div>
             <div class="prism-controls">
-              ${ids.map(id => `<button class="prism-target" data-player="${i}" data-robot="${id}" aria-label="${prismRobots[id]}, ${prismColors[id].name}">${prismRobot(id)}</button>`).join('')}
+              ${ids.map(id => `<button class="prism-target" data-player="${i}" data-target="${id}" aria-label="${prismCharacters[id].name}, ${prismCharacters[id].color}">${prismPortrait(id)}</button>`).join('')}
             </div>
           </section>`).join('')}
       </div>`;
@@ -174,19 +181,19 @@ function prismGame() {
     const display = stage.querySelector('.prism-clues');
     display.classList.remove('reveal-answer');
     display.innerHTML = clues.map(({ id, color }) =>
-      `<div class="prism-clue" data-clue="${id}">${prismRobot(id, color)}</div>`).join('');
-    setStatus('Trouve les bons robots !');
+      `<div class="prism-clue" data-clue="${id}">${prismPortrait(id, color)}</div>`).join('');
+    setStatus('Retrouve les bonnes couleurs !');
     updateTargets();
     runClock(config.time);
   }
 
   function updateTargets() {
-    for (const button of stage.querySelectorAll('[data-robot]')) {
+    for (const button of stage.querySelectorAll('[data-target]')) {
       const player = Number(button.dataset.player);
-      const robot = Number(button.dataset.robot);
-      button.classList.toggle('claimed', claimed.has(robot));
-      button.classList.toggle('correct', phase === 'result' && clues.some(clue => clue.id === robot && clue.color === robot));
-      button.setAttribute('aria-disabled', phase !== 'live' || locked.has(player) || claimed.has(robot));
+      const target = Number(button.dataset.target);
+      button.classList.toggle('claimed', claimed.has(target));
+      button.classList.toggle('correct', phase === 'result' && clues.some(clue => clue.id === target && clue.color === target));
+      button.setAttribute('aria-disabled', phase !== 'live' || locked.has(player) || claimed.has(target));
     }
     stage.querySelectorAll('.prism-seat').forEach((seat, index) => seat.classList.toggle('locked', locked.has(index)));
   }
@@ -194,17 +201,17 @@ function prismGame() {
   function react(button) {
     if (phase !== 'live' || rules.open) return;
     const player = Number(button.dataset.player);
-    const robot = Number(button.dataset.robot);
-    if (locked.has(player) || claimed.has(robot)) return;
-    if (!clues.some(clue => clue.id === robot && clue.color === robot)) {
+    const target = Number(button.dataset.target);
+    if (locked.has(player) || claimed.has(target)) return;
+    if (!clues.some(clue => clue.id === target && clue.color === target)) {
       locked.add(player);
       sound([280, 196]);
-      setStatus(seats[player] + ' attend la carte suivante.');
+      setStatus(mascot(player).name + ' attend la carte suivante.');
       updateTargets();
       if (locked.size === count) closeRound();
       return;
     }
-    claimed.set(robot, player);
+    claimed.set(target, player);
     scores[player]++;
     const score = stage.querySelector(`.prism-seat-${player} .prism-score`);
     score.textContent = `✦ ${scores[player]}`;
@@ -212,10 +219,11 @@ function prismGame() {
     score.classList.remove('prism-pop');
     void score.offsetWidth;
     score.classList.add('prism-pop');
-    const found = stage.querySelector(`[data-clue="${robot}"]`);
-    found.classList.add('found', `prism-seat-${player}`);
+    const found = stage.querySelector(`[data-clue="${target}"]`);
+    found.classList.add('found');
+    found.style.setProperty('--seat', mascot(player).paint);
     sound([523, 659, 784]);
-    setStatus(`Un éclat pour ${seats[player]} !`);
+    setStatus(`Un éclat pour ${mascot(player).name} !`);
     updateTargets();
     if (claimed.size === clues.filter(clue => clue.id === clue.color).length) closeRound();
   }
@@ -228,7 +236,7 @@ function prismGame() {
     for (const clue of clues) {
       if (clue.id === clue.color) stage.querySelector(`[data-clue="${clue.id}"]`).classList.add('right');
     }
-    if (!claimed.size) setStatus('Voici les robots à trouver.');
+    if (!claimed.size) setStatus('Voici les bonnes couleurs.');
     updateTargets();
     runClock(prismModes[mode].pause);
   }
@@ -259,20 +267,20 @@ function prismGame() {
     stopClock();
     phase = 'finished';
     const best = Math.max(...scores);
-    const winners = scores.map((score, i) => score === best ? seats[i] : null).filter(Boolean);
+    const winners = scores.flatMap((score, i) => score === best ? [mascot(i).name] : []);
     sound([523, 659, 784, 1047]);
     stage.innerHTML = `<div class="prism-finish">
       <span class="prism-cup" aria-hidden="true">✦</span>
       <h1>${best === 0 ? 'Bien essayé !' : winners.length === 1 ? winners[0] + ' gagne !' : 'Victoire partagée !'}</h1>
       <p>${best === 0 ? 'Aucun éclat cette fois.' : winners.join(' · ')}</p>
-      <ul class="prism-final-scores">${scores.map((score, i) => `<li class="prism-seat-${i}">${seats[i]} <strong>✦ ${score}</strong></li>`).join('')}</ul>
+      <ul class="prism-final-scores">${scores.map((score, i) => `<li style="--seat:${mascot(i).paint}" aria-label="${mascot(i).name}, ${score} éclats">${prismPortrait(lineup[i])}<strong>✦ ${score}</strong></li>`).join('')}</ul>
       <div class="prism-choices"><button class="prism-action" data-start>↻ Rejouer</button><button class="secondary" data-setup>Réglages</button></div>
     </div>`;
     focus('[data-start]');
   }
 
   stage.addEventListener('pointerdown', event => {
-    const button = event.target.closest('[data-robot]');
+    const button = event.target.closest('[data-target]');
     if (!button || event.button !== 0) return;
     event.preventDefault();
     react(button);
@@ -281,14 +289,28 @@ function prismGame() {
   stage.addEventListener('click', event => {
     const button = event.target.closest('button');
     if (!button) return;
-    if (button.hasAttribute('data-robot')) {
+    if (button.hasAttribute('data-target')) {
       if (event.detail === 0) react(button);
     } else if (button.hasAttribute('data-start')) start();
     else if (button.hasAttribute('data-setup')) {
       setup();
       focus('[data-start]');
+    } else if (button.hasAttribute('data-seat')) {
+      selectedSeat = Number(button.dataset.seat);
+      setup();
+      focus(`[data-seat="${selectedSeat}"]`);
+    } else if (button.hasAttribute('data-character')) {
+      const id = Number(button.dataset.character);
+      const previous = lineup.indexOf(id);
+      lineup[previous] = lineup[selectedSeat];
+      lineup[selectedSeat] = id;
+      setup();
+      focus(`[data-character="${id}"]`);
     } else if (button.dataset.count || button.dataset.mode) {
-      if (button.dataset.count) count = Number(button.dataset.count);
+      if (button.dataset.count) {
+        count = Number(button.dataset.count);
+        selectedSeat = Math.min(selectedSeat, count - 1);
+      }
       if (button.dataset.mode) mode = button.dataset.mode;
       setup();
       focus(button.dataset.count ? `[data-count="${count}"]` : `[data-mode="${mode}"]`);

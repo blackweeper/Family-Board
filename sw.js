@@ -1,4 +1,4 @@
-const CACHE = 'family-board-v33';
+const CACHE = 'family-board-v34';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
@@ -16,7 +16,7 @@ const ASSETS = [
   'covers/pico-egg-0.png', 'covers/pico-egg-1.png', 'covers/pico-egg-2.png', 'covers/pico-egg-3.png',
   'covers/pico-otter.png', 'covers/pico-shelter.jpg',
   'prism.js', 'prism.css', 'covers/prism.jpg', 'covers/prism-board.jpg',
-  'covers/prism-robot-0.jpg', 'covers/prism-robot-1.jpg', 'covers/prism-robot-2.jpg', 'covers/prism-robot-3.jpg',
+  'covers/prism-character-0.png', 'covers/prism-character-1.png', 'covers/prism-character-2.png', 'covers/prism-character-3.png',
   'lagoon.js', 'lagoon.css', 'covers/lagoon.jpg', 'covers/lagoon-board.jpg', 'covers/lagoon-treasures.jpg',
   'covers/lagoon-otter.jpg', 'covers/lagoon-crab.jpg', 'covers/lagoon-octopus.jpg', 'covers/lagoon-turtle.jpg',
   'covers/lagoon-puffin.jpg', 'covers/lagoon-seahorse.jpg',
