@@ -1,4 +1,4 @@
-const CACHE = 'family-board-v35';
+const CACHE = 'family-board-v36';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
@@ -9,14 +9,16 @@ const ASSETS = [
   'covers/safari-toucan.jpg', 'covers/safari-monkey.jpg',
   'covers/safari-turtle.jpg', 'covers/safari-rhino.jpg',
   'coop.js', 'coop.css', 'covers/coop.jpg', 'covers/coop-board.jpg',
+  'covers/coop-fox.png', 'covers/coop-nest.png', 'covers/coop-egg.png', 'covers/coop-shield.png',
   'covers/coop-token-0.jpg', 'covers/coop-token-1.jpg', 'covers/coop-token-2.jpg', 'covers/coop-token-3.jpg',
   'table.js', 'table.css', 'covers/table.jpg', 'covers/table-board.jpg',
   'covers/table-card-0.jpg', 'covers/table-card-1.jpg', 'covers/table-card-2.jpg',
   'pico.js', 'pico.css', 'covers/pico.jpg', 'covers/pico-board.jpg', 'covers/pico-token.png',
   'covers/pico-egg-0.png', 'covers/pico-egg-1.png', 'covers/pico-egg-2.png', 'covers/pico-egg-3.png',
   'covers/pico-otter.png', 'covers/pico-shelter.jpg',
-  'prism.js', 'prism.css', 'covers/prism.jpg', 'covers/prism-board.jpg',
+  'prism.js', 'prism.css', 'covers/prism.jpg', 'covers/prism-cover.jpg', 'covers/prism-board.jpg',
   'covers/prism-character-0.png', 'covers/prism-character-1.png', 'covers/prism-character-2.png', 'covers/prism-character-3.png',
+  'covers/prism-character-4.png', 'covers/prism-character-5.png', 'covers/prism-character-6.png', 'covers/prism-character-7.png',
   'lagoon.js', 'lagoon.css', 'covers/lagoon.jpg', 'covers/lagoon-board.jpg', 'covers/lagoon-treasures.jpg',
   'covers/lagoon-otter.jpg', 'covers/lagoon-crab.jpg', 'covers/lagoon-octopus.jpg', 'covers/lagoon-turtle.jpg',
   'covers/lagoon-puffin.jpg', 'covers/lagoon-seahorse.jpg',

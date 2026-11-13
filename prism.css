@@ -4,10 +4,10 @@
 .prism-bar button { min-height:44px; }
 .prism-intro,.prism-table,.prism-finish { border:1px solid #c5b2ff66; border-radius:26px; box-shadow:0 14px 42px #08091d8c; }
 .prism-intro,.prism-finish { display:grid; align-items:center; min-height:clamp(420px,53vw,625px); background:linear-gradient(90deg,#141735fc 0 22%,#171539d9 36%,#24194913 68%),url('./covers/prism.jpg') center/cover; }
-.prism-intro-copy { padding:clamp(18px,3.6vw,45px); }
+.prism-intro-copy { padding:clamp(18px,3vw,36px); }
 .prism h1 { margin:0; font:900 clamp(2.8rem,6vw,5.1rem)/.94 'DM Sans',system-ui; letter-spacing:-.065em; }
 .prism-intro p { font-weight:700; }
-.prism fieldset { border:0; padding:0; margin:14px 0; }
+.prism fieldset { border:0; padding:0; margin:10px 0; }
 .prism legend { margin-bottom:5px; }
 .prism-choices { display:flex; flex-wrap:wrap; gap:7px; }
 .prism-choices button,.prism-action { cursor:pointer; min-height:48px; min-width:48px; padding:8px 13px; border:1px solid #dfc9ff68; border-radius:13px; background:#27244c; font-weight:800; }
@@ -44,9 +44,9 @@
 .prism-portrait[data-tint="2"] img { filter:grayscale(1) sepia(1) saturate(3) hue-rotate(4deg); }
 .prism-portrait[data-tint="3"] img { filter:grayscale(1) sepia(1) saturate(2.6) hue-rotate(42deg); }
 .prism-lineup,.prism-picker { display:flex; gap:7px; flex-wrap:wrap; }
-.prism-picker { margin-top:8px; }
+.prism-picker { margin-top:8px; max-width:325px; }
 .prism-lineup button,.prism-picker button {
-  position:relative; width:clamp(49px,6vw,68px); min-height:48px; padding:0; border:1px solid #d6caff70;
+  position:relative; width:clamp(48px,5.2vw,60px); min-height:48px; padding:0; border:1px solid #d6caff70;
   border-radius:12px; background:#211d46; cursor:pointer;
 }
 .prism-lineup button span + span { position:absolute; right:4px; bottom:3px; font-weight:800; color:#fff4c4; }
@@ -68,8 +68,7 @@
 .prism-example > div { display:flex; gap:8px; margin-top:7px; }
 .prism-example .prism-portrait { width:58px; background:#211d46; border-radius:10px; }
 .prism-example p { font-size:.88rem; }
-.cover-open[data-detail=prism] .cover-art,#details[data-game=prism] .detail-art { background:#21194e url('./covers/prism.jpg') center/cover; color:transparent; text-shadow:none; }
-.cover-open[data-detail=prism] .cover-art { background-size:120% auto; background-position:right center; }
+.cover-open[data-detail=prism] .cover-art,#details[data-game=prism] .detail-art { background:#21194e url('./covers/prism-cover.jpg') center/cover; color:transparent; text-shadow:none; }
 @media (min-width:700px) and (orientation:landscape) {
   .prism-table { position:relative; display:block; min-height:clamp(450px,76svh,675px); }
   .prism-seat,.prism-challenge { position:absolute; translate:-50% -50%; }

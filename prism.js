@@ -3,10 +3,14 @@ const prismCharacters = [
   { name:'Fantôme', color:'blanc', paint:'#f3efff' },
   { name:'Poule', color:'jaune', paint:'#ffdf76' },
   { name:'Grenouille', color:'verte', paint:'#aee779' },
+  { name:'Lapin', color:'bleu', paint:'#91cfff' },
+  { name:'Écureuil', color:'roux', paint:'#ffac7e' },
+  { name:'Hérisson', color:'violet', paint:'#c7a9ff' },
+  { name:'Tortue', color:'turquoise', paint:'#8ff0da' },
 ];
 const prismModes = {
-  little: { rounds: 8, time: 9000, pause: 1200 },
-  family: { rounds: 12, time: 6500, pause: 1000 },
+  little: { rounds: 20, time: 9000, pause: 1200 },
+  family: { rounds: 20, time: 6500, pause: 1000 },
 };
 
 function prismPortrait(id, color = id) {
@@ -68,7 +72,7 @@ function prismGame() {
         <button class="secondary" id="prism-rules">? Règles</button>
       </div>
       <div id="prism-stage"></div>
-      <dialog class="prism-rules" aria-label="Règles de Prisme Express">
+      <dialog class="prism-rules" aria-label="Règles des Couleurs en cavale">
         ${prismRules}
         <form method="dialog"><button class="primary">Compris !</button></form>
       </dialog>
@@ -100,7 +104,7 @@ function prismGame() {
     stage.innerHTML = `
       <div class="prism-intro">
         <div class="prism-intro-copy">
-          <h1>Prisme<br>Express</h1>
+          <h1>Couleurs<br>en cavale</h1>
           <p>Retrouve les personnages dans leur vraie couleur !</p>
           <fieldset><legend>Joueurs</legend><div class="prism-choices">
             ${[2,3,4].map(n => `<button data-count="${n}" aria-pressed="${count === n}">${n}</button>`).join('')}
@@ -110,14 +114,14 @@ function prismGame() {
               ${lineup.slice(0,count).map((id,i) => `<button data-seat="${i}" aria-label="Joueur ${i + 1}, ${mascot(i).name}" aria-pressed="${i === selectedSeat}">${prismPortrait(id)}<span>${i + 1}</span></button>`).join('')}
             </div>
             <div class="prism-picker" aria-label="Personnage du joueur ${selectedSeat + 1}">
-              ${ids.map(id => `<button data-character="${id}" aria-label="${prismCharacters[id].name}" aria-pressed="${id === lineup[selectedSeat]}">${prismPortrait(id)}</button>`).join('')}
+              ${prismCharacters.map((_,id) => `<button data-character="${id}" aria-label="${prismCharacters[id].name}" aria-pressed="${id === lineup[selectedSeat]}">${prismPortrait(id)}</button>`).join('')}
             </div>
           </fieldset>
           <fieldset><legend>Mode</legend><div class="prism-choices">
             <button data-mode="little" aria-pressed="${mode === 'little'}">Petits</button>
             <button data-mode="family" aria-pressed="${mode === 'family'}">Famille</button>
           </div></fieldset>
-          <p class="prism-mode-info">${mode === 'little' ? '8 cartes · Plus de temps pour observer' : '12 cartes · Un rythme plus rapide'}</p>
+          <p class="prism-mode-info">${mode === 'little' ? '20 cartes · Plus de temps pour observer' : '20 cartes · Un rythme plus rapide'}</p>
           <button class="prism-action" data-start>▶ Jouer</button>
         </div>
       </div>`;
@@ -135,8 +139,13 @@ function prismGame() {
   function start() {
     scores = Array(count).fill(0);
     round = 0;
-    deck = makeDeck();
-    if (deck[0].key === previousCard) deck.push(deck.shift());
+    deck = [];
+    while (deck.length < prismModes[mode].rounds) {
+      const batch = makeDeck();
+      const lastKey = deck.at(-1)?.key ?? previousCard;
+      if (batch[0].key === lastKey) batch.push(batch.shift());
+      deck.push(...batch);
+    }
     sound([392, 523, 659]);
     stage.innerHTML = `
       <div class="prism-table" data-count="${count}">
@@ -302,7 +311,7 @@ function prismGame() {
     } else if (button.hasAttribute('data-character')) {
       const id = Number(button.dataset.character);
       const previous = lineup.indexOf(id);
-      lineup[previous] = lineup[selectedSeat];
+      if (previous !== -1) lineup[previous] = lineup[selectedSeat];
       lineup[selectedSeat] = id;
       setup();
       focus(`[data-character="${id}"]`);

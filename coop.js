@@ -4,16 +4,17 @@ const coopHens = [
   { name:'Moka', color:'#f8a6ce' },
 ];
 const coopModes = {
-  little: { eggs:2, limit:6, wheel:['egg','egg','shield','egg','fox','egg'] },
-  family: { eggs:3, limit:5, wheel:['egg','fox','egg','shield','egg','egg'] },
+  little: { eggs:4, limit:10 },
+  family: { eggs:5, limit:9 },
 };
-const coopSymbols = { egg:'🥚', shield:'🛡️', fox:'🦊' };
+const coopWheel = ['egg','fox','egg','shield','egg','fox','egg','egg'];
+const coopIcon = kind => `<img src="./covers/coop-${kind}.png" alt="" draggable="false">`;
 const coopRules = `
   <h2>Comment jouer ?</h2>
   <ol>
-    <li>Chacun joue à son tour. Choisis un nid qui a encore une place, puis lance la girouette.</li>
+    <li>Chacun appuie sur Tourner à son tour. Le nid à remplir s’allume automatiquement et la roue se tourne vers le joueur suivant après le résultat.</li>
     <li>🥚 <strong>Œuf</strong> : ajoute un œuf au nid choisi.</li>
-    <li>🛡️ <strong>Protection</strong> : pose une protection sur ce nid. Il ne peut en avoir qu’une à la fois.</li>
+    <li>🛡️ <strong>Protection</strong> : pose une protection sur le nid éclairé. Il ne peut en avoir qu’une à la fois.</li>
     <li>🦊 <strong>Renard</strong> : si le nid est protégé, le bouclier disparaît et bloque le renard. Sinon, le renard avance et prend un œuf dans ce nid s’il y en a un.</li>
     <li>Remplissez les trois nids pour gagner ensemble. Si le renard atteint le poulailler avant, la partie est perdue.</li>
   </ol>`;
@@ -27,7 +28,10 @@ function coopGame() {
   let mode = 'little';
   let player = 0;
   let phase = 'setup';
-  let selected = -1;
+  let selected = 0;
+  let wheelBag = [];
+  let movedFox = false;
+  let nestEffect = '';
   let nests = [];
   let fox = 0;
   let angle = 0;
@@ -37,6 +41,7 @@ function coopGame() {
   let soundOn = true;
   let audio;
   const config = () => coopModes[mode];
+  const goal = () => coopHens.length * config().eggs;
   const total = () => nests.reduce((sum,nest) => sum + nest.eggs,0);
 
   app.innerHTML = `<section class="coop">
@@ -79,7 +84,7 @@ function coopGame() {
     stage.innerHTML = `<div class="coop-intro">
       <div class="coop-intro-copy">
         <h1>La Ronde du<br>Poulailler</h1>
-        <p>Tournez la girouette et protégez les œufs ensemble.</p>
+        <p>Faites tourner la roue et protégez les œufs ensemble.</p>
         <fieldset><legend>Joueurs</legend><div class="coop-options">
           ${[1,2,3,4].map(n => `<button data-count="${n}" aria-pressed="${count === n}">${n}</button>`).join('')}
         </div></fieldset>
@@ -87,7 +92,7 @@ function coopGame() {
           <button data-mode="little" aria-pressed="${mode === 'little'}">Petits</button>
           <button data-mode="family" aria-pressed="${mode === 'family'}">Famille</button>
         </div></fieldset>
-        <p class="coop-mode">${3*config().eggs} œufs à mettre à l’abri</p>
+        <p class="coop-mode">${goal()} œufs à mettre à l’abri</p>
         <button class="coop-primary" data-start>▶ Jouer</button>
       </div>
     </div>`;
@@ -95,63 +100,67 @@ function coopGame() {
 
   function start() {
     player = 0;
-    selected = -1;
+    selected = 0;
+    wheelBag = [];
+    movedFox = false;
+    nestEffect = '';
     nests = coopHens.map(() => ({eggs:0, shield:false}));
     fox = 0;
     angle = 0;
     result = '';
     notice = '';
-    phase = 'choose';
+    phase = 'ready';
     sound([392,523,659]);
     render();
-    focus('[data-nest]:enabled');
+    focus('[data-spin]');
   }
 
   function render() {
-    const {eggs,limit,wheel} = config();
-    rulesButton.disabled = phase === 'spinning';
-    stage.innerHTML = `<div class="coop-board" data-phase="${phase}">
+    const { eggs, limit } = config();
+    const foxPosition = 86 - 49 * fox / limit;
+    const angleBySeat = count === 2 ? [0,180] : [0,-90,180,90];
+    rulesButton.disabled = phase !== 'ready';
+    stage.innerHTML = `<div class="coop-board" data-phase="${phase}" data-seat="${player}" data-count="${count}" style="--seat-angle:${angleBySeat[player]}deg;--fox-step:${49 / limit}cqw">
       <div class="coop-hud">
-        <strong class="coop-pill">${count === 1 ? 'Partie solo' : '● Joueur ' + (player + 1)}</strong>
-        <strong class="coop-pill" aria-label="${total()} œufs sur ${eggs*3}">🥚 ${total()} / ${eggs*3}</strong>
+        <strong class="coop-pill">${count === 1 ? 'Partie solo' : 'Joueur ' + (player + 1)}</strong>
+        <strong class="coop-pill" aria-label="${total()} œufs sur ${goal()}">🥚 ${total()} / ${goal()}</strong>
         <div class="coop-track" aria-label="Renard : ${fox} pas sur ${limit}">
-          ${coopPortrait(3)}${Array.from({length:limit},(_,i) => `<i class="${i < fox ? 'reached' : ''}"></i>`).join('')}<span aria-hidden="true">⌂</span>
+          ${coopIcon('fox')}${Array.from({length:limit},(_,i) => `<i class="${i < fox ? 'reached' : ''}"></i>`).join('')}
         </div>
       </div>
+      <div class="coop-fox ${movedFox ? 'advancing' : ''}" style="--fox:${foxPosition}%" aria-hidden="true">${coopIcon('fox')}</div>
+      <div class="coop-nests" aria-label="Les trois nids">
+        ${nests.map((nest,i)=>`<div class="coop-nest ${nest.eggs === eggs ? 'full' : ''}" style="--capacity:${eggs}" data-nest="${i}"
+          data-active="${i === selected}" data-effect="${i === selected ? nestEffect : ''}" role="group"
+          aria-label="${coopHens[i].name}, ${nest.eggs} œufs sur ${eggs}${nest.shield ? ', protégé' : ''}">
+          <span class="coop-eggs" aria-hidden="true">${Array.from({length:eggs},(_,n)=>`<span class="coop-egg ${n < nest.eggs ? 'filled' : ''} ${i === selected && nestEffect === 'egg' && n === nest.eggs - 1 ? 'new' : ''}">${coopIcon('egg')}</span>`).join('')}</span>
+          ${nest.shield ? `<span class="coop-shield" aria-hidden="true">${coopIcon('shield')}</span>` : ''}
+        </div>`).join('')}
+      </div>
       <div class="coop-center">
-        <div class="coop-wheel" role="img" aria-label="Girouette : quatre cases œuf, une protection, une case renard">
-          ${wheel.map((kind,i)=>`<span class="coop-sector ${kind}" style="--sector:${i*60}deg" aria-hidden="true"><b>${coopSymbols[kind]}</b></span>`).join('')}
+        <div class="coop-wheel" role="img" aria-label="Roue : cinq œufs, une protection et deux renards">
+          ${coopWheel.map((kind,i)=>`<span class="coop-sector ${kind}${phase === 'result' && angle % 360 === i * 45 ? ' landed' : ''}" style="--sector:${i * 45}deg" aria-hidden="true">${coopIcon(kind)}</span>`).join('')}
           <span class="coop-needle" style="--angle:${angle}deg" aria-hidden="true"></span>
         </div>
         <div class="coop-controls">
-          <p class="coop-status" role="status">${phase === 'result' ? notice : selected < 0 ? 'Choisis un nid.' : 'Prêt à lancer la girouette !'}</p>
-          ${phase === 'result' ? `<button class="coop-primary" data-next>${count === 1 ? 'Continuer →' : 'Au suivant →'}</button>` : `<button class="coop-primary" data-spin ${selected < 0 ? 'disabled' : ''}>↻ Tourner</button>`}
+          <button class="coop-primary" data-spin ${phase !== 'ready' ? 'disabled' : ''}>↻ Tourner</button>
+          <p class="coop-status" role="status">${phase === 'result' ? notice : ''}</p>
         </div>
-      </div>
-      <div class="coop-nests" aria-label="Les trois nids">
-        ${nests.map((nest,i)=>`<button class="coop-nest ${nest.eggs === eggs ? 'full' : ''}" style="--hen:${coopHens[i].color}" data-nest="${i}"
-          aria-pressed="${i === selected}" aria-label="${coopHens[i].name}, ${nest.eggs} œufs sur ${eggs}${nest.shield ? ', protégé' : ''}"
-          ${phase !== 'choose' || nest.eggs === eggs ? 'disabled' : ''}>
-          ${coopPortrait(i)}<strong>${coopHens[i].name}</strong>
-          <span class="coop-eggs" aria-hidden="true">${Array.from({length:eggs},(_,n)=>`<i class="${n < nest.eggs ? 'filled' : ''}"></i>`).join('')}</span>
-          <span class="coop-shield" aria-hidden="true">${nest.shield ? '🛡️' : ''}</span>
-        </button>`).join('')}
       </div>
     </div>`;
   }
 
   function spin() {
-    if (selected < 0 || phase !== 'choose') return;
-    const wheel = config().wheel;
-    const slot = Math.floor(Math.random() * wheel.length);
-    result = wheel[slot];
-    angle += 1080 + ((slot*60 - angle % 360 + 360) % 360);
+    if (phase !== 'ready') return;
+    if (!wheelBag.length) wheelBag = coopWheel.map((_, index) => index);
+    const pick = Math.floor(Math.random() * wheelBag.length);
+    const [slot] = wheelBag.splice(pick,1);
+    result = coopWheel[slot];
+    angle += 1080 + ((slot * 45 - angle % 360 + 360) % 360);
     phase = 'spinning';
     rulesButton.disabled = true;
     stage.querySelector('.coop-board').dataset.phase = phase;
-    stage.querySelector('.coop-status').textContent = 'La girouette tourne…';
     stage.querySelector('[data-spin]').disabled = true;
-    stage.querySelectorAll('[data-nest]').forEach(button => {button.disabled = true});
     stage.querySelector('.coop-needle').style.setProperty('--angle',angle+'deg');
     sound([392,440,523]);
     timer = setTimeout(resolveSpin,matchMedia('(prefers-reduced-motion: reduce)').matches ? 75 : 950);
@@ -161,30 +170,59 @@ function coopGame() {
     const nest = nests[selected];
     if (result === 'egg') {
       nest.eggs++;
-      notice = 'Un œuf pour ' + coopHens[selected].name + ' !';
+      nestEffect = 'egg';
+      notice = nest.eggs === config().eggs ? 'Nid rempli !' : 'Un œuf à l’abri !';
       sound([523,659,784]);
     } else if (result === 'shield') {
-      notice = nest.shield ? 'Ce nid garde son bouclier.' : 'Ce nid est protégé !';
       nest.shield = true;
+      nestEffect = 'shield';
+      notice = 'Nid protégé !';
       sound([440,587,740]);
     } else if (nest.shield) {
       nest.shield = false;
-      notice = 'Le bouclier a arrêté le renard !';
+      nestEffect = 'blocked';
+      notice = 'Renard bloqué !';
       sound([440,587]);
     } else {
       fox++;
+      movedFox = true;
+      nestEffect = 'fox';
       const stolen = nest.eggs > 0;
-      nest.eggs = Math.max(0,nest.eggs-1);
-      notice = stolen ? 'Le renard avance et emporte un œuf !' : 'Le renard avance. Le nid était vide.';
+      nest.eggs = Math.max(0,nest.eggs - 1);
+      notice = stolen ? 'Un œuf volé !' : 'Le renard avance !';
       sound([330,247,196]);
-    }
-    if (total() === config().eggs*3 || fox === config().limit) {
-      finish(fox < config().limit);
-      return;
     }
     phase = 'result';
     render();
-    focus('[data-next]');
+    timer = setTimeout(advance,1100);
+  }
+
+  function advance() {
+    if (total() === goal() || fox >= config().limit) {
+      finish(fox < config().limit);
+      return;
+    }
+    const previousWheel = stage.querySelector('.coop-center');
+    const previousAngle = parseFloat(getComputedStyle(previousWheel).rotate) || 0;
+    player = (player + 1) % count;
+    for (let step = 1; step <= nests.length; step++) {
+      const index = (selected + step) % nests.length;
+      if (nests[index].eggs < config().eggs) {
+        selected = index;
+        break;
+      }
+    }
+    phase = 'ready';
+    movedFox = false;
+    nestEffect = '';
+    render();
+    const wheel = stage.querySelector('.coop-center');
+    const nextAngle = parseFloat(getComputedStyle(wheel).rotate) || 0;
+    if (previousAngle !== nextAngle && !matchMedia('(prefers-reduced-motion: reduce)').matches && wheel.animate) {
+      const offset = (previousAngle - nextAngle + 540) % 360 - 180;
+      wheel.animate([{rotate:`${nextAngle + offset}deg`},{rotate:`${nextAngle}deg`}],{duration:310,easing:'ease-out'});
+    }
+    focus('[data-spin]');
   }
 
   function finish(won) {
@@ -194,7 +232,7 @@ function coopGame() {
     stage.innerHTML = `<div class="coop-finish">
       <div class="coop-finale-art">${won ? coopHens.map((_,i)=>coopPortrait(i)).join('') : coopPortrait(3)}</div>
       <h1>${won ? 'Tous les nids sont remplis !' : 'Le renard a trouvé le poulailler !'}</h1>
-      <p>${total()} / ${config().eggs*3} œufs à l’abri</p>
+      <p>${total()} / ${goal()} œufs à l’abri</p>
       <div class="coop-options"><button class="coop-primary" data-start>↻ Rejouer</button><button class="secondary" data-setup>Réglages</button></div>
     </div>`;
     focus('[data-start]');
@@ -212,18 +250,7 @@ function coopGame() {
       if (button.dataset.mode) mode = button.dataset.mode;
       setup();
       focus(button.dataset.count ? `[data-count="${count}"]` : `[data-mode="${mode}"]`);
-    } else if (phase === 'choose' && button.hasAttribute('data-nest')) {
-      selected = Number(button.dataset.nest);
-      render();
-      focus('[data-spin]');
     } else if (button.hasAttribute('data-spin')) spin();
-    else if (phase === 'result' && button.hasAttribute('data-next')) {
-      player = (player+1) % count;
-      selected = -1;
-      phase = 'choose';
-      render();
-      focus('[data-nest]:enabled');
-    }
   });
 
   rulesButton.onclick = () => rules.showModal();
