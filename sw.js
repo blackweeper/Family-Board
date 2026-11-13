@@ -1,1 +1,34 @@
-const CACHE='family-board-v3';const ASSETS=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(hit=>hit||fetch(e.request).then(res=>{const copy=res.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return res}).catch(()=>caches.match('./index.html'))))});
+const CACHE = 'family-board-v4';
+const HOME = new URL('index.html', self.registration.scope).href;
+const ASSETS = [
+  'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
+  'launcher.js', 'manifest.webmanifest', 'slingshot.jpg',
+].map(path => new URL(path, self.registration.scope).href);
+
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await cache.addAll(ASSETS.map(url => new Request(url, { cache: 'reload' })));
+    await self.skipWaiting();
+  })());
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const names = await caches.keys();
+    await Promise.all(names.filter(name => name.startsWith('family-board-') && name !== CACHE)
+      .map(name => caches.delete(name)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('fetch', event => {
+  const { request } = event;
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  if (request.mode === 'navigate' && (url.href.split(/[?#]/)[0] === self.registration.scope || url.href.split(/[?#]/)[0] === HOME)) {
+    event.respondWith(caches.open(CACHE).then(cache => cache.match(HOME)).then(hit => hit || fetch(request)));
+  } else if (ASSETS.includes(request.url)) {
+    event.respondWith(caches.open(CACHE).then(cache => cache.match(request)).then(hit => hit || fetch(request)));
+  }
+});

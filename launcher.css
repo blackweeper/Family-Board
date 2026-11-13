@@ -1,0 +1,66 @@
+:root { --bg:#101323; --panel:#1b2036; --muted:#b9c0d8; }
+body { background:radial-gradient(ellipse at 25% 0%,#262447,transparent 65%),var(--bg); }
+.shell { max-width:1320px; padding:max(20px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left)); }
+.topbar { padding-bottom:20px; }
+.brand b { font:800 1.2rem 'DM Sans',system-ui; letter-spacing:-.035em; }
+.brand em { color:#bcaaff; }
+.mark { background:#c4b3ff; color:#292042; }
+.spotlight { position:relative; isolation:isolate; overflow:hidden; display:grid; align-items:center; min-height:clamp(290px,36vw,460px); border:1px solid #ffffff26; border-radius:30px; background:#342568 url('./slingshot.jpg') center 54% / cover no-repeat; box-shadow:0 18px 52px #07081666; }
+.spotlight::before { position:absolute; z-index:-1; inset:0; content:""; background:linear-gradient(90deg,#1d173ef5,#241944bf 28%,#25184218 70%); }
+.spotlight-copy { padding:clamp(24px,5vw,66px); }
+.spotlight .eyebrow { color:#ffdfa2; }
+.spotlight h1 { margin:.12em 0; font:800 clamp(3.1rem,7.4vw,7rem)/.88 'DM Sans',system-ui; letter-spacing:-.075em; }
+.spotlight p { margin:1.2rem 0; font-weight:700; }
+.spotlight-art { display:none; }
+.primary.launch-button { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:12px 20px; background:#ffe5a9; color:#2c2042; text-decoration:none; }
+.library { margin-top:28px; }
+.library-head,.shelves,.detail-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.library-head { justify-content:space-between; margin-bottom:14px; }
+.library-head h2 { margin:0; font-size:clamp(1.5rem,3vw,2.2rem); letter-spacing:-.04em; }
+.library-head label { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:.86rem; }
+.library-head select,.shelves button,.star,.close-detail { min-height:44px; border:1px solid var(--line); border-radius:14px; background:#252941; color:#f6f4ff; font:inherit; cursor:pointer; }
+.library-head select,.shelves button { padding:8px 14px; }
+.shelves { margin-bottom:18px; }
+.shelves button[aria-pressed="true"] { background:#d0bfff; color:#251940; font-weight:800; }
+.covers { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+.cover { position:relative; min-width:0; overflow:hidden; border:1px solid var(--line); border-radius:20px; background:#1e233a; }
+.coral { --light:#fa936e; --dark:#7e2b61; }
+.violet { --light:#be96ff; --dark:#49298c; }
+.blue { --light:#70d6ff; --dark:#21499f; }
+.mint { --light:#8ce9b1; --dark:#1f645e; }
+.gold { --light:#ffd682; --dark:#8a4829; }
+.cover-open { display:block; width:100%; height:100%; padding:0; text-align:left; background:none; border:0; cursor:pointer; }
+.cover-art,.detail-art { display:grid; place-items:center; background:radial-gradient(circle at 50% 48%,#ffffff47 0 21%,transparent 22% 31%,#ffffff26 32% 33%,transparent 34%),linear-gradient(138deg,var(--light),var(--dark)); }
+.cover-art { min-height:105px; aspect-ratio:2.15; font-size:clamp(2.75rem,5vw,4.25rem); text-shadow:0 6px 12px #110e3555; transition:font-size .18s; }
+.cover-open[data-detail="slingshot"] .cover-art { background:#342568 url('./slingshot.jpg') right 56% / cover; color:transparent; text-shadow:none; }
+.cover-copy { display:grid; gap:5px; padding:12px; }
+.cover-copy small,.detail-meta,.empty { color:var(--muted); }
+.cover-copy strong { font-size:1.05rem; }
+.star,.close-detail { display:grid; place-items:center; width:44px; height:44px; font-size:1.45rem; background:#1c1836ec; }
+.cover .star { position:absolute; top:7px; right:7px; }
+.star[aria-pressed="true"] { color:#ffdc82; }
+.empty { padding:20px 0; }
+#details { width:min(560px,calc(100% - 32px)); max-height:calc(100% - 32px); padding:0; overflow:auto; border:1px solid #ffffff38; border-radius:24px; background:var(--panel); color:#f5f7ff; }
+#details::backdrop { background:#090b19c9; }
+.detail-art { min-height:140px; font-size:4.4rem; }
+#details[data-game="slingshot"] .detail-art { min-height:175px; background:#342568 url('./slingshot.jpg') right 56% / cover; color:transparent; }
+.close-detail { position:absolute; top:10px; right:10px; }
+.detail-copy { padding:20px 24px 24px; }
+.detail-copy h2 { margin:0; font-size:clamp(1.5rem,4vw,2.2rem); }
+.detail-copy p { margin:10px 0; }
+.detail-meta { font-size:.9rem; }
+.detail-actions { margin-top:18px; }
+button:focus-visible,a:focus-visible,select:focus-visible { outline:3px solid #ffe5a9; outline-offset:2px; }
+.cover-open:focus-visible { outline-offset:-4px; }
+@media (hover:hover) {
+  .cover-open:hover .cover-art { font-size:clamp(3.1rem,5.5vw,4.65rem); }
+  .shelves button:hover,.star:hover,.close-detail:hover { border-color:#c4b3ff; }
+}
+@media (max-width:820px) { .covers { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:600px) {
+  .shell { padding-inline:max(14px,env(safe-area-inset-left),env(safe-area-inset-right)); }
+  .covers { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .spotlight { background-position:59% center; }
+  .spotlight::before { background:linear-gradient(90deg,#1d173ef5,#24194475 70%,transparent); }
+}
+@media (prefers-reduced-motion:reduce) { .cover-art,.toast { transition:none; } }

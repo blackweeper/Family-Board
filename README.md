@@ -1,24 +1,19 @@
-# Family Board — V1
+# Family Board 2.0
 
-Prototype de console familiale pour iPad en mode paysage.
+Console familiale en français, pensée pour l’iPad en paysage. [Ouvrir Family Board](https://blackweeper.github.io/Family-Board/).
 
-## Jeux inclus
-- Memory Battle : memory à deux joueurs, scores et alternance.
-- Puissance 4 : deux joueurs avec détection des alignements.
-- Dé magique : dé numérique à lancer ou résultat d'un vrai dé.
-- Catapult Challenge : mini-jeu d'adresse avec score.
-- Treasure Quest : quiz coopératif.
-- Cartes mystères : première version basée sur le quiz coopératif.
+- **Maison** — Family Slingshot, Memory Battle, Puissance 4, Dé magique, Catapult Challenge, Treasure Quest et Cartes mystères.
+- **Web** — Labyrinthe spatial, Animal Slider et Memory des super-vilains, hébergés par Toy Theater.
+- **iPad** — Thinkrolls 2, Monument Valley 2 et Toca Boca World via l’App Store belge.
 
-## Déploiement GitHub Pages
-1. Ouvrir **Settings → Pages** dans le dépôt.
-2. Dans **Build and deployment**, choisir **Deploy from a branch**.
-3. Choisir la branche `main` et le dossier `/(root)`, puis enregistrer.
-4. Attendre la publication, puis ouvrir `https://blackweeper.github.io/Family-Board/` sur l'iPad.
-5. Dans Safari : **Partager → Sur l’écran d’accueil**.
+Les favoris sont conservés dans le stockage local du navigateur. Les jeux Web s’ouvrent hors du launcher et nécessitent Internet. Les fiches iPad renvoient vers l’App Store. Pour lancer une app installée, utilisez son icône ou le bouton d’ouverture de l’App Store. Un lien universel nécessite une association entre le site et l’application de l’éditeur. [Documentation Apple](https://developer.apple.com/documentation/xcode/allowing-apps-and-websites-to-link-to-your-content).
 
-## Mode hors ligne
-Le service worker met en cache les fichiers principaux après le premier chargement. La police distante dispose de polices système de secours.
+## Développement
 
-## Limites de cette V1
-Prototype initial : pas de profils ni de sauvegarde persistante des scores, pas de reconnaissance automatique des pions, pas de scan QR, et pas d'intégration de jeux commerciaux tiers. Les accessoires physiques (dés/pions/cartes) sont utilisés manuellement en complément de l'écran. Tester sur iPad avant utilisation familiale.
+Servez le dossier en HTTP avec `python -m http.server 8000`, puis ouvrez `http://localhost:8000/`. Le catalogue se trouve dans `catalog.js`. Les jeux maison sont lancés par leur identifiant dans `app.js`. Pour remplacer une entrée externe par un jeu maison, conservez son identifiant afin de préserver les favoris, changez son type et ajoutez le lancement dans `app.js`.
+
+Le service worker conserve le launcher, ses ressources locales et les jeux maison après le premier chargement en ligne. Incrémentez la version du cache dans `sw.js` lors d’une mise à jour des fichiers précachés.
+
+## Publication
+
+GitHub Pages publie la racine de la branche `main`. Sur l’iPad, ouvrez le site dans Safari puis utilisez **Partager → Sur l’écran d’accueil** pour l’installer.
