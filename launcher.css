@@ -64,3 +64,12 @@ button:focus-visible,a:focus-visible,select:focus-visible { outline:3px solid #f
   .spotlight::before { background:linear-gradient(90deg,#1d173ef5,#24194475 70%,transparent); }
 }
 @media (prefers-reduced-motion:reduce) { .cover-art,.toast { transition:none; } }
+
+.cover-open[data-arcade] .cover-art { aspect-ratio:3/2; overflow:hidden; }
+.cover-art img { display:block; width:100%; height:100%; object-fit:cover; }
+.cover-play { position:absolute; top:7px; left:7px; display:grid; place-items:center; width:44px; height:44px; border-radius:14px; background:#ffe5a9; color:#2c2042; }
+.arcade-bar { display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.arcade-bar h1 { margin:0; font-size:clamp(1rem,2.8vw,1.6rem); }
+.arcade-bar #back { min-height:44px; }
+.arcade-game { display:block; width:min(100%, calc(max(240px, 100vh - 175px) * 5 / 3)); aspect-ratio:5/3; margin:auto; border:0; border-radius:16px; background:#181d32; }
+.arcade-credit { color:var(--muted); text-align:center; font-size:.85rem; }

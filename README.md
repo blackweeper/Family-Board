@@ -6,7 +6,7 @@ Console familiale en français, pensée pour l’iPad en paysage. [Ouvrir Family
 - **Web** — Labyrinthe spatial, Animal Slider et Memory des super-vilains, hébergés par Toy Theater.
 - **iPad** — Thinkrolls 2, Monument Valley 2 et Toca Boca World via l’App Store belge.
 
-Les favoris sont conservés dans le stockage local du navigateur. Les jeux Web s’ouvrent hors du launcher et nécessitent Internet. Les fiches iPad renvoient vers l’App Store. Pour lancer une app installée, utilisez son icône ou le bouton d’ouverture de l’App Store. Un lien universel nécessite une association entre le site et l’application de l’éditeur. [Documentation Apple](https://developer.apple.com/documentation/xcode/allowing-apps-and-websites-to-link-to-your-content).
+Les favoris sont conservés dans le stockage local du navigateur. Les jeux Toy Theater s’ouvrent sur leur site. Dix jeux HTMLGames se lancent dans le launcher, avec leurs jaquettes officielles. Ces jeux nécessitent Internet et peuvent afficher des publicités. Les repères d’âge sont indicatifs. Le fichier ads.txt du fournisseur est publié sous le chemin du projet GitHub Pages. Les fiches iPad renvoient vers l’App Store. Pour lancer une app installée, utilisez son icône ou le bouton d’ouverture de l’App Store. Un lien universel nécessite une association entre le site et l’application de l’éditeur. [Documentation Apple](https://developer.apple.com/documentation/xcode/allowing-apps-and-websites-to-link-to-your-content).
 
 ## Développement
 

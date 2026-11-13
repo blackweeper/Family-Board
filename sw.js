@@ -1,8 +1,18 @@
-const CACHE = 'family-board-v4';
+const CACHE = 'family-board-v5';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
   'launcher.js', 'manifest.webmanifest', 'slingshot.jpg',
+  'covers/BalloonMaze.jpg',
+  'covers/BalloonPop.jpg',
+  'covers/ColoringForKids.jpg',
+  'covers/FindTheOddOneOut.jpg',
+  'covers/JigsawJamAnimal.jpg',
+  'covers/JigsawJamCars.jpg',
+  'covers/LumaBubbles.jpg',
+  'covers/MemoryPuzzle.jpg',
+  'covers/PlushyAnimals.jpg',
+  'covers/ZooAnimals.jpg',
 ].map(path => new URL(path, self.registration.scope).href);
 
 self.addEventListener('install', event => {

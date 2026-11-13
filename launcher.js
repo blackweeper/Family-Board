@@ -54,8 +54,9 @@ function home(focusSelector) {
       </nav>
       <div class="covers">${games.map(game => `
         <article class="cover ${game.color}">
-          <button class="cover-open" data-detail="${game.id}">
-            <span class="cover-art" aria-hidden="true">${game.icon}</span>
+          <button class="cover-open" ${game.provider ? 'data-arcade' : 'data-detail'}="${game.id}">
+            <span class="cover-art" aria-hidden="true">${game.provider ? `<img src="./covers/${game.provider}.jpg" alt="" loading="lazy">` : game.icon}</span>
+            ${game.provider ? '<span class="cover-play" aria-hidden="true">▶</span>' : ''}
             <span class="cover-copy"><small>${sourceLabels[game.type]} · ${game.category}</small><strong>${game.title}</strong></span>
           </button>
           ${favoriteButton(game)}
@@ -93,6 +94,8 @@ app.addEventListener('click', event => {
     shelf = button.dataset.shelf;
     category = '';
     home(`[data-shelf="${shelf}"]`);
+  } else if (button.dataset.arcade) {
+    openArcade(catalog.find(game => game.id === button.dataset.arcade));
   } else if (button.dataset.detail) {
     showDetails(catalog.find(game => game.id === button.dataset.detail));
   } else if (button.dataset.star) {
@@ -130,5 +133,22 @@ details.addEventListener('click', event => {
 details.addEventListener('close', () => {
   if (detailReturnFocus) app.querySelector(detailReturnFocus)?.focus({ preventScroll: true });
 });
+
+function openArcade(game) {
+  app.innerHTML = `
+    <section class="arcade" aria-labelledby="arcade-title">
+      <div class="arcade-bar">
+        <button type="button" class="secondary" id="back">← Retour aux jeux</button>
+        <h1 id="arcade-title">${game.title}</h1>
+      </div>
+      ${navigator.onLine ?
+        `<iframe class="arcade-game" src="https://cdn.htmlgames.com/${game.provider}/index.html?lang=fr" title="${game.title}" allow="autoplay"></iframe>` :
+        '<p class="empty" role="status">Ce jeu a besoin d’Internet. Reviens au catalogue pour jouer hors ligne.</p>'}
+      <p class="arcade-credit">${game.description} · ${game.players} (repère) · HTMLGames / Zygomatic · Publicités possibles</p>
+    </section>`;
+  app.querySelector('#back').onclick = () => home(`[data-arcade="${game.id}"]`);
+  window.scrollTo(0, 0);
+  app.querySelector('#back').focus({ preventScroll: true });
+}
 
 home();
