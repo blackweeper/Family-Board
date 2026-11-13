@@ -1,0 +1,74 @@
+.pico { color:#fff9e6; }
+.pico-bar { display:flex; gap:8px; justify-content:flex-end; margin-bottom:12px; }
+.pico-bar #back { margin-right:auto; }
+.pico-bar button { min-height:44px; }
+.pico-bar button:disabled { opacity:.55; cursor:default; }
+.pico-intro,.pico-table,.pico-finish { overflow:hidden; border:1px solid #b9f1cb80; border-radius:27px; box-shadow:0 14px 40px #05251c70; }
+.pico-intro { display:grid; align-items:center; min-height:clamp(420px,53vw,620px); background:linear-gradient(90deg,#082923f2,#082923bc 32%,#08292312 76%),url('./covers/pico.jpg') center/cover; }
+.pico-intro-copy { padding:clamp(22px,5vw,60px); }
+.pico h1 { margin:0; font:900 clamp(2.7rem,6.5vw,5.8rem)/.94 'DM Sans',system-ui; letter-spacing:-.065em; }
+.pico-intro p { font-weight:800; }
+.pico fieldset { border:0; padding:0; margin:14px 0; }
+.pico legend { margin-bottom:6px; }
+.pico-choices,.pico-tools { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; }
+.pico-intro .pico-choices { justify-content:flex-start; }
+.pico-choices button,.pico-action { cursor:pointer; min-height:48px; min-width:48px; padding:9px 14px; border:1px solid #ffe8ac68; border-radius:13px; color:#fff7d6; background:#20483f; font-weight:800; -webkit-tap-highlight-color:transparent; }
+.pico-choices button[aria-pressed=true],.pico .pico-action { background:#ffe08f; color:#362a19; }
+.pico-mode { font-size:.9rem; }
+.pico-table {
+  display:grid; grid-template-rows:auto minmax(130px,1fr) auto; min-height:clamp(460px,70svh,660px);
+  padding:clamp(10px,2.3vw,28px);
+  background:linear-gradient(#092b231c,#092b235b),url('./covers/pico-board.jpg') center/cover;
+}
+.pico-hud { display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.pico-turn,.pico-progress,.pico-threat { border:1px solid #c7efc457; border-radius:999px; background:#112f29ed; padding:7px 10px; font-weight:800; white-space:nowrap; }
+.pico-turn { color:var(--player); }
+.pico-threat { display:flex; align-items:center; gap:4px; }
+.pico-threat i,.pico-nest i { display:inline-block; width:9px; height:9px; background:#d4f8dc45; border-radius:50%; }
+.pico-threat i.filled { background:#ffb38e; box-shadow:0 0 9px #ffac8caa; }
+.pico-stream { position:relative; min-height:150px; }
+.pico-bird { position:absolute; width:clamp(104px,19vw,216px); left:13%; top:52%; transform:translate(-50%,-50%); }
+.pico-bird img,.pico-finish img { display:block; width:100%; filter:drop-shadow(0 8px 11px #10281b83); }
+.pico-bird > .pico-egg { position:absolute; left:68%; top:48%; width:21%; }
+.pico-table:is([data-phase=place],[data-phase=miss]) .pico-bird { left:84%; }
+.pico-table[data-phase=slide] .pico-bird { animation:pico-ride .78s cubic-bezier(.2,.55,.34,1) both; }
+.pico-table[data-outcome=crack]:is([data-phase=slide],[data-phase=miss]) .pico-bird > .pico-egg { animation:pico-crack .78s ease both; }
+@keyframes pico-ride {
+  0% { left:13%; transform:translate(-50%,-50%) rotate(-8deg); }
+  45% { transform:translate(-50%,-61%) rotate(6deg); }
+  78% { transform:translate(-50%,-43%) rotate(-5deg); }
+  100% { left:84%; transform:translate(-50%,-50%); }
+}
+@keyframes pico-crack { 65% { opacity:1; } 100% { opacity:0; transform:translate(50%,-70%) rotate(40deg); } }
+.pico-dock { display:grid; justify-items:center; gap:9px; }
+.pico-status { margin:0; font-weight:850; text-align:center; text-shadow:0 2px 4px #102e20,0 0 10px #0c2c20; }
+.pico-meter { position:relative; width:min(90%,390px); height:24px; border:2px solid #fff1b9; border-radius:999px; background:#1e4140; box-shadow:0 3px 12px #0b261c91; }
+.pico-meter span { position:absolute; top:0; bottom:0; left:var(--left); width:var(--width); background:#75ec9c; border-inline:2px solid #e7ffbf; }
+.pico-meter i { position:absolute; top:-4px; bottom:-4px; left:0; width:6px; transform:translateX(-50%); background:#fff6cb; border:1px solid #42362b; border-radius:5px; }
+.pico-egg { width:clamp(26px,4vw,44px); aspect-ratio:4/5; display:inline-grid; place-items:center; border-radius:50% 50% 45% 45% / 61% 61% 39% 39%; color:#24362a; background:radial-gradient(ellipse at 32% 23%,#ffffffb5,transparent 58%),var(--egg); box-shadow:inset 0 -4px 6px #3c3e294a,0 3px 4px #12322c65; font-size:clamp(.9rem,2vw,1.35rem); }
+.pico-choice { min-width:54px; min-height:56px; padding:5px 9px; border:1px solid #d3f2c681; border-radius:15px; background:#183e35e8; cursor:pointer; }
+.pico-choice:disabled { opacity:.38; cursor:default; }
+.pico-nests { display:flex; justify-content:center; gap:8px; }
+.pico-nest { min-width:clamp(66px,9vw,110px); min-height:48px; display:grid; place-items:center; gap:2px; padding:5px 8px; border:1px solid #b9e3ad6e; border-radius:16px; background:linear-gradient(#346849,#204635); color:var(--egg); }
+.pico-nest:not(:disabled) { border-color:var(--egg); box-shadow:0 0 12px #c9ffbf85; cursor:pointer; }
+.pico-nest span { display:flex; gap:4px; }
+.pico-nest i { width:12px; height:15px; border-radius:50% 50% 45% 45% / 61% 61% 39% 39%; }
+.pico-nest i.filled { display:grid; place-items:center; background:var(--egg); color:#24362a; font:800 8px/1 system-ui; }
+.pico-finish { display:grid; place-content:center; justify-items:center; gap:12px; padding:22px; min-height:clamp(405px,53vw,620px); text-align:center; background:linear-gradient(#082e2f87,#082e2fd9),url('./covers/pico-board.jpg') center/cover; }
+.pico-finish img { width:clamp(110px,19vw,200px); }
+.pico-finish h1 { font-size:clamp(2rem,5.5vw,4rem); }
+.pico-finish p { margin:0; font-weight:800; }
+.pico-rules { width:min(530px,calc(100% - 28px)); max-height:calc(100% - 28px); border:1px solid #b9f4ca; border-radius:22px; padding:24px; color:#fff9e6; background:#183d33; }
+.pico-rules::backdrop { background:#081c18dc; }
+.pico-rules h2 { margin-top:0; }
+.pico-rules li { padding:4px; line-height:1.45; }
+.cover-open[data-detail=pico] .cover-art,#details[data-game=pico] .detail-art { background:#123f32 url('./covers/pico.jpg') center/cover; }
+@media(max-width:460px) {
+  .pico-bar .secondary { padding-inline:7px; font-size:.8rem; }
+  .pico-hud { font-size:.82rem; }
+  .pico-bird { left:17%; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .pico-table[data-phase=slide] .pico-bird { animation:none; left:84%; }
+  .pico-table[data-outcome=crack] .pico-bird > .pico-egg { animation:none!important; opacity:0; }
+}
