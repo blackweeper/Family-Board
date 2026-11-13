@@ -29,7 +29,6 @@ function tableGame() {
   let phase = 'setup';
   let last = null;
   let topCard = null;
-  let discarded = 0;
   let timer;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let soundOn = true;
@@ -93,7 +92,6 @@ function tableGame() {
     active = 0;
     last = null;
     topCard = null;
-    discarded = 0;
     phase = 'pick';
     sound([392, 523, 659]);
     render();
@@ -127,7 +125,6 @@ function tableGame() {
 
   function reveal() {
     topCard = last.card;
-    discarded++;
     phase = 'reveal';
     sound(last.correct ? [523, 659, 784] : [349, 262]);
     render();
@@ -149,6 +146,10 @@ function tableGame() {
       const y = previousDock.y + previousDock.height / 2 - currentDock.y - currentDock.height / 2;
       const currentAngle = parseFloat(getComputedStyle(dock).rotate) || 0;
       const offset = (previousAngle - currentAngle + 540) % 360 - 180;
+      stage.querySelector('.table-discard').animate([
+        { rotate: `${currentAngle + offset}deg` },
+        { rotate: `${currentAngle}deg` },
+      ], { duration: 320, easing: 'ease-out' });
       dock.animate([
         { translate: `calc(-50% + ${x}px) calc(-50% + ${y}px)`, rotate: `${currentAngle + offset}deg`, opacity: .6 },
         { translate: '-50% -50%', rotate: `${currentAngle}deg`, opacity: 1 },
@@ -181,11 +182,10 @@ function tableGame() {
       ${seats()}
       <div class="table-center">
         <span class="table-turn" style="--player:${player.color}">● Tour de ${player.name}</span>
-        <div class="table-discard" data-count="${discarded}">
+        <div class="table-discard" data-filled="${topCard !== null}">
           ${topCard !== null ? `<figure class="table-card ${revealed ? 'fresh' : ''}" aria-label="Carte révélée : ${tableMenu[topCard]}">${tableImage(topCard)}</figure>` :
             '<div class="table-card table-back" role="img" aria-label="Carte face cachée">✦</div>'}
           ${revealed ? `<span class="table-result" aria-hidden="true">${last.correct ? '✓' : '×'}</span>` : ''}
-          <span class="table-count table-discard-count" role="img" aria-label="${discarded} cartes jouées"><i></i>${discarded}</span>
         </div>
         <p class="table-status" role="status">${status}</p>
       </div>

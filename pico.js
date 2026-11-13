@@ -12,8 +12,8 @@ const picoRules = `
   <ol>
     <li>Jouez chacun à votre tour. Choisis un œuf dans le nid.</li>
     <li>Sur la jauge, attends que le curseur soit dans la zone verte, puis touche <strong>Glisser</strong>. Pico descend la cascade avec l’œuf !</li>
-    <li>Un œuf intact rejoint automatiquement une carte-cachette de son motif. À chaque œuf sauvé, la zone verte rétrécit et le curseur accélère.</li>
-    <li>Si l’œuf se fissure, la loutre l’emporte et avance vers le nid. Un œuf du même motif le remplace au tour suivant. Chaque cachette complétée fait reculer la loutre.</li>
+    <li>Un œuf intact rejoint automatiquement une carte-cachette de son motif. Si aucune cachette n’attend ce motif, la main passe au joueur suivant. À chaque œuf sauvé, la zone verte rétrécit et le curseur accélère.</li>
+    <li>Si l’œuf se fissure, la loutre l’emporte et avance vers le nid. Chaque cachette complétée fait reculer la loutre.</li>
     <li>Gagnez ensemble en remplissant toutes les cartes-cachettes avant que la loutre n’atteigne le nid.</li>
   </ol>`;
 
@@ -183,7 +183,7 @@ function picoGame() {
     const { limit } = config();
     const active = phase === 'choose' || phase === 'aim';
     const stageText = {
-      choose: notice || 'Choisis un œuf.',
+      choose: '',
       aim: 'Appuie quand le curseur est dans le vert.',
       slide: 'Pico descend la cascade !',
       place: 'Œuf intact ! Il rejoint sa cachette.',
@@ -191,10 +191,7 @@ function picoGame() {
       steal: 'Attention, la loutre attrape l’œuf !',
       miss: 'La loutre emporte l’œuf fissuré !',
     };
-    const nestSlots = shelters.flatMap(card => card.slots);
-    const carried = ['choose','saved'].includes(phase) ? -1 : nestSlots.findIndex(slot => !slot.filled && slot.egg === selected);
-    const remaining = goal() - total() - Number(carried >= 0);
-    stage.innerHTML = `<div class="pico-table" data-phase="${phase}" data-outcome="${outcome}" data-seat="${player}" style="--otter:${96 - 68 * threat / limit}%;--otter-step:${68 / limit}cqw">
+    stage.innerHTML = `<div class="pico-table" data-phase="${phase}" data-outcome="${outcome}" data-seat="${player}" style="--otter:${96 - 45 * threat / limit}%;--otter-step:${45 / limit}cqw">
       <div class="pico-hud">
         <div class="pico-turn" style="--player:${colors[player]}">● Joueur ${player + 1}</div>
         <div class="pico-progress" aria-label="${total()} œufs sauvés sur ${goal()}">🥚 ${total()} / ${goal()}</div>
@@ -203,17 +200,14 @@ function picoGame() {
         </div>
       </div>
       <div class="pico-stream">
-        <div class="pico-start-nest" data-capacity="${goal()}" role="img" aria-label="Nid de départ, ${remaining} œufs">
-          ${nestSlots.map((slot, i) => `<span class="pico-start-slot">${!slot.filled && i !== carried ? picoEgg(slot.egg) : ''}</span>`).join('')}
-        </div>
         ${actor()}<span class="pico-splash" aria-hidden="true"></span>
         <div class="pico-otter"><img src="./covers/pico-otter.png" alt="La loutre" draggable="false">${phase === 'steal' || phase === 'miss' ? picoEgg(selected) : ''}</div>
       </div>
       <div class="pico-dock">
-        <p class="pico-status" role="status">${stageText[phase]}</p>
+        ${stageText[phase] ? `<p class="pico-status" role="status">${stageText[phase]}</p>` : ''}
         ${phase === 'aim' ? meter() : ''}
         <div class="pico-tools">
-          ${active ? (phase === 'choose' ? picoEggs.map((name,i)=>`<button class="pico-choice" data-egg="${i}" aria-label="Œuf ${name}" ${!shelters.some(card => needs(card,i)) ? 'disabled' : ''}>${picoEgg(i)}</button>`).join('') :
+          ${active ? (phase === 'choose' ? picoEggs.map((name,i)=>`<button class="pico-choice" data-egg="${i}" aria-label="Œuf ${name}" >${picoEgg(i)}</button>`).join('') :
             '<button class="pico-action" data-slide>➜ Glisser</button>') : ''}
         </div>
       </div>
@@ -263,9 +257,13 @@ function picoGame() {
   function resolveSlide() {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (outcome === 'safe') {
+      const index = shelters.findIndex(card => needs(card, selected));
+      if (index === -1) {
+        next();
+        return;
+      }
       phase = 'place';
       render();
-      const index = shelters.findIndex(card => needs(card, selected));
       const slot = shelters[index].slots.findIndex(item => !item.filled && item.egg === selected);
       flyEgg(stage.querySelector(`[data-slot="${index}-${slot}"] .pico-egg`), reduced ? 0 : 500);
       timer = setTimeout(() => shelter(index, slot), reduced ? 0 : 500);
@@ -316,12 +314,12 @@ function picoGame() {
     }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 80 : 680);
   }
 
-  function next(text = '') {
+  function next() {
     player = (player + 1) % playerCount;
     selected = -1;
     outcome = '';
     phase = 'choose';
-    notice = text;
+    notice = '';
     filledCard = -1;
     filledSlot = -1;
     render();

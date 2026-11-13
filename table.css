@@ -28,7 +28,6 @@
   width:8px; height:11px; border:1px solid currentColor; border-radius:2px;
   transform:rotate(-14deg); box-shadow:2px 1px #123738,3px 2px currentColor;
 }
-.table-discard-count { padding:3px 10px; }
 .table-stack { display:grid; place-items:center; width:var(--hand-card,clamp(16px,2.4vw,28px)); aspect-ratio:3/4; border:1px solid var(--player); border-radius:5px; color:var(--player); background:linear-gradient(145deg,#255c61,#143337); box-shadow:0 2px 0 #190e24; font-size:.7rem; }
 .table-center { grid-area:center; display:grid; justify-items:center; align-content:center; gap:9px; }
 .table-turn { border:1px solid var(--player); border-radius:999px; color:var(--player); background:#143a3b; padding:5px 12px; font-weight:800; }
@@ -83,12 +82,15 @@
   .table-board[data-active="1"] .table-dock { left:79%; top:50%; rotate:-90deg; }
   .table-board[data-active="2"] .table-dock { top:24.5%; rotate:180deg; }
   .table-board[data-active="3"] .table-dock { left:21%; top:50%; rotate:90deg; }
+  .table-board[data-active="1"] .table-discard { rotate:-90deg; }
+  .table-board[data-active="2"] .table-discard { rotate:180deg; }
+  .table-board[data-active="3"] .table-discard { rotate:90deg; }
 }
 @media (orientation:portrait), (max-width:699px) {
   .table-seat-1 .table-hand,.table-seat-3 .table-hand { display:grid; grid-template-columns:repeat(2,auto); }
 }
 .table-discard { display:grid; position:relative; justify-items:center; gap:8px; }
-.table-discard:not([data-count="0"]) .table-card { box-shadow:0 3px #23474a,0 5px #ffd99b,0 7px #23474a,0 9px #d6ae78,0 12px 19px #09252799; }
+.table-discard[data-filled=true] .table-card { box-shadow:0 3px #23474a,0 5px #ffd99b,0 7px #23474a,0 9px #d6ae78,0 12px 19px #09252799; }
 .table-flying { position:fixed; z-index:5; pointer-events:none; }
 .table-result {
   position:absolute; z-index:1; top:8px; right:5px; translate:33% -38%;
