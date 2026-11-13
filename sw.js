@@ -1,4 +1,4 @@
-const CACHE = 'family-board-v31';
+const CACHE = 'family-board-v32';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',

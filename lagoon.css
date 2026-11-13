@@ -85,8 +85,14 @@
 @media(min-width:681px) {
   .lagoon-seat-1 .lagoon-token { rotate:-90deg; }
   .lagoon-seat-3 .lagoon-token { rotate:90deg; }
-  .lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-dock { --side-offset:clamp(20px,4vw,55px); transform:translateX(var(--side-offset)) rotate(var(--turn)); }
-  .lagoon-table[data-active="3"] .lagoon-dock { --side-offset:clamp(-55px,-4vw,-20px); }
+  .lagoon-table[data-active="1"] { --side:1; }
+  .lagoon-table[data-active="3"] { --side:-1; }
+  .lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-dock {
+    transform:translateX(calc(var(--side) * clamp(52px,7vw,92px))) rotate(var(--turn));
+  }
+  .lagoon-table:is([data-active="1"],[data-active="3"]) :is(.lagoon-seat-0,.lagoon-seat-2) {
+    translate:calc(var(--side) * clamp(-72px,-6vw,-42px)) 0;
+  }
 }
 .lagoon-message { max-width:31ch; }
 .lagoon-dock .lagoon-actions { flex-wrap:nowrap; }
@@ -103,8 +109,8 @@
   .lagoon-card { width:clamp(38px,12svh,85px); }
 }
 @media(max-width:680px) {
-  .lagoon-table { grid-template: "north east west" auto "dock dock dock" 1fr "south south south" auto / repeat(3,minmax(0,1fr)); padding:10px; }
-  .lagoon-dock { transform:none; width:100%; }
+  .lagoon-table { grid-template: "west north east" auto "dock dock dock" 1fr "south south south" auto / minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); padding:10px; }
+  .lagoon-table .lagoon-dock { transform:none; width:100%; }
   .lagoon-token span { width:clamp(43px,11vw,70px); }
   .lagoon-card,.lagoon-table:is([data-active="1"],[data-active="3"]) .lagoon-card { width:clamp(28px,13vw,74px); }
   .lagoon-bar .secondary { padding-inline:8px; font-size:.85rem; }
