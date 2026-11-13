@@ -14,7 +14,7 @@
 .prism-choices button[aria-pressed=true],.prism .prism-action { background:#ffe19a; color:#302143; }
 .prism-mode-info { font-size:.86rem; }
 .prism-table {
-  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.65fr) minmax(0,1fr);
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);
   grid-template-rows:auto 1fr auto; align-items:center; gap:10px;
   min-height:clamp(455px,72svh,665px); padding:clamp(10px,2.3vw,29px);
   background:linear-gradient(#120e2628,#120e264f),url('./covers/prism-board.jpg') center/cover;
@@ -22,7 +22,7 @@
 .prism-challenge { grid-area:2/2; min-width:0; text-align:center; }
 .prism-round { margin:0 0 11px; color:#ded2ff; font-weight:800; font-size:.85rem; }
 .prism-clues { display:flex; justify-content:center; gap:clamp(5px,1vw,12px); }
-.prism-clue { min-width:0; flex:0 1 104px; border:2px solid transparent; border-radius:14px; box-shadow:0 6px 18px #0a091988; }
+.prism-clue { min-width:0; flex:0 1 116px; border:2px solid transparent; border-radius:14px; box-shadow:0 6px 18px #0a091988; }
 .prism-clue.found,.reveal-answer .prism-clue.right { border-color:var(--seat,#ffe28c); box-shadow:0 0 16px #ffe28c5e; }
 .reveal-answer .prism-clue:not(.right) { opacity:.48; }
 .prism-timer { height:5px; margin:12px auto 0; max-width:250px; background:#d7bcff2b; border-radius:10px; overflow:hidden; }

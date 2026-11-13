@@ -6,8 +6,8 @@ const prismColors = [
   { name: 'rose', mark: '✦', paint: '#e65b9c' },
 ];
 const prismModes = {
-  little: { rounds: 8, time: 9000, pause: 1200, figures: 2, matches: 1 },
-  family: { rounds: 12, time: 6500, pause: 1000, figures: 3, matches: 2 },
+  little: { rounds: 8, time: 9000, pause: 1200 },
+  family: { rounds: 12, time: 6500, pause: 1000 },
 };
 
 function prismRobot(id, color = id) {
@@ -23,7 +23,7 @@ const prismRules = `
   <ol>
     <li>Chacun choisit une zone du plateau. Les quatre robots de référence y gardent toujours leur couleur et leur symbole.</li>
     <li>Regarde les robots au centre. Touche dans ta zone le robot qui a la même forme et le même symbole.</li>
-    <li>Le premier à trouver un robot correct gagne un éclat. En mode Famille, plusieurs robots peuvent être corrects. Un robot déjà trouvé ne rapporte plus de point.</li>
+    <li>Le premier à trouver un robot correct gagne un éclat. Sur chaque carte, un à trois robots peuvent être corrects. Un robot déjà trouvé ne rapporte plus de point.</li>
     <li>Une erreur bloque tes boutons jusqu’à la carte suivante. À la fin, le plus grand nombre d’éclats gagne. En cas d’égalité, la victoire est partagée.</li>
   </ol>
   <div class="prism-example">
@@ -110,23 +110,17 @@ function prismGame() {
             <button data-mode="little" aria-pressed="${mode === 'little'}">Petits</button>
             <button data-mode="family" aria-pressed="${mode === 'family'}">Famille</button>
           </div></fieldset>
-          <p class="prism-mode-info">${mode === 'little' ? '8 cartes · Un seul robot à trouver par carte' : '12 cartes · Jusqu’à deux robots à trouver par carte'}</p>
+          <p class="prism-mode-info">${mode === 'little' ? '8 cartes · Plus de temps pour observer' : '12 cartes · Un rythme plus rapide'}</p>
           <button class="prism-action" data-start>▶ Jouer</button>
         </div>
       </div>`;
   }
 
   function makeDeck() {
-    const config = prismModes[mode];
     const cards = [];
-    for (let mask = 1; mask < 16; mask++) {
-      const robots = ids.filter(id => mask & (1 << id));
-      if (robots.length !== config.figures) continue;
-      for (let pattern = 1; pattern < 1 << robots.length; pattern++) {
-        const matches = robots.filter((_, index) => pattern & (1 << index));
-        if (matches.length > config.matches) continue;
-        cards.push({ robots, matches, key: `${mask}/${pattern}` });
-      }
+    for (let pattern = 1; pattern < (1 << ids.length) - 1; pattern++) {
+      const matches = ids.filter(id => pattern & (1 << id));
+      cards.push({ matches, key: pattern });
     }
     return prismShuffle(cards);
   }
@@ -168,12 +162,12 @@ function prismGame() {
       return;
     }
     phase = 'live';
-    const { robots, matches, key } = deck[round];
+    const { matches, key } = deck[round];
     previousCard = key;
     round++;
     locked = new Set();
     claimed = new Map();
-    clues = prismShuffle(robots).map(id => ({
+    clues = prismShuffle(ids).map(id => ({
       id, color: matches.includes(id) ? id : prismShuffle(ids.filter(color => color !== id))[0],
     }));
     stage.querySelector('.prism-round').textContent = `Carte ${round} / ${config.rounds}`;

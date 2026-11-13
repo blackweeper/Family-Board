@@ -68,7 +68,5 @@
 @keyframes lagoon-pearl { 45% { transform:scale(1.22); background:#d8ffe9; color:#11362a; } }
 @media(prefers-reduced-motion:reduce) { .lagoon-table[data-phase=banked] .lagoon-raft.current .lagoon-bank { animation:none; } }
 
-.cover-open[data-detail=lagoon] .cover-art { aspect-ratio:16/9; }
-#details[data-game=lagoon] .detail-art { aspect-ratio:16/9; }
 .lagoon-choices [data-seat],.lagoon-action[data-next],.lagoon-turn { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
 .lagoon-choices [data-seat] img,.lagoon-action[data-next] img,.lagoon-turn img { width:24px; height:24px; object-fit:cover; border-radius:50%; }

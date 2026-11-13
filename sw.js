@@ -1,4 +1,4 @@
-const CACHE = 'family-board-v18';
+const CACHE = 'family-board-v19';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
@@ -15,17 +15,7 @@ const ASSETS = [
   'covers/lagoon-puffin.jpg', 'covers/lagoon-seahorse.jpg',
   'covers/lagoon-axolotl.jpg', 'covers/lagoon-dolphin.jpg',
   'safari.js', 'safari.css', 'covers/safari.jpg', 'covers/safari-board.jpg',
-  'launcher.js', 'manifest.webmanifest', 'slingshot.jpg',
-  'covers/BalloonMaze.jpg',
-  'covers/BalloonPop.jpg',
-  'covers/ColoringForKids.jpg',
-  'covers/FindTheOddOneOut.jpg',
-  'covers/JigsawJamAnimal.jpg',
-  'covers/JigsawJamCars.jpg',
-  'covers/LumaBubbles.jpg',
-  'covers/MemoryPuzzle.jpg',
-  'covers/PlushyAnimals.jpg',
-  'covers/ZooAnimals.jpg',
+  'launcher.js', 'manifest.webmanifest',
 ].map(path => new URL(path, self.registration.scope).href);
 
 self.addEventListener('install', event => {
