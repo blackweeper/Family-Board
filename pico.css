@@ -33,7 +33,7 @@
 .pico-threat i.filled { background:#ffb38e; box-shadow:0 0 9px #ffac8caa; }
 .pico-stream { position:absolute; z-index:1; container-type:inline-size; inset:0 14%; pointer-events:none; }
 .pico-bird,.pico-otter { position:absolute; transform:translate(-50%,-50%); }
-.pico-bird { z-index:2; width:clamp(105px,18vw,204px); left:39%; top:52%; }
+.pico-bird { z-index:2; width:clamp(92px,min(15vw,24svh),174px); left:50%; top:49%; }
 .pico-otter { z-index:1; width:clamp(86px,16vw,180px); left:var(--otter); top:27%; }
 .pico-bird > img,.pico-otter > img,.pico-finish img { display:block; width:100%; filter:drop-shadow(0 8px 9px #10281b83); }
 .pico-bird > .pico-egg { position:absolute; left:65%; top:45%; width:26%; }
@@ -45,18 +45,19 @@
 .pico-table[data-phase=aim] .pico-bird > img { animation:pico-bob 1.6s ease-in-out infinite; }
 .pico-table[data-phase=steal] .pico-otter > img { animation:pico-lunge .4s cubic-bezier(.24,.65,.36,1) both; }
 .pico-table[data-phase=steal] .pico-otter > .pico-egg { animation:pico-reveal .01s .43s both; }
-.pico-splash { position:absolute; left:73%; top:58%; width:15%; height:7%; border:3px solid #e3fffbbd; border-radius:50%; opacity:0; }
+.pico-splash { position:absolute; left:73%; top:55%; width:13%; height:7%; border:3px solid #e3fffbbd; border-radius:50%; opacity:0; }
 .pico-table[data-phase=slide] .pico-splash { animation:pico-ripple .5s .29s ease-out; }
 .pico-dock {
-  position:absolute; bottom:4%; left:50%; z-index:3; transform:translateX(-50%);
-  display:grid; justify-items:center; gap:10px; width:min(90%,340px);
+  position:absolute; bottom:2%; left:50%; z-index:3; transform:translateX(-50%);
+  display:grid; justify-items:center; gap:5px; width:min(90%,340px);
 }
 .pico-status {
   margin:0; padding:5px 12px; border-radius:999px; background:#14332ce8;
   font-weight:850; text-align:center; box-shadow:0 2px 8px #0c2c2060;
 }
 .pico-tools:empty { display:none; }
-.pico-meter { position:relative; width:min(95%,315px); height:25px; border:2px solid #fff1b9; border-radius:999px; background:#1e4140; box-shadow:0 3px 12px #0b261c91; }
+.pico-table[data-phase=aim] .pico-status { padding-block:3px; }
+.pico-meter { position:relative; width:min(95%,315px); height:21px; border:2px solid #fff1b9; border-radius:999px; background:#1e4140; box-shadow:0 3px 12px #0b261c91; }
 .pico-meter span { position:absolute; inset-block:0; left:var(--left); width:var(--width); background:#75ec9c; border-inline:2px solid #e7ffbf; }
 .pico-meter i { position:absolute; top:-4px; bottom:-4px; left:0; width:6px; transform:translateX(-50%); background:#fff6cb; border:1px solid #42362b; border-radius:5px; }
 .pico-egg { display:grid; width:clamp(28px,4.1vw,47px); aspect-ratio:4/5; place-items:center; }
@@ -69,11 +70,11 @@
 .pico-choice:active { transform:translateY(3px); box-shadow:0 1px 0 #0a2925; }
 .pico-choice:disabled { opacity:.36; cursor:default; }
 .pico-nests {
-  position:absolute; top:68%; left:50%; transform:translate(-50%,-50%);
-  display:flex; justify-content:center; gap:clamp(4px,1.2vw,14px); width:min(75%,690px);
+  position:absolute; top:69%; left:50%; transform:translate(-50%,-50%);
+  display:flex; justify-content:center; gap:clamp(4px,1.2vw,14px); width:min(74%,654px);
 }
 .pico-nest {
-  position:relative; flex:1 1 0; min-width:0; max-width:167px; aspect-ratio:1.83;
+  position:relative; flex:1 1 0; min-width:0; max-width:min(151px,21svh); aspect-ratio:1.92;
   display:grid; place-items:center; overflow:hidden;
   border:1px solid #ffe8a5; border-radius:clamp(7px,1.4vw,16px);
   background:#a5744d url('./covers/pico-shelter.jpg') center 59%/cover;
@@ -90,9 +91,9 @@
 .pico-slot.filled .pico-egg { opacity:1; filter:none; }
 .pico-slot.just-saved { animation:pico-tuck .58s cubic-bezier(.2,.75,.25,1) both; }
 @keyframes pico-ride {
-  0% { left:39%; transform:translate(-50%,-50%) rotate(-8deg); }
-  45% { transform:translate(-50%,-62%) rotate(6deg); }
-  78% { transform:translate(-50%,-42%) rotate(-5deg); }
+  0% { left:50%; transform:translate(-50%,-50%) rotate(-8deg); }
+  45% { transform:translate(-50%,-54%) rotate(4deg); }
+  78% { transform:translate(-50%,-46%) rotate(-4deg); }
   100% { left:73%; transform:translate(-50%,-50%); }
 }
 @keyframes pico-bob { 50% { transform:translateY(-5px) rotate(-3deg); } }
