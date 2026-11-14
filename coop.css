@@ -50,15 +50,18 @@
   position:relative; display:grid; align-content:center; justify-items:center; gap:1px;
 }
 .coop-rail {
-  position:relative; isolation:isolate; width:100%; height:82px; display:grid; align-items:center; padding-inline:8.9%;
+  position:relative; isolation:isolate; width:100%; height:82px; display:grid; align-items:center; padding:0 5.6%;
+  border:0; background:none; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
   filter:drop-shadow(0 6px 5px #2735209c);
 }
+.coop-rail:disabled { cursor:default; opacity:1; }
+.coop-rail:focus-visible { outline:2px solid #fff3b0; outline-offset:2px; border-radius:12px; }
 .coop-rail::after {
   content:''; position:absolute; z-index:1; inset:0;
   background:url('./covers/coop-rail.webp') center/100% 100% no-repeat; pointer-events:none;
 }
 .coop-meter {
-  position:relative; width:100%; height:62%; border:1px solid #5c3122; border-radius:12px;
+  position:relative; display:block; width:100%; height:62%; border:1px solid #5c3122; border-radius:9px;
   background:repeating-linear-gradient(-35deg,#713633 0 6px,#87433a 6px 11px);
   box-shadow:inset 0 0 10px #3b1f16b8;
 }
@@ -73,15 +76,15 @@
 .coop-zone img,.coop-fox-icon img { position:absolute; display:block; width:100%; height:100%; object-fit:contain; }
 .coop-zone img { padding:4px 1px; filter:drop-shadow(0 2px 2px #3c382b69); }
 .coop-zone[data-zone=shield] img { padding-block:5px; }
-.coop-fox-icon { position:absolute; left:var(--start); top:50%; translate:-50% -50%; width:clamp(25px,10%,42px); height:90%; }
-.coop-fox-icon img { filter:drop-shadow(0 2px 2px #37241a); }
+.coop-fox-icon { position:absolute; left:var(--start); width:var(--size); inset-block:0; display:grid; place-items:center; }
+.coop-fox-icon img { position:static; width:min(90%,42px); height:86%; filter:drop-shadow(0 2px 2px #37241a); }
 .coop-board[data-phase=result] .coop-timing:has(.coop-feedback[data-effect=egg]) [data-zone=egg],
 .coop-board[data-phase=result] .coop-timing:has(.coop-feedback[data-effect=shield]) [data-zone=shield] {
   animation:coop-zone-flash .62s ease-out;
 }
 @keyframes coop-zone-flash { 38% { filter:brightness(1.72); } }
 .coop-cursor {
-  position:absolute; z-index:2; left:var(--cursor); top:50%; translate:-50% -50%;
+  position:absolute; z-index:2; left:var(--cursor); top:50%; translate:-50% -50%; pointer-events:none;
   width:4px; height:calc(100% + 15px); border-radius:4px;
   background:#fff5cb; box-shadow:0 0 0 1px #63492b,0 0 6px #fff2b0;
 }
@@ -145,12 +148,6 @@
 @keyframes coop-jolt { 28% { transform:rotate(-5deg); } 68% { transform:rotate(5deg); } }
 @keyframes coop-protect { 45% { filter:drop-shadow(0 0 15px #ceff9a) brightness(1.35); } }
 @keyframes coop-block { 40% { transform:scale(1.32); } to { transform:scale(.4); opacity:0; } }
-@media (min-width:700px) and (orientation:landscape) {
-  .coop-center { rotate:var(--seat-angle); }
-  .coop-board[data-seat="2"] .coop-center,.coop-board[data-count="2"][data-seat="1"] .coop-center { top:57%; }
-  .coop-board[data-seat="1"]:not([data-count="2"]) .coop-center { left:87%; top:53%; width:clamp(224px,42svh,350px); }
-  .coop-board[data-seat="3"] .coop-center { left:13%; top:53%; width:clamp(224px,42svh,350px); }
-}
 @media (max-width:699px), (orientation:portrait) {
   .coop-hud { inset-inline:7px; }
   .coop-track { gap:3px; }

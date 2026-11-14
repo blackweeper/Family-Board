@@ -1,18 +1,19 @@
 const coopModes = {
-  little: { eggs:4, speed:1270, eggWidth:23, shieldWidth:11 },
-  family: { eggs:5, speed:1050, eggWidth:20, shieldWidth:9 },
+  little: { eggs:4, speed:1950, eggWidth:34, shieldWidth:18 },
+  family: { eggs:5, speed:1580, eggWidth:28, shieldWidth:15 },
 };
 const coopFoxLimit = 5;
 const coopIcon = kind => '<img src="./covers/coop-'+kind+'.png" alt="" draggable="false">';
 
 function coopTargets(mode, progress, random = Math.random) {
   const { eggWidth, shieldWidth, speed } = coopModes[mode];
-  const early = 7 + random() * 19;
-  const late = 60 + random() * 19;
-  const forward = random() < .5;
-  const egg = { start:forward ? early : late - 8, width:eggWidth * (1 - .38 * progress) };
-  const shield = { start:forward ? late : early + 5, width:shieldWidth * (1 - .31 * progress) };
-  return { egg, shield, speed:speed * (1 - .28 * progress) };
+  const egg = { width:eggWidth * (1 - .19 * progress) };
+  const shield = { width:shieldWidth * (1 - .18 * progress) };
+  const free = 100 - egg.width - shield.width;
+  const [first, last] = random() < .5 ? [egg, shield] : [shield, egg];
+  first.start = free * (.22 + random() * .08);
+  last.start = 100 - last.width - free * (.22 + random() * .08);
+  return { egg, shield, speed:speed * (1 - .17 * progress) };
 }
 
 function coopOutcome(cursor, targets) {
@@ -25,7 +26,7 @@ function coopOutcome(cursor, targets) {
 const coopRules = `
   <h2>Comment jouer ?</h2>
   <ol>
-    <li>Appuie sur <strong>Lancer</strong> pour faire partir le curseur, puis sur <strong>Stop</strong> pour l’arrêter. Les deux récompenses sont sur la même jauge.</li>
+    <li>Appuie sur <strong>Lancer</strong> pour faire partir le curseur. Touche la jauge ou appuie sur <strong>Stop</strong> pour l’arrêter.</li>
     <li>Dans la zone dorée, l’œuf rejoint le nid éclairé. Dans la zone verte, un bouclier protège ce nid. Un nid peut avoir un seul bouclier.</li>
     <li>Si tu t’arrêtes dans la zone du renard, il avance et vole un œuf au nid éclairé s’il y en a un. Un bouclier bloque ce vol et disparaît.</li>
     <li>Plus il y a d’œufs à l’abri, plus le curseur accélère et plus les zones de récompense rétrécissent.</li>
@@ -186,24 +187,24 @@ function coopGame() {
   }
 
   function render() {
-    const angle=(count===2?[0,180]:[0,-90,180,90])[player];
     rulesButton.disabled=phase==='result';
     const mark = (kind, {start,width}) => '<span class="coop-zone" data-zone="'+kind+'" style="--start:'+start+
       '%;--size:'+width+'%">'+coopIcon(kind)+'</span>';
     const low=targets.egg.start<targets.shield.start?targets.egg:targets.shield;
     const high=low===targets.egg?targets.shield:targets.egg;
-    const dangerCenter=(low.start+low.width+high.start)/2;
-    const bar='<div class="coop-rail"><div class="coop-meter" aria-hidden="true" style="--cursor:'+cursor+
-      '%"><span class="coop-fox-icon" style="--start:'+dangerCenter+'%">'+coopIcon('fox')+'</span>'+
+    const danger=[[0,low.start],[low.start+low.width,high.start],[high.start+high.width,100]];
+    const bar='<button type="button" class="coop-rail" data-stop aria-label="Arrêter le curseur sur la jauge" '+(phase==='aim'?'':'disabled')+
+      '><span class="coop-meter" aria-hidden="true" style="--cursor:'+cursor+
+      '%">'+danger.map(([start,end])=>'<span class="coop-fox-icon" style="--start:'+start+'%;--size:'+(end-start)+'%">'+coopIcon('fox')+'</span>').join('')+
       mark('egg',targets.egg)+mark('shield',targets.shield)+
-      '<span class="coop-cursor"></span></div></div>';
+      '<span class="coop-cursor"></span></span></button>';
     const action=phase==='result'?
       '<div class="coop-feedback" data-effect="'+effect+'" aria-hidden="true">'+coopIcon(effect==='blocked'?'shield':effect)+
       '<span>'+(effect==='fox'?'×':effect==='blocked'?'✦':'✓')+'</span></div>':
       '<button class="coop-tap" '+(phase==='ready'?'data-try':'data-stop')+'><span aria-hidden="true">'+
       (phase==='ready'?'▶':'■')+'</span>'+ (phase==='ready'?'Lancer':'Stop')+'</button>';
     stage.innerHTML='<div class="coop-board" data-phase="'+phase+'" data-seat="'+player+'" data-count="'+count+
-      '" style="--seat-angle:'+angle+'deg;--fox-step:'+49/coopFoxLimit+'cqw">'+
+      '" style="--fox-step:'+49/coopFoxLimit+'cqw">'+
       '<div class="coop-hud"><strong class="coop-pill">'+(count===1?'Partie solo':'Joueur '+(player+1))+'</strong>'+
       '<strong class="coop-pill" aria-label="'+total()+' œufs sur '+goal()+'">🥚 '+total()+' / '+goal()+'</strong>'+
       '<div class="coop-track" aria-label="Renard : '+fox+' pas sur '+coopFoxLimit+'">'+coopIcon('fox')+
@@ -221,7 +222,7 @@ function coopGame() {
     phase='aim';
     render();
     frame=requestAnimationFrame(moveCursor);
-    focus('[data-stop]');
+    focus('.coop-tap[data-stop]');
   }
 
   function moveCursor(time) {
@@ -292,17 +293,10 @@ function coopGame() {
       finish(fox<coopFoxLimit);
       return;
     }
-    const oldAngle=parseFloat(getComputedStyle(stage.querySelector('.coop-center')).rotate)||0;
     player=(player+1)%count;
     do { selected=(selected+1)%nests.length; } while (nests[selected].eggs===config().eggs);
     ready();
     render();
-    const controls=stage.querySelector('.coop-center');
-    const nextAngle=parseFloat(getComputedStyle(controls).rotate)||0;
-    if (oldAngle!==nextAngle&&!reduced.matches&&controls.animate) {
-      const offset=(oldAngle-nextAngle+540)%360-180;
-      controls.animate([{rotate:nextAngle+offset+'deg'},{rotate:nextAngle+'deg'}],{duration:310,easing:'ease-out'});
-    }
     focus('[data-try]');
   }
 
