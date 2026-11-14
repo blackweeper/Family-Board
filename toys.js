@@ -45,6 +45,7 @@ function toysCard(player,unit,world) {
 
 const toysRules = '<h2>Comment jouer ?</h2><ol>'+
   '<li>Installez-vous face à face. À ton tour, touche la pile pour piocher deux cartes, ou touche un jouet puis une case accessible.</li>'+
+  '<li>Touche la flèche « Passer » pour donner la main à l’autre équipe.</li>'+
   '<li>Suis les chemins dessinés sur le terrain. Les cartes reliées à leur quartier général brillent. Pour reprendre une case, utilise un jouet dont le nombre est au moins aussi grand.</li>'+
   '<li>Les jouets de force 1 donnent une carte. Ceux de force 2 peuvent sauter une case pour se poser sur une case vide. Les jouets de force 3 et 4 misent sur leur force.</li>'+
   '<li>Atteins le quartier général adverse par un chemin relié au tien pour gagner. Si les deux équipes sont bloquées, la partie est nulle.</li></ol>';
@@ -65,7 +66,7 @@ function toysDeck() {
 function toysGame() {
   const soundtrack = familyMusic();
   let world=0, turn=0, phase='setup', chosen=-1, pieces=[], hands=[], decks=[], links=[], adjacency=[];
-  let fresh=-1, added=0, passes=0, timer, audio, muted=false, message='';
+  let fresh=-1, added=0, blockedPasses=0, timer, audio, muted=false, message='';
   const map=()=>toysWorlds[world];
   const name=(player,unit)=>toysRosters[map().id][player*toysRanks+unit];
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -123,7 +124,7 @@ function toysGame() {
     hands=decks.map(deck=>[0,1,2,deck.pop()]);
     fresh=-1;
     added=0;
-    passes=0;
+    blockedPasses=0;
     message='';
     render();
     sound([392,523,659]);
@@ -158,6 +159,10 @@ function toysGame() {
     return hands[player].length<=handLimit-2&&decks[player].length>=2;
   }
 
+  function hasAction(available) {
+    return canDraw(turn)||hands[turn].some(unit=>available[unit].size);
+  }
+
   function playerArea(player,available) {
     const current=player===turn;
     const active=current&&phase==='pick';
@@ -170,7 +175,9 @@ function toysGame() {
           '" '+(active&&available[unit].size?'':'disabled')+'>'+toysCard(player,unit,map().id)+'</button>';
       }).join('')+'</div>'+
       '<button class="toys-draw" data-draw="'+player+'" '+(active&&canDraw(player)?'':'disabled')+' aria-label="Piocher deux cartes">'+
-      '<span class="toys-deck" aria-hidden="true"><i></i><i></i><b>+2</b></span></button></div>';
+      '<span class="toys-deck" aria-hidden="true"><i></i><i></i><b>+2</b></span></button>'+
+      '<button class="toys-pass" data-pass="'+player+'" data-blocked="'+(active&&!hasAction(available))+'" '+(active?'':'disabled')+' aria-label="Passer le tour">'+
+      '<span aria-hidden="true">↪</span><small>Passer</small></button></div>';
   }
 
   function render() {
@@ -200,7 +207,7 @@ function toysGame() {
       added=1;
     }
     fresh=site;
-    passes=0;
+    blockedPasses=0;
     sound(captured?[330,523,659]:[440,659]);
     endTurn(site===toysHome(1-turn));
   }
@@ -214,26 +221,17 @@ function toysGame() {
         finish(turn);
         return;
       }
-      turn=1-turn;
-      const connected=reach(turn);
-      if(!canDraw(turn)&&!hands[turn].some(unit=>legal(unit,connected).size)){
-        passes++;
-        if(passes===2){
-          finish(-1);
-          return;
-        }
-        message='Les '+toysTeams[turn]+' passent leur tour.';
-        fresh=-1;
-        added=0;
-        endTurn();
+      if(blockedPasses===2){
+        finish(-1);
         return;
       }
+      turn=1-turn;
       phase='pick';
       fresh=-1;
       added=0;
       message='';
       render();
-      focus('.toys-seat.current [data-hand]:enabled, .toys-seat.current [data-draw]:enabled');
+      focus('.toys-seat.current :is([data-hand], [data-draw], [data-pass]):enabled');
     },reduced.matches?160:720);
   }
 
@@ -269,10 +267,17 @@ function toysGame() {
       } else if(button.hasAttribute('data-site')) place(Number(button.dataset.site));
       else if(button.hasAttribute('data-draw')&&canDraw(turn)){
         hands[turn].push(decks[turn].pop(),decks[turn].pop());
-        passes=0;
+        blockedPasses=0;
         added=2;
         message='Deux nouveaux jouets !';
         sound([440,523,659]);
+        endTurn();
+      } else if(button.dataset.pass===String(turn)){
+        const connected=reach(turn);
+        const blocked=!canDraw(turn)&&!hands[turn].some(unit=>legal(unit,connected).size);
+        blockedPasses=blocked?blockedPasses+1:0;
+        message='Les '+toysTeams[turn]+' passent leur tour.';
+        sound([494,392]);
         endTurn();
       }
     }
