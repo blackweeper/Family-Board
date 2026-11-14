@@ -1,4 +1,5 @@
 const catalog = [
+  { id:'archeo', title:'Les Fouilles d’Archéo', color:'coral', players:'1 à 5 joueurs · dès 5 ans', description:'Soulève les couches de terre, rassemble les fossiles et trouve l’œuf secret avant que toutes les pelles ne cassent.' },
   { id: 'mosaic', title: 'L’Atelier des mosaïques', color: 'mint', players: '2 à 4 joueurs · dès 5 ans', description: 'Choisis des tuiles dans les bols et assembles-en les formes. Termine ton animal ou complète les petits dessins pour gagner des étoiles.' },
   { id: 'flip7', title: 'Flip 7', color: 'coral', players: '3 à 18 joueurs · dès 8 ans', description: 'Sept numéros différents, quinze points de bonus. Tente une nouvelle carte ou mets tes points à l’abri.' },
   { id: 'kiwi', title: 'Flying Kiwis', color: 'mint', players: '2 à 4 joueurs · dès 5 ans', description: 'Tends ton élastique et envoie tes kiwis dans la caisse. Forme un carré avant les autres !' },

@@ -1,4 +1,4 @@
-const CACHE = 'family-board-v47';
+const CACHE = 'family-board-v48';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
@@ -40,6 +40,8 @@ const ASSETS = [
   ...Array.from({ length: 4 }, (_, i) => 'covers/kiwi-bird-' + i + '.webp'),
   'flip7-rules.js', 'flip7.js', 'flip7.css', 'covers/flip7.jpg', 'covers/flip7-mat.webp',
   'mosaic-rules.js', 'mosaic.js', 'mosaic.css', 'covers/mosaic.jpg', 'covers/mosaic-mat.jpg',
+  'archeo-rules.js', 'archeo.js', 'archeo.css', 'covers/archeo.jpg', 'covers/archeo-site.webp',
+  ...Array.from({ length:6 }, (_,i) => 'covers/archeo-fossil-' + i + '.webp'),
   'launcher.js', 'manifest.webmanifest',
 ].map(path => new URL(path, self.registration.scope).href);
 
