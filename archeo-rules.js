@@ -32,7 +32,7 @@ class ArcheoGame {
     const specimens = archeoFossils.flatMap(({groups}, fossil) => groups.flatMap(parts => parts.map(part => ({kind:'fossil', fossil, part}))));
     const make = (kind, amounts) => amounts.map(amount => ({kind, amount}));
     const sand = [...make('cart',[1,1,1]), ...make('peek',[1,1]),
-      ...make('repair',[1,1,2]), ...make('rock',[1,1,1,1,1,1,1,2,2,2])];
+      ...make('repair',[1,1,2]), ...make('rock',[1,1,1,1,1,1,2,2,2,2])];
     const mixed = archeoShuffle(specimens,random);
     sand.push(...mixed.slice(0,7));
     const soil = [...mixed.slice(7), ...make('cart',[1,1]), ...make('peek',[1,1,1]), ...make('repair',[1,1,1,2]),
@@ -49,9 +49,11 @@ class ArcheoGame {
     const candidates = this.tiles.filter(tile => tile.kind === 'fossil' && tile.level > 0);
     for (const fossil of archeoShuffle(candidates,random)) {
       const cover = fossil.above.find(tile => tile.level === fossil.level - 1 && !tile.hint);
-      if (cover) cover.hint = true;
+      if (cover) cover.hint = 'fossil';
       if (this.tiles.filter(tile => tile.hint).length === 3) break;
     }
+    const hazards = this.tiles.filter(tile => tile.level < 2 && tile.kind === 'rock' && !tile.hint);
+    for (const hazard of archeoShuffle(hazards,random).slice(0,4)) hazard.hint = 'rock';
   }
 
   accessible() {

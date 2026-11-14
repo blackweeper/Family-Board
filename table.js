@@ -23,6 +23,7 @@ function tableDeal(count) {
 }
 
 function tableGame() {
+  const soundtrack = familyMusic();
   let count = 4;
   let active = 0;
   let piles = [];
@@ -74,6 +75,7 @@ function tableGame() {
   }
 
   function setup() {
+    soundtrack.stop();
     phase = 'setup';
     stage.innerHTML = `<div class="table-intro">
       <div class="table-intro-copy">
@@ -88,6 +90,7 @@ function tableGame() {
   }
 
   function start() {
+    soundtrack.start('table');
     piles = tableDeal(count);
     active = 0;
     last = null;
@@ -199,6 +202,7 @@ function tableGame() {
   }
 
   function finish() {
+    soundtrack.stop();
     phase = 'finished';
     rulesButton.disabled = false;
     const player = players[active];
@@ -229,6 +233,7 @@ function tableGame() {
   rulesButton.onclick = () => rules.showModal();
   app.querySelector('#table-sound').onclick = event => {
     soundOn = !soundOn;
+    soundtrack.mute(!soundOn);
     if (soundOn) audio?.resume().catch(() => {});
     else audio?.suspend().catch(() => {});
     event.currentTarget.textContent = soundOn ? '🔊 Son' : '🔇 Son';
@@ -236,6 +241,7 @@ function tableGame() {
   };
   app.querySelector('#back').onclick = () => {
     clearTimeout(timer);
+    soundtrack.close();
     audio?.close().catch(() => {});
     home('[data-detail="table"]');
   };

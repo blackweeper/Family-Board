@@ -34,6 +34,7 @@ function flip7Card(card, hidden = false) {
 }
 
 function flip7Game() {
+  const soundtrack = familyMusic();
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const pending = new Set();
   let count = 4, game, flow, event, banner, decision, inspectedSeat, effectCard;
@@ -93,6 +94,7 @@ function flip7Game() {
   }
 
   function setup() {
+    soundtrack.stop();
     reset();
     game = undefined;
     stage.innerHTML = '<div class="f7-intro"><div class="f7-intro-copy"><h1>Flip 7</h1>' +
@@ -108,6 +110,7 @@ function flip7Game() {
   function start() {
     reset();
     game = new Flip7Game(count);
+    soundtrack.start('flip7');
     flow = game.play();
     sound([293, 440, 587, 740]);
     drive();
@@ -125,9 +128,9 @@ function flip7Game() {
       '<div class="f7-rack" aria-label="Cartes du joueur">' +
       (numbers.length ? numbers.map(card => flip7Card(card, hidden)).join('') : '<span class="f7-no-cards" aria-hidden="true">✧</span>') +
       '</div><footer class="f7-hand-bottom"><div class="f7-modifiers">' +
-      bonusCards.map(card => hidden ? flip7Card(card, true) :
-        '<span class="f7-pill-effect" data-kind="' + card.kind + '">' +
-        (card.kind === 'add' ? '+' + card.value : card.kind === 'double' ? '×2' : flip7Actions[card.kind][1]) + '</span>').join('') +
+      bonusCards.map(card => card.kind === 'chance' ? (hidden ? flip7Card(card,true) :
+        '<span class="f7-pill-effect" data-kind="chance">' + flip7Actions.chance[1] + '</span>') :
+        flip7Card(card)).join('') +
       (p.status === 'frozen' ? '<span class="f7-pill-effect" data-kind="freeze">▣ Stop</span>' : '') +
       '</div><span class="f7-current-score" aria-label="' + game.amount(p) + ' points pour la manche">' +
       (status ? '<small>' + status + ' · </small>' : '') + '+' + game.amount(p) + '</span></footer></article>';
@@ -279,6 +282,7 @@ function flip7Game() {
   }
 
   function summary(tie) {
+    if (game.winner) soundtrack.stop();
     const standings = [...game.players].sort((a, b) => b.total - a.total || b.gain - a.gain || a.seat - b.seat);
     const title = game.winner ? tag(game.winner) + ' gagne !' : tie ? 'Égalité en tête' : 'Fin de manche';
     stage.innerHTML = '<div class="f7-summary"><div class="f7-scoreboard"><h2>' + title + '</h2>' +
@@ -307,10 +311,12 @@ function flip7Game() {
     const data = button.dataset;
     if (button.id === 'back') {
       reset();
+      soundtrack.close();
       audio?.close().catch(() => {});
       home('[data-detail="flip7"]');
     } else if ('f7Sound' in data) {
       muted = !muted;
+      soundtrack.mute(muted);
       button.textContent = muted ? '🔇 Son' : '♪ Son';
       button.setAttribute('aria-pressed', String(!muted));
       if (muted) audio?.suspend().catch(() => {});

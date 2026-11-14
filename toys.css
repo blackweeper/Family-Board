@@ -19,7 +19,8 @@
 .toys-finish h1 { font-size:clamp(2rem,6vw,4.2rem); }
 .toys-finish p { margin:0; font-weight:800; }
 .toys-winners { display:flex; justify-content:center; gap:8px; }
-.toys-winners img { width:clamp(60px,13vw,145px); object-fit:contain; }
+.toys-winners { flex-wrap:wrap; }
+.toys-winners img { width:clamp(44px,11vw,130px); object-fit:contain; }
 .toys-end-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
 .toys-rules { width:min(560px,calc(100% - 26px)); max-height:calc(100% - 26px); padding:21px; border:1px solid #ccbaff; border-radius:22px; background:#202c50; color:#fff4da; }
 .toys-rules::backdrop { background:#10152be6; }

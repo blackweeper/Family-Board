@@ -7,13 +7,13 @@ const coopIcon = kind => '<img src="./covers/coop-'+kind+'.png" alt="" draggable
 
 function coopTargets(mode, progress, random = Math.random) {
   const { eggWidth, shieldWidth, speed } = coopModes[mode];
-  const egg = { width:eggWidth * (1 - .19 * progress) };
-  const shield = { width:shieldWidth * (1 - .18 * progress) };
+  const egg = { width:eggWidth * (1 - .26 * progress) };
+  const shield = { width:shieldWidth * (1 - .23 * progress) };
   const free = 100 - egg.width - shield.width;
   const [first, last] = random() < .5 ? [egg, shield] : [shield, egg];
   first.start = free * (.22 + random() * .08);
   last.start = 100 - last.width - free * (.22 + random() * .08);
-  return { egg, shield, speed:speed * (1 - .17 * progress) };
+  return { egg, shield, speed:speed * (1 - .23 * progress) };
 }
 
 function coopOutcome(cursor, targets) {
@@ -26,7 +26,7 @@ function coopOutcome(cursor, targets) {
 const coopRules = `
   <h2>Comment jouer ?</h2>
   <ol>
-    <li>Appuie sur <strong>Lancer</strong> pour faire partir le curseur. Touche la jauge ou appuie sur <strong>Stop</strong> pour l’arrêter.</li>
+    <li>Touche la jauge ou <strong>Lancer</strong> pour faire partir le curseur. Touche à nouveau la jauge ou appuie sur <strong>Stop</strong> pour l’arrêter.</li>
     <li>Dans la zone dorée, l’œuf rejoint le nid éclairé. Dans la zone verte, un bouclier protège ce nid. Un nid peut avoir un seul bouclier.</li>
     <li>Si tu t’arrêtes dans la zone du renard, il avance et vole un œuf au nid éclairé s’il y en a un. Un bouclier bloque ce vol et disparaît.</li>
     <li>Plus il y a d’œufs à l’abri, plus le curseur accélère et plus les zones de récompense rétrécissent.</li>
@@ -162,7 +162,7 @@ function coopGame() {
     startAmbience();
     sound([392,523,659]);
     render();
-    focus('[data-try]');
+    focus('.coop-tap[data-try]');
   }
 
   function ready() {
@@ -193,7 +193,7 @@ function coopGame() {
     const low=targets.egg.start<targets.shield.start?targets.egg:targets.shield;
     const high=low===targets.egg?targets.shield:targets.egg;
     const danger=[[0,low.start],[low.start+low.width,high.start],[high.start+high.width,100]];
-    const bar='<button type="button" class="coop-rail" data-stop aria-label="Arrêter le curseur sur la jauge" '+(phase==='aim'?'':'disabled')+
+    const bar='<button type="button" class="coop-rail" '+(phase==='ready'?'data-try aria-label="Lancer le curseur sur la jauge"':'data-stop aria-label="Arrêter le curseur sur la jauge"')+(phase==='result'?' disabled':'')+
       '><span class="coop-meter" aria-hidden="true" style="--cursor:'+cursor+
       '%">'+danger.map(([start,end])=>'<span class="coop-fox-icon" style="--start:'+start+'%;--size:'+(end-start)+'%">'+coopIcon('fox')+'</span>').join('')+
       mark('egg',targets.egg)+mark('shield',targets.shield)+

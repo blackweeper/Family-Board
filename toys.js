@@ -3,10 +3,14 @@ const toysUnits = [
   { id:'dino', name:'Turbo le dino' },
   { id:'rabbit', name:'Lune le lapin' },
   { id:'lion', name:'Milo le lion' },
+  { id:'hamster', name:'Pistache le pilote' },
+  { id:'penguin', name:'Givre le manchot' },
   { id:'raccoon', name:'Zig le raton' },
   { id:'fox', name:'Flèche le renard' },
   { id:'octopus', name:'Bulle la pieuvre' },
   { id:'bear', name:'Roc l’ours' },
+  { id:'dragon', name:'Braise le dragon' },
+  { id:'crab', name:'Pince le pirate' },
 ];
 const toysWorlds = [
   { id:'castle', name:'Château des blocs', extra:[[1,3],[8,10]], blocked:[[3,4],[7,8]] },
@@ -14,7 +18,11 @@ const toysWorlds = [
   { id:'space', name:'Station des fusées', extra:[[2,4],[4,6],[5,7],[7,9]], blocked:[[3,4],[7,8],[4,7]] },
   { id:'pirate', name:'Lagon des pirates', extra:[[0,4],[7,11],[4,8],[3,7]], blocked:[[0,1],[10,11],[3,6],[5,8]] },
   { id:'snow', name:'Train des neiges', extra:[[2,4],[7,9],[0,4],[8,10]], blocked:[[0,3],[8,11],[4,7]] },
+  { id:'volcano', name:'Île du volcan', extra:[[0,4],[4,8],[3,7],[7,11]], blocked:[[3,4],[4,7],[7,8]] },
+  { id:'candy', name:'Village des bonbons', extra:[[2,4],[4,6],[5,7],[7,9]], blocked:[[0,3],[5,8],[7,10]] },
+  { id:'reef', name:'Récif des sous-marins', extra:[[0,4],[3,7],[4,8],[7,11]], blocked:[[0,1],[4,5],[6,9],[10,11]] },
 ];
+const toysRanks = toysUnits.length/2;
 const toysTeams = ['Bleus','Rouges'];
 const toysSites = Array.from({length:12},(_,i)=>[22+i%3*28,25+Math.floor(i/3)*16.67]);
 toysSites.push([50,91],[50,9]);
@@ -30,7 +38,7 @@ function toysLinks(world) {
 }
 
 function toysPortrait(player,unit) {
-  return '<img src="./covers/toys-'+toysUnits[player*4+unit].id+'.png" alt="" draggable="false">';
+  return '<img src="./covers/toys-'+toysUnits[player*toysRanks+unit].id+'.png" alt="" draggable="false">';
 }
 
 function toysCard(player,unit) {
@@ -42,12 +50,12 @@ function toysCard(player,unit) {
 const toysRules = '<h2>Comment jouer ?</h2><ol>'+
   '<li>Installez-vous face à face. À ton tour, touche la pile pour piocher deux cartes, ou touche un jouet puis une case accessible.</li>'+
   '<li>Suis les chemins dessinés sur le terrain. Les cartes reliées à leur quartier général brillent. Pour reprendre une case, utilise un jouet dont le nombre est au moins aussi grand.</li>'+
-  '<li>Les jouets de force 1 donnent une carte. Ceux de force 2 peuvent sauter une case pour se poser sur une case vide. Ceux de force 3 et 4 sont les plus forts.</li>'+
+  '<li>Les jouets de force 1 donnent une carte. Ceux de force 2 peuvent sauter une case pour se poser sur une case vide. Les autres jouets ont une force de 3 à 6.</li>'+
   '<li>Atteins le quartier général adverse par un chemin relié au tien pour gagner. Si les deux équipes sont bloquées, la partie est nulle.</li></ol>'+
-  '<div class="toys-guide">'+toysUnits.map((unit,id)=>'<div>'+toysCard(Math.floor(id/4),id%4)+'<strong>'+unit.name+'</strong></div>').join('')+'</div>';
+  '<div class="toys-guide">'+toysUnits.map((unit,id)=>'<div>'+toysCard(Math.floor(id/toysRanks),id%toysRanks)+'<strong>'+unit.name+'</strong></div>').join('')+'</div>';
 
 function toysDeck() {
-  const deck = Array.from({length:20},(_,i)=>i%4);
+  const deck = Array.from({length:24},(_,i)=>i%toysRanks);
   for(let i=deck.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [deck[i],deck[j]]=[deck[j],deck[i]];
@@ -56,6 +64,7 @@ function toysDeck() {
 }
 
 function toysGame() {
+  const soundtrack = familyMusic();
   let world=0, turn=0, phase='setup', chosen=-1, pieces=[], hands=[], decks=[], links=[], adjacency=[];
   let fresh=-1, added=0, passes=0, timer, audio, muted=false, message='';
   const map=()=>toysWorlds[world];
@@ -90,6 +99,7 @@ function toysGame() {
   }
 
   function setup() {
+    soundtrack.stop();
     phase='setup';
     rulesButton.disabled=false;
     stage.innerHTML='<div class="toys-intro"><h1>Duel des jouets</h1><fieldset><legend>Choisis ton terrain</legend><div class="toys-worlds">'+
@@ -98,6 +108,7 @@ function toysGame() {
   }
 
   function start() {
+    soundtrack.start(map().id);
     turn=0;
     phase='pick';
     chosen=-1;
@@ -155,7 +166,7 @@ function toysGame() {
       '<div class="toys-hand">'+hands[player].map((unit,i)=>{
         const arrival=current&&added&&i>=hands[player].length-added;
         return '<button class="toys-unit'+(arrival?' arriving':'')+'" data-hand="'+i+'" data-unit="'+unit+
-          '" aria-label="'+toysUnits[player*4+unit].name+', force '+(unit+1)+'" aria-pressed="'+(current&&chosen===i)+
+          '" aria-label="'+toysUnits[player*toysRanks+unit].name+', force '+(unit+1)+'" aria-pressed="'+(current&&chosen===i)+
           '" '+(active&&available[unit].size?'':'disabled')+'>'+toysCard(player,unit)+'</button>';
       }).join('')+'</div>'+
       '<button class="toys-draw" data-draw="'+player+'" '+(active&&canDraw(player)?'':'disabled')+' aria-label="Piocher deux cartes">'+
@@ -165,7 +176,7 @@ function toysGame() {
   function render() {
     rulesButton.disabled=phase==='result';
     const connected=[reach(0),reach(1)];
-    const available=Array.from({length:4},(_,unit)=>legal(unit,connected[turn]));
+    const available=Array.from({length:toysRanks},(_,unit)=>legal(unit,connected[turn]));
     const targets=chosen===-1?new Set():available[hands[turn][chosen]];
     stage.innerHTML='<div class="toys-board" data-world="'+map().id+'" data-turn="'+turn+'">'+playerArea(1,available)+
       '<div class="toys-arena"><img class="toys-map" src="./covers/toys-'+map().id+'.jpg" alt="" draggable="false">'+
@@ -173,7 +184,7 @@ function toysGame() {
         const piece=pieces[i];
         const label=i>=12?'Quartier général '+toysTeams[i-12]:'Case '+(i+1);
         return '<button class="toys-site'+(i>=12?' base':'')+(fresh===i?' fresh':'')+(piece&&connected[piece.player].has(i)?' linked':'')+'" style="--x:'+x+'%;--y:'+y+
-          '%" data-site="'+i+'" aria-label="'+label+(piece?', '+toysUnits[piece.player*4+piece.unit].name+', force '+(piece.unit+1):'')+
+          '%" data-site="'+i+'" aria-label="'+label+(piece?', '+toysUnits[piece.player*toysRanks+piece.unit].name+', force '+(piece.unit+1):'')+
           '" '+(phase==='pick'&&targets.has(i)?'':'disabled')+'>'+(piece?toysCard(piece.player,piece.unit):'')+'</button>';
       }).join('')+'</div>'+playerArea(0,available)+
       '<span class="toys-sr" role="status">'+(message||(chosen===-1?'Au tour des '+toysTeams[turn]:'Touche une case accessible'))+'</span></div>';
@@ -227,9 +238,10 @@ function toysGame() {
   }
 
   function finish(winner) {
+    soundtrack.stop();
     phase='finished';
     rulesButton.disabled=false;
-    const art=winner===-1?[toysPortrait(0,3),toysPortrait(1,3)]:[0,1,2,3].map(unit=>toysPortrait(winner,unit));
+    const art=winner===-1?[toysPortrait(0,5),toysPortrait(1,5)]:Array.from({length:toysRanks},(_,unit)=>toysPortrait(winner,unit));
     stage.innerHTML='<div class="toys-finish"><div class="toys-winners">'+art.join('')+'</div><h1>'+
       (winner===-1?'Égalité !':'Les '+toysTeams[winner]+' gagnent !')+'</h1><div class="toys-end-actions">'+
       '<button class="toys-action" data-start aria-label="Rejouer">↻</button><button class="secondary" data-setup>Changer de terrain</button></div></div>';
@@ -268,6 +280,7 @@ function toysGame() {
   rulesButton.onclick=()=>rules.showModal();
   app.querySelector('#toys-sound').onclick=event=>{
     muted=!muted;
+    soundtrack.mute(muted);
     if(muted) audio?.suspend().catch(()=>{});
     else audio?.resume().catch(()=>{});
     event.currentTarget.textContent=muted?'🔇 Son':'🔊 Son';
@@ -275,6 +288,7 @@ function toysGame() {
   };
   app.querySelector('#back').onclick=()=>{
     clearTimeout(timer);
+    soundtrack.close();
     audio?.close().catch(()=>{});
     home('[data-detail="toys"]');
   };

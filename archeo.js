@@ -3,6 +3,7 @@ const archeoRules = `
   <ol>
     <li>La dernière personne à avoir creusé un trou commence. À tour de rôle, touchez une tuile dégagée. Il faut retirer tout ce qui la recouvre avant de pouvoir la soulever.</li>
     <li>Les fragments rejoignent leurs fossiles. Les petits os sur certaines tuiles signalent un fossile en dessous.</li>
+    <li>Un caillou visible avertit d’un danger sur cette tuile. Prépare une brouette ou choisis une autre zone.</li>
     <li>La brouette appartient au joueur qui la trouve. Face aux cailloux, utilisez une de vos brouettes ou perdez une pelle par caillou. Chaque marteau répare une pelle.</li>
     <li>Avec la loupe, regardez une autre tuile accessible. Elle se referme ensuite et le tour passe.</li>
     <li>Au fond, quatre cavités cachent un œuf à deux étoiles, deux œufs cassés et deux cailloux réunis sur une tuile.</li>
@@ -10,8 +11,10 @@ const archeoRules = `
   </ol>
   <p>D’après Archéo, de Thomas Favrelière et Adrien Pédron, édité par Gigamic. <a target="_blank" rel="noopener" href="https://www.gigamic.com/index.php?controller=attachment&amp;id_attachment=631">Livret officiel</a></p>`;
 
-const archeoColors = ['#89e1db','#ffbd78','#e6a1dc','#c9e692','#afbeff'];
-const archeoIcons = {peek:'🔎',repair:'🔨',rock:'🪨',shell:'🥚'};
+const archeoColors = ['#89e1db','#ffbd78','#c8a3f1','#c9e692','#efacd7','#afbeff'];
+const archeoNames = ['Naya','Malo','Meï','Léo','Zélie','Sami'];
+const archeoAvatar = id => `<img class="ar-avatar" src="./covers/archeo-player-${id}.webp" alt="" draggable="false">`;
+const archeoIcons = {peek:'🔎',repair:'🔨',shell:'🥚'};
 const archeoCart = '<span class="ar-cart-icon" aria-hidden="true"></span>';
 const archeoSpade = '<span class="ar-tool-icon" aria-hidden="true"></span>';
 const archeoLabels = {cart:'Une brouette',peek:'Une loupe',repair:'Pelles réparées',rock:'Attention, cailloux !',egg:'L’œuf aux deux étoiles !',shell:'Un œuf cassé'};
@@ -24,11 +27,15 @@ function archeoSymbol(tile) {
   if (tile.kind === 'fossil') return archeoArt(tile.fossil);
   if (tile.kind === 'egg') return `<span class="ar-found-egg">${archeoArt(5)}<i aria-hidden="true">★★</i></span>`;
   if (tile.kind === 'cart') return `<span class="ar-symbol">${archeoCart}</span>`;
-  return `<span class="ar-symbol" aria-hidden="true">${archeoIcons[tile.kind].repeat(tile.kind === 'rock' || tile.kind === 'repair' ? tile.amount : 1)}${tile.kind === 'shell' ? '<b>╱</b>' : ''}</span>`;
+  if (tile.kind === 'rock') return `<span class="ar-symbol ar-stones">${'<i class="ar-stone"></i>'.repeat(tile.amount)}</span>`;
+  return `<span class="ar-symbol" aria-hidden="true">${archeoIcons[tile.kind].repeat(tile.kind === 'repair' ? tile.amount : 1)}${tile.kind === 'shell' ? '<b>╱</b>' : ''}</span>`;
 }
 
 function archeoGame() {
+  const soundtrack = familyMusic();
   let count = 2, first = 0, game, busy = false, muted = false, audio, ticket = 0;
+  let selected = 0;
+  const players = [0,1,2,3,4];
   const motion = matchMedia('(prefers-reduced-motion: no-preference)');
   app.innerHTML = `<section class="ar"><div class="ar-bar"><button class="secondary" id="back">← Jeux</button>
     <button class="secondary" data-ar-sound aria-pressed="true">♪ Son</button><button class="secondary" data-ar-rules>? Règles</button></div>
@@ -59,10 +66,13 @@ function archeoGame() {
   }
 
   function setup() {
+    soundtrack.stop();
     game = null;
     stage.innerHTML = `<div class="ar-intro"><div class="ar-cover"><h1>Les Fouilles d’Archéo</h1></div><div class="ar-setup">
       <fieldset><legend>Paléontologues</legend><div class="ar-choices">${[1,2,3,4,5].map(n => `<button data-ar-count="${n}" aria-pressed="${count === n}">${n}</button>`).join('')}</div></fieldset>
-      ${count > 1 ? `<label>Qui a creusé un trou en dernier ? <select data-ar-first>${Array.from({length:count},(_,i) => `<option value="${i}" ${first === i ? 'selected' : ''}>Joueur ${i+1}</option>`).join('')}</select></label>` : ''}
+      <fieldset><legend>Choisis ton personnage</legend><div class="ar-lineup">${players.slice(0,count).map((id,i) => `<button data-ar-seat="${i}" aria-label="Joueur ${i+1}, ${archeoNames[id]}" aria-pressed="${i === selected}">${archeoAvatar(id)}<b>${i+1}</b></button>`).join('')}</div>
+      <div class="ar-avatar-picker">${archeoNames.map((name,id) => `<button data-ar-avatar="${id}" aria-label="${name}" aria-pressed="${id === players[selected]}">${archeoAvatar(id)}</button>`).join('')}</div></fieldset>
+      ${count > 1 ? `<label>Qui a creusé en dernier ? <select data-ar-first>${players.slice(0,count).map((id,i) => `<option value="${i}" ${first === i ? 'selected' : ''}>${archeoNames[id]}</option>`).join('')}</select></label>` : ''}
       <button class="ar-primary" data-ar-start>⛏️ Fouiller</button></div></div>`;
   }
 
@@ -77,8 +87,9 @@ function archeoGame() {
 
   function tileMarkup(tile, accessible) {
     const coords = `style="--x:${tile.x};--y:${tile.y};--level:${tile.level};--variant:${tile.id.split('-')[1]%4}"`;
-    const hint = tile.hint ? '<span class="ar-hint" aria-hidden="true">🦴</span>' : '';
-    return accessible ? `<button ${coords} class="ar-tile ar-level-${tile.level}" data-ar-dig="${tile.id}" aria-label="${archeoDepth[tile.level]}, case ${tile.id.split('-')[1]*1+1}${tile.hint ? ', indice os' : ''}">${hint}</button>` :
+    const hint = tile.hint ? `<span class="ar-hint" data-hint="${tile.hint}" aria-hidden="true">${tile.hint === 'rock' ? '<i class="ar-stone"></i>' : '🦴'}</span>` : '';
+    const clue = {rock:', cailloux visibles',fossil:', indice os'}[tile.hint] || '';
+    return accessible ? `<button ${coords} class="ar-tile ar-level-${tile.level}" data-ar-dig="${tile.id}" aria-label="${archeoDepth[tile.level]}, case ${Number(tile.id.split('-')[1])+1}${clue}">${hint}</button>` :
       `<span ${coords} class="ar-tile ar-level-${tile.level} covered" aria-hidden="true">${hint}</span>`;
   }
 
@@ -86,20 +97,21 @@ function archeoGame() {
     const open = new Set(game.accessible());
     const peek = game.phase === 'peek';
     const label = peek ? '🔎 Choisis une tuile à regarder' : 'Touche une tuile dégagée';
-    stage.innerHTML = `<div class="ar-board" style="--player:${archeoColors[game.turn]}" data-phase="${game.phase}">
+    stage.innerHTML = `<div class="ar-board" style="--player:${archeoColors[players[game.turn]]}" data-phase="${game.phase}">
       <div class="ar-hud"><span class="ar-score" aria-label="${game.score} étoiles sur 10">★ ${game.score} / 10</span>
         <div class="ar-tools" aria-label="${game.tools} pelles sur ${game.maxTools}">${Array.from({length:game.maxTools},(_,i) => `<span class="${i >= game.tools ? 'broken' : ''}" aria-hidden="true">${archeoSpade}</span>`).join('')}</div></div>
       <div class="ar-work"><div class="ar-site"><div class="ar-pit" aria-label="Site de fouilles">${game.tiles.filter(t => !t.dug).map(tile => tileMarkup(tile,open.has(tile) && (game.phase === 'dig' || peek))).join('')}</div>
-        <div class="ar-turn" role="status"><b>${count === 1 ? 'Solo' : 'Joueur ' + (game.turn+1)}</b><span>${label}</span></div></div>
-      <aside class="ar-museum">${collection()}<div class="ar-players" aria-label="Brouettes personnelles">${game.carts.map((cart,i) => `<span class="ar-player" style="--seat:${archeoColors[i]}" data-current="${i === game.turn}" aria-label="Joueur ${i+1}, ${cart} brouettes"><b>${i+1}</b> ${archeoCart} ${cart}</span>`).join('')}</div></aside></div>
+        <div class="ar-turn" role="status">${archeoAvatar(players[game.turn])}<div><b>${archeoNames[players[game.turn]]}${count === 1 ? ' · Solo' : ''}</b><span>${label}</span></div></div></div>
+      <aside class="ar-museum">${collection()}<div class="ar-players" aria-label="Brouettes personnelles">${game.carts.map((cart,i) => `<span class="ar-player" style="--seat:${archeoColors[players[i]]}" data-current="${i === game.turn}" aria-label="${archeoNames[players[i]]}, ${cart} brouettes">${archeoAvatar(players[i])} ${archeoCart} ${cart}</span>`).join('')}</div></aside></div>
     </div>`;
     if (!busy) focus('[data-ar-dig]');
   }
 
   function outcome(tile, { look = false, risk = false, text = '' } = {}) {
     const label = text || (tile.kind === 'fossil' ? archeoFossils[tile.fossil].name : look && tile.kind === 'repair' ? 'Des marteaux' : archeoLabels[tile.kind]);
+    const display = text === 'Brouette utilisée !' ? `<span class="ar-symbol ar-cart-haul">${archeoCart}<i class="ar-stone"></i></span>` : archeoSymbol(tile);
     stage.querySelector('.ar-board').insertAdjacentHTML('beforeend', `<div class="ar-overlay" ${risk ? 'data-risk' : ''}><div class="ar-find" data-kind="${tile.kind}" role="${risk ? 'group' : 'status'}" aria-label="${label}">
-      ${archeoSymbol(tile)}<strong>${look ? '🔎 ' : ''}${label}</strong>
+      ${display}<strong>${look ? '🔎 ' : ''}${label}</strong>
       ${risk ? `<div class="ar-choices"><button class="ar-primary" data-ar-protect="yes">${archeoCart} Utiliser (${game.carts[game.turn]})</button><button data-ar-protect="no" aria-label="Perdre ${tile.amount} pelle${tile.amount === 1 ? '' : 's'}">${archeoSpade} −${tile.amount}</button></div>` : ''}</div></div>`);
     if (risk) focus('[data-ar-protect]');
   }
@@ -107,6 +119,7 @@ function archeoGame() {
   const wait = ms => new Promise(resolve => setTimeout(resolve,motion.matches ? ms : Math.min(ms,180)));
 
   function finish() {
+    soundtrack.stop();
     const win = game.score === 10;
     const result = game.score >= 7 ? 'Experts en fouilles !' : game.score >= 4 ? 'De vrais paléontologues en herbe !' : 'Sur la piste des fossiles !';
     const confetti = win ? Array.from({length:24},(_,i) => `<i style="--left:${i*100/24}%;--delay:${i%6*75}ms">✦</i>`).join('') : '';
@@ -143,7 +156,8 @@ function archeoGame() {
     const message = tile.kind === 'rock' ? protectedRock ? 'Brouette utilisée !' : `Pelles abîmées · −${tile.amount}` : '';
     outcome(tile,{text:message});
     if (tile.kind === 'rock' && !protectedRock) stage.querySelector('.ar-tools').classList.add('shaken');
-    sound(tile.kind === 'rock' && !protectedRock ? [392,262,196] : [523,659,880]);
+    const notes = { rock:protectedRock ? [392,494,587] : [392,262,196], repair:[330,392,659], cart:[440,523,698], egg:[523,659,880,1047] };
+    sound(notes[tile.kind] ?? [523,659,880]);
     await wait(840);
     if (run !== ticket) return;
     if (motion.matches && tile.kind === 'fossil') {
@@ -200,11 +214,13 @@ function archeoGame() {
     const data = button.dataset;
     if (button.id === 'back') {
       ticket++;
+      soundtrack.close();
       audio?.close().catch(() => {});
       home('[data-detail="archeo"]');
     } else if ('arRules' in data) dialog.showModal();
     else if ('arSound' in data) {
       muted = !muted;
+      soundtrack.mute(muted);
       button.textContent = muted ? '🔇 Son' : '♪ Son';
       button.setAttribute('aria-pressed',!muted);
       if (muted) audio?.suspend().catch(() => {});
@@ -212,12 +228,24 @@ function archeoGame() {
     } else if ('arCount' in data) {
       count = Number(data.arCount);
       first = Math.min(first,count-1);
+      selected = Math.min(selected,count-1);
       setup();
       focus(`[data-ar-count="${count}"]`);
+    } else if ('arSeat' in data || 'arAvatar' in data) {
+      if ('arSeat' in data) selected = Number(data.arSeat);
+      else {
+        const id = Number(data.arAvatar);
+        const other = players.indexOf(id);
+        if (other >= 0) players[other] = players[selected];
+        players[selected] = id;
+      }
+      setup();
+      focus('arSeat' in data ? `[data-ar-seat="${selected}"]` : `[data-ar-avatar="${players[selected]}"]`);
     } else if ('arStart' in data) {
       ticket++;
       busy = false;
       game = new ArcheoGame(count,first);
+      soundtrack.start('archeo');
       sound([392,523,659]);
       render();
     } else if ('arSetup' in data) {

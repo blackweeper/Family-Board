@@ -1,7 +1,7 @@
-const CACHE = 'family-board-v48';
+const CACHE = 'family-board-v49';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
-  'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
+  'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js', 'game-music.js',
   'covers/safari-panda.jpg', 'covers/safari-fox.jpg',
   'covers/safari-frog.jpg', 'covers/safari-lion.jpg',
   'covers/safari-elephant.jpg', 'covers/safari-zebra.jpg',
@@ -42,6 +42,10 @@ const ASSETS = [
   'mosaic-rules.js', 'mosaic.js', 'mosaic.css', 'covers/mosaic.jpg', 'covers/mosaic-mat.jpg',
   'archeo-rules.js', 'archeo.js', 'archeo.css', 'covers/archeo.jpg', 'covers/archeo-site.webp',
   ...Array.from({ length:6 }, (_,i) => 'covers/archeo-fossil-' + i + '.webp'),
+  ...Array.from({ length:6 }, (_,i) => 'covers/archeo-player-' + i + '.webp'),
+  ...['hamster','penguin','dragon','crab'].map(id => 'covers/toys-' + id + '.png'),
+  ...['volcano','candy','reef'].map(id => 'covers/toys-' + id + '.jpg'),
+  ...['bridge','gate','mole'].map(id => 'covers/carrot-' + id + '-v2.webp'),
   'launcher.js', 'manifest.webmanifest',
 ].map(path => new URL(path, self.registration.scope).href);
 

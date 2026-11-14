@@ -107,7 +107,7 @@
 
 .carrot-table {
   display: grid;
-  grid-template-columns: minmax(124px, 17%) minmax(0, 1fr);
+  grid-template-columns: minmax(137px, 19%) minmax(0, 1fr);
   grid-template-areas: "controls board" "teams teams";
   align-items: center;
   gap: clamp(8px, 1.5vmin, 15px);
@@ -148,7 +148,7 @@
   box-shadow: 0 1px 2px #67613d80;
 }
 .carrot-space {
-  width: 5.6%;
+  width: 6.2%;
   aspect-ratio: 1.32;
   transform: translate(-50%, -50%);
   border: 1px solid #a87c43;
@@ -174,8 +174,8 @@
   font-size: clamp(.87rem, 2.7cqw, 2rem);
 }
 .carrot-bridge {
-  width: 15.5%;
-  height: 13%;
+  width: 19%;
+  height: 17%;
   transform: translate(-50%, -50%) rotate(-9deg);
   perspective: 150px;
 }
@@ -191,19 +191,19 @@
   bottom: 13%;
   width: 100%;
   height: 76%;
-  object-fit: fill;
+  object-fit: contain;
   transform-origin: bottom;
   filter: drop-shadow(0 2px 2px #2e311eaa);
 }
-.carrot-bridge.up img { transform: rotateX(-68deg); filter: brightness(.71) drop-shadow(0 4px 3px #242419dd); }
+.carrot-bridge.up img { transform: rotateX(-62deg); filter: brightness(.85) drop-shadow(0 4px 3px #242419dd); }
 .carrot-mole, .carrot-gate {
-  width: 7.7%;
+  width: 9%;
   aspect-ratio: 1;
   pointer-events: none;
   transform: translate(-50%, -52%);
 }
 .carrot-mole {
-  width: 6.7%;
+  width: 8%;
   transform: translate(-50%, -35%);
   overflow: hidden;
   border-radius: 50%;
@@ -213,6 +213,7 @@
 .carrot-mole img { transform: translateY(68%); opacity: .7; }
 .carrot-mole.popped { z-index: 4; overflow: visible; }
 .carrot-mole.popped img { transform: none; opacity: 1; }
+.carrot-gate { perspective:140px; }
 .carrot-gate img { transform-origin: 12% 83%; filter: drop-shadow(1px 2px 2px #2c321ab0); }
 .carrot-goal {
   z-index: 2;
@@ -350,7 +351,7 @@ button.carrot-rabbit[data-rabbit] {
   position: relative;
   display: grid;
   place-items: center;
-  width: clamp(66px, 6.1vw, 104px);
+  width: clamp(72px, 7.6vw, 118px);
   aspect-ratio: .78;
   padding: 6px;
   border: 2px solid #fff2bf;

@@ -1,7 +1,7 @@
 const picoEggs = ['Azur', 'Soleil', 'Prune', 'Menthe'];
 const picoModes = {
-  little: { cards:3, limit:5, speed:1160, width:22, name:'Petits' },
-  family: { cards:4, limit:4, speed:910, width:17, name:'Famille' },
+  little: { cards:3, limit:8, speed:1160, width:22, name:'Petits' },
+  family: { cards:4, limit:8, speed:910, width:17, name:'Famille' },
 };
 const picoRecipes = [
   [0,0,1], [1,1,2], [2,2,3], [3,3,0],
@@ -11,7 +11,7 @@ const picoRules = `
   <h2>Comment jouer ?</h2>
   <ol>
     <li>Jouez chacun à votre tour. Choisis un œuf dans le nid.</li>
-    <li>Sur la jauge, attends que le curseur soit dans la zone verte, puis touche <strong>Glisser</strong>. Pico descend la cascade avec l’œuf !</li>
+    <li>Sur la jauge, attends que le curseur soit dans la zone verte, puis touche la jauge ou <strong>Glisser</strong>. Pico descend avec l’œuf !</li>
     <li>Un œuf intact rejoint automatiquement une carte-cachette de son motif. Si aucune cachette n’attend ce motif, la main passe au joueur suivant. À chaque œuf sauvé, la zone verte rétrécit et le curseur accélère.</li>
     <li>Si l’œuf se fissure, la loutre l’emporte et avance vers le nid. Chaque cachette complétée fait reculer la loutre.</li>
     <li>Gagnez ensemble en remplissant toutes les cartes-cachettes avant que la loutre n’atteigne le nid.</li>
@@ -175,7 +175,7 @@ function picoGame() {
   }
 
   function meter() {
-    return `<div class="pico-meter" role="img" aria-label="Arrête le curseur dans la zone verte" style="--left:${targetLeft}%;--width:${targetWidth}%"><span></span><i></i></div>`;
+    return `<button class="pico-meter" data-slide aria-label="Arrêter le curseur dans la zone verte" style="--left:${targetLeft}%;--width:${targetWidth}%"><span class="pico-meter-water" aria-hidden="true"><b>🪶</b><i></i></span></button>`;
   }
 
   function render() {
@@ -242,7 +242,7 @@ function picoGame() {
     lastFrame = undefined;
     render();
     meterFrame = requestAnimationFrame(animateMeter);
-    focus('[data-slide]');
+    focus('.pico-action[data-slide]');
   }
 
   function slide() {

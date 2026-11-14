@@ -43,6 +43,7 @@ function prismShuffle(items) {
 }
 
 function prismGame() {
+  const soundtrack = familyMusic();
   let count = 4;
   let mode = 'little';
   let scores = [];
@@ -100,6 +101,7 @@ function prismGame() {
   }
 
   function setup() {
+    soundtrack.stop();
     phase = 'setup';
     stage.innerHTML = `
       <div class="prism-intro">
@@ -137,6 +139,7 @@ function prismGame() {
   }
 
   function start() {
+    soundtrack.start('prism');
     scores = Array(count).fill(0);
     round = 0;
     deck = [];
@@ -273,6 +276,7 @@ function prismGame() {
   }
 
   function finish() {
+    soundtrack.stop();
     stopClock();
     phase = 'finished';
     const best = Math.max(...scores);
@@ -351,6 +355,7 @@ function prismGame() {
   });
   app.querySelector('#prism-sound').onclick = event => {
     soundOn = !soundOn;
+    soundtrack.mute(!soundOn);
     if (!soundOn) audio?.suspend().catch(() => {});
     else audio?.resume().catch(() => {});
     event.currentTarget.textContent = soundOn ? '🔊 Son' : '🔇 Son';
@@ -358,6 +363,7 @@ function prismGame() {
   };
   app.querySelector('#back').onclick = () => {
     stopClock();
+    soundtrack.close();
     audio?.close().catch(() => {});
     home('[data-detail="prism"]');
   };

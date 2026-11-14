@@ -231,6 +231,8 @@
 .f7-deck .f7-card-back span { font-size: clamp(1.3rem,3.3vw,2.4rem); }
 .f7-modifiers { display: flex; align-items: center; flex-wrap: wrap; min-width: 0; gap: 3px; }
 .f7-modifiers .f7-card-back { width: 12px; }
+.f7-modifiers :is(.f7-card-add,.f7-card-double) { width:clamp(24px,3.5vw,36px); font-size:.61rem; }
+.f7-modifiers :is(.f7-card-add,.f7-card-double) strong { font-size:1.65em; }
 .f7-modifiers .f7-card-back span { font-size: .46rem; }
 .f7-pill-effect {
   border-radius: 6px; padding: 2px 4px; border: 1px solid #a86b4c;

@@ -7,15 +7,15 @@ const carrotTeams = [
 
 // Case 0 is the staircase. The two ends of the drawbridge are 13 and 14.
 const carrotPoints = [
-  [14, 87], [15, 75], [17, 62], [21, 48], [30, 44], [37, 33],
-  [45, 23], [55, 24], [65, 27], [78, 34], [85, 44], [86, 58],
-  [81, 70], [73, 82], [52, 87], [42, 82], [33, 76], [35, 63],
+  [11, 90], [11, 77], [13, 63], [18, 48], [25, 36], [34, 25],
+  [43, 17], [54, 18], [66, 21], [79, 28], [89, 39], [90, 55],
+  [85, 71], [75, 84], [51, 90], [41, 86], [30, 79], [34, 62],
   [43, 70], [51, 73], [61, 70], [69, 63], [69, 50], [63, 42],
   [54, 39], [45, 40], [50, 54],
 ];
 
 const carrotArt = (asset, options = '') =>
-  '<img src="./covers/carrot-' + asset + '.webp" draggable="false" alt="" ' + options + '>';
+  '<img src="./covers/carrot-' + asset + (['bridge','gate','mole'].includes(asset) ? '-v2' : '') + '.webp" draggable="false" alt="" ' + options + '>';
 
 const carrotRules = '<div class="carrot-rules-copy"><h3>La course à la carotte</h3><ol>' +
   '<li>Choisis une couleur et place tes quatre lapins au départ. Le plus jeune pioche en premier. Jouez ensuite dans le sens des aiguilles d’une montre.</li>' +
@@ -157,10 +157,10 @@ function carrotGame() {
       '<span class="carrot-podium"></span>' + carrotArt('goal') + '<span class="carrot-spin-arrow" aria-hidden="true">⟳</span></button>';
     return '<div class="carrot-board" aria-label="La colline de Croque-Carotte">' + path() +
       '<span class="carrot-start" aria-hidden="true" style="' + pointStyle(carrotPoints[0]) + '">➜</span>' +
-      spaces + '<div class="carrot-mole" aria-hidden="true" style="' + pointStyle([22, 55]) + '">' +
+      spaces + '<div class="carrot-mole" aria-hidden="true" style="' + pointStyle([20, 55]) + '">' +
       carrotArt('mole') + '</div><div class="carrot-gate" aria-hidden="true" style="' + pointStyle([65, 35.5]) + '">' +
       carrotArt('gate') + '</div><div class="carrot-bridge' + (race.bridgeUp ? ' up' : '') +
-      '" role="img" aria-label="Pont-levis ' + (race.bridgeUp ? 'levé' : 'baissé') + '" style="' + pointStyle([62.5, 84.5]) + '">' +
+      '" role="img" aria-label="Pont-levis ' + (race.bridgeUp ? 'levé' : 'baissé') + '" style="' + pointStyle([63, 87]) + '">' +
       '<span></span>' + carrotArt('bridge') + '</div>' + goal +
       race.rabbits.filter(rabbit => !rabbit.lost && rabbit.pos > 0).map(rabbit => piece(rabbit)).join('') + '</div>';
   }
@@ -341,8 +341,9 @@ function carrotGame() {
     render();
     const bridge = root.querySelector('.carrot-bridge img');
     animate(bridge, [
-      { transform: race.bridgeUp ? 'rotateX(0deg)' : 'rotateX(-68deg)' },
-      { transform: race.bridgeUp ? 'rotateX(-68deg)' : 'rotateX(0deg)' },
+      { transform: race.bridgeUp ? 'rotateX(0deg)' : 'rotateX(-62deg)' },
+      { transform: race.bridgeUp ? 'rotateX(-71deg)' : 'rotateX(8deg)', offset:.78 },
+      { transform: race.bridgeUp ? 'rotateX(-62deg)' : 'rotateX(0deg)' },
     ], 360);
     if (race.hole !== null) {
       animate(root.querySelector('[data-space="' + race.hole + '"]'), [{ scale: '.62' }, { scale: '1' }], 300);
@@ -350,12 +351,12 @@ function carrotGame() {
     if (result.obstacle === 'mole') {
       const mole = root.querySelector('.carrot-mole img');
       mole.parentElement.classList.add('popped');
-      animate(mole, [{ transform: 'translateY(66%) scale(.7)' }, { transform: 'none' }], 360);
+      animate(mole, [{ transform:'translateY(70%) scale(.7)' },{ transform:'translateY(-18%) scale(1.09) rotate(-7deg)',offset:.5 },{ transform:'none' }], 510);
       tone([240, 320, 430], { spacing: .07, wave: 'triangle' });
     }
     if (result.obstacle === 'gate') {
       const gate = root.querySelector('.carrot-gate img');
-      animate(gate, [{ rotate: '0deg' }, { rotate: '42deg' }, { rotate: '0deg' }], 680);
+      animate(gate,[{ transform:'rotateY(0)' },{ transform:'rotateY(-105deg)',offset:.41 },{ transform:'rotateY(-92deg)',offset:.68 },{ transform:'rotateY(0)' }],720);
       tone([360, 396, 315], { spacing: .095, wave: 'triangle' });
     }
     const animations = result.effects.map(async ({ rabbit, kind, from, to }) => {

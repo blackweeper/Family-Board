@@ -19,6 +19,7 @@ function mosaicPreview(id) {
 }
 
 function mosaicGame() {
+  const soundtrack = familyMusic();
   let lineup = [0,1,2,3], count = 2, selected = 0, first = 0, mode = 'apprentice';
   let game, busy = false, generation = 0, muted = false, audio;
   const animate = matchMedia('(prefers-reduced-motion: no-preference)');
@@ -54,6 +55,7 @@ function mosaicGame() {
   }
 
   function setup() {
+    soundtrack.stop();
     game = null;
     stage.innerHTML = `<div class="mos-intro"><div class="mos-hero"><h1>L’Atelier des mosaïques</h1></div><div class="mos-setup">
       <fieldset><legend>Joueurs</legend><div class="mos-choices">${[2,3,4].map(n => `<button data-mos-count="${n}" aria-pressed="${n === count}">${n}</button>`).join('')}</div></fieldset>
@@ -136,6 +138,7 @@ function mosaicGame() {
   const wait = ms => animate.matches ? new Promise(resolve => setTimeout(resolve,ms)) : Promise.resolve();
 
   function finish() {
+    soundtrack.stop();
     const { winners } = game;
     const confetti = Array.from({ length:22 }, (_,i) => `<i style="--left:${i*100/22}%;--delay:${i%6*85}ms"></i>`).join('');
     stage.innerHTML = `<div class="mos-finish"><div class="mos-confetti" aria-hidden="true">${confetti}</div>
@@ -217,11 +220,13 @@ function mosaicGame() {
     const data = button.dataset;
     if (button.id === 'back') {
       generation++;
+      soundtrack.close();
       audio?.close().catch(() => {});
       home('[data-detail="mosaic"]');
     } else if ('mosRules' in data) dialog.showModal();
     else if ('mosSound' in data) {
       muted = !muted;
+      soundtrack.mute(muted);
       button.textContent = muted ? '🔇 Son' : '♪ Son';
       button.setAttribute('aria-pressed', !muted);
       if (muted) audio?.suspend().catch(() => {});
@@ -230,6 +235,7 @@ function mosaicGame() {
       generation++;
       busy = false;
       game = new MosaicGame(lineup.slice(0,count),mode,first);
+      soundtrack.start('mosaic');
       sound([392,523,659]);
       render(true);
     } else if ('mosSetup' in data) {

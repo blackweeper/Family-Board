@@ -27,6 +27,7 @@ function athleteSnake(players,start,rounds) {
 }
 
 function athleteGame() {
+  const soundtrack = familyMusic();
   let count=4, mode='draft', layout='alternating', phase='setup', course=0, first=0;
   let hands, points, reserve, previous, selected, choosing, draft, pool, draftRound, race, flow, decision, last, bronze;
   let timer, audio, muted=false;
@@ -76,6 +77,7 @@ function athleteGame() {
   }
 
   function setup() {
+    soundtrack.stop();
     phase='setup';
     stage.innerHTML='<div class="athlete-intro"><div><h1>Athlètes de<br>Compète</h1><p>Quatre courses · 36 athlètes</p>'+
       '<fieldset><legend>Joueurs</legend><div class="athlete-options">'+[2,3,4,5,6].map(n=>'<button data-count="'+n+'" aria-pressed="'+(n===count)+'">'+n+'</button>').join('')+'</div></fieldset>'+
@@ -97,6 +99,7 @@ function athleteGame() {
   }
 
   function begin() {
+    soundtrack.start('athletes');
     hands=indexList().map(()=>[]);
     points=indexList().map(()=>0);
     previous=[];
@@ -272,6 +275,7 @@ function athleteGame() {
       eligible=race.racers.filter(r=>r.pos===lastPlace).map(r=>r.player);
     }
     const done=course===3;
+    if(done) soundtrack.stop();
     if(!done) first=tiebreak(eligible);
     const winners=indexList().filter(i=>points[i]===Math.max(...points));
     const title=done?(winners.length===1?playerName(winners[0])+' gagne !':'Victoire partagée !'):'Arrivée · course '+(course+1);
@@ -312,6 +316,7 @@ function athleteGame() {
   app.querySelector('#athlete-rules').onclick=()=>showInfo(athleteRules);
   app.querySelector('#athlete-sound').onclick=event=>{
     muted=!muted;
+    soundtrack.mute(muted);
     event.currentTarget.textContent=muted?'🔇 Son':'🔊 Son';
     event.currentTarget.setAttribute('aria-pressed',!muted);
     if(muted) audio?.suspend().catch(()=>{});
@@ -319,6 +324,7 @@ function athleteGame() {
   };
   app.querySelector('#back').onclick=()=>{
     clearTimeout(timer);
+    soundtrack.close();
     audio?.close().catch(()=>{});
     home('[data-detail="athletes"]');
   };
