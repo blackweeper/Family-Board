@@ -1,4 +1,6 @@
 const catalog = [
+  { id:'mail', title:'Le Courrier des lapins', color:'mint', players:'3 à 6 joueurs · dès 6 ans', description:'Choisissez des images, retrouvez l’invitation en votant en secret et réunissez les huit lapins pour la fête.' },
+  { id:'wombat', title:'La Tour des wombats', color:'coral', players:'1 à 4 joueurs · dès 6 ans', description:'Orientez la tour et lancez le dé sur les assaillants. Défendez ensemble les quatre chemins avant que les boucliers cèdent.' },
   { id:'shark', title:'Festin des requins', color:'blue', players:'2 à 5 joueurs · dès 5 ans', description:'Choisis une pile en secret et découvre quels requins convoitent le même plat. Cinq tridents ou le meilleur festin te donnent la victoire.' },
   { id:'mud', title:'Plongée dans la boue', color:'mint', players:'2 à 4 joueurs · dès 5 ans', description:'Fais avancer ton cochon, bondis du plongeoir et remplis tes bassines avec les mottes qui éclaboussent le plateau.' },
   { id:'archeo', title:'Les Fouilles d’Archéo', color:'coral', players:'1 à 5 joueurs · dès 5 ans', description:'Soulève les couches de terre, rassemble les fossiles et trouve l’œuf secret avant que toutes les pelles ne cassent.' },

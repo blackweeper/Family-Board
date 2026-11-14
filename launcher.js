@@ -9,7 +9,7 @@ let favoritesOnly = false;
 let detailReturnFocus = '';
 let theater = false;
 const details = document.querySelector('#details');
-const gameRules = { safari: safariRules, lagoon: lagoonRules, prism: prismRules, pico: picoRules, table: tableRules, coop: coopRules, toys: toysRules, athletes: athleteRules, carrot: carrotRules, kiwi: kiwiRules, flip7: flip7Rules, mosaic: mosaicRules, archeo: archeoRules, shark:sharkRules, mud:mudRules };
+const gameRules = { safari: safariRules, lagoon: lagoonRules, prism: prismRules, pico: picoRules, table: tableRules, coop: coopRules, toys: toysRules, athletes: athleteRules, carrot: carrotRules, kiwi: kiwiRules, flip7: flip7Rules, mosaic: mosaicRules, archeo: archeoRules, shark:sharkRules, mud:mudRules, mail:mailRules, wombat:wombatRules };
 const isFavorite = game => favorites.has(game.id);
 
 function toggleFavorite(game) {
