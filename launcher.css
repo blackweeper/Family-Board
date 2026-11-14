@@ -61,7 +61,7 @@ button:focus-visible,a:focus-visible,select:focus-visible { outline:3px solid #f
   padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
 }
 .game-theater .topbar,.game-theater footer { display:none; }
-.game-theater :is(.prism-table,.safari-table,.lagoon-table,.prism-intro,.safari-intro,.lagoon-intro,.prism-finish,.safari-victory,.lagoon-victory,.pico-table,.pico-intro,.pico-finish,.table-board,.table-intro,.table-finish,.coop-board,.coop-intro,.coop-finish,.toys-board,.toys-intro,.toys-finish,.athlete) {
+.game-theater :is(.prism-table,.safari-table,.lagoon-table,.prism-intro,.safari-intro,.lagoon-intro,.prism-finish,.safari-victory,.lagoon-victory,.pico-table,.pico-intro,.pico-finish,.table-board,.table-intro,.table-finish,.coop-board,.coop-intro,.coop-finish,.toys-board,.toys-intro,.toys-finish,.athlete,.carrot-game) {
   min-height:calc(100dvh - max(8px,env(safe-area-inset-top)) - max(8px,env(safe-area-inset-bottom)) - 56px);
 }
 [data-fullscreen] { white-space:nowrap; }
