@@ -15,7 +15,7 @@ const carrotPoints = [
 ];
 
 const carrotArt = (asset, options = '') =>
-  '<img src="./covers/carrot-' + asset + (['bridge','gate','mole'].includes(asset) ? '-v2' : '') + '.webp" draggable="false" alt="" ' + options + '>';
+  '<img src="./covers/carrot-' + asset + (asset === 'gate' ? '-v3' : asset === 'mole' ? '-v2' : '') + '.webp" draggable="false" alt="" ' + options + '>';
 
 const carrotRules = '<div class="carrot-rules-copy"><h3>La course à la carotte</h3><ol>' +
   '<li>Choisis une couleur et place tes quatre lapins au départ. Le plus jeune pioche en premier. Jouez ensuite dans le sens des aiguilles d’une montre.</li>' +
@@ -158,8 +158,8 @@ function carrotGame() {
     return '<div class="carrot-board" aria-label="La colline de Croque-Carotte">' + path() +
       '<span class="carrot-start" aria-hidden="true" style="' + pointStyle(carrotPoints[0]) + '">➜</span>' +
       spaces + '<div class="carrot-mole" aria-hidden="true" style="' + pointStyle([20, 55]) + '">' +
-      carrotArt('mole') + '</div><div class="carrot-gate" aria-hidden="true" style="' + pointStyle([65, 35.5]) + '">' +
-      carrotArt('gate') + '</div><div class="carrot-bridge' + (race.bridgeUp ? ' up' : '') +
+      carrotArt('mole') + '</div><div class="carrot-gate" aria-hidden="true" style="' + pointStyle([63, 38.5]) + '">' +
+      '<span></span>' + carrotArt('gate') + '</div><div class="carrot-bridge' + (race.bridgeUp ? ' up' : '') +
       '" role="img" aria-label="Pont-levis ' + (race.bridgeUp ? 'levé' : 'baissé') + '" style="' + pointStyle([63, 87]) + '">' +
       '<span></span>' + carrotArt('bridge') + '</div>' + goal +
       race.rabbits.filter(rabbit => !rabbit.lost && rabbit.pos > 0).map(rabbit => piece(rabbit)).join('') + '</div>';

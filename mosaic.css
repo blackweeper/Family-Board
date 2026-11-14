@@ -3,10 +3,13 @@
 .mos-bar #back { margin-right:auto; }
 .mos-bar .secondary { min-height:44px; padding-inline:clamp(7px,1.4vw,16px); }
 .mos-intro,.mos-table,.mos-finish { border:1px solid #e9c77973; border-radius:25px; overflow:hidden; box-shadow:0 12px 32px #070d1a70; }
-.mos-intro { display:grid; place-items:end; min-height:clamp(550px,67vw,760px); padding:clamp(12px,2.6vw,29px); background:#193e44 url('covers/mosaic.jpg') center top/cover; }
+.mos-intro { display:grid; place-items:end center; min-height:clamp(530px,63vw,715px); padding:clamp(12px,2.6vw,29px); background:linear-gradient(0deg,#0c3237 0%,#123e45d9 12%,#123e4500 53%),#193e44 url('covers/mosaic.jpg') center 21%/cover; }
 .mos-hero { position:absolute; }
 .mos-hero h1 { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
-.mos-setup { display:grid; width:min(100%,375px); gap:7px; align-content:center; padding:clamp(11px,1.5vw,16px); border:1px solid #fce5aeaa; border-radius:20px; background:#143f45ed; box-shadow:0 8px 24px #102e3f7f; }
+.mos-setup { display:grid; width:min(100%,825px); gap:10px 16px; grid-template-columns:minmax(155px,1fr) minmax(200px,1.12fr) minmax(210px,1.6fr); align-items:end; }
+.mos-setup fieldset:nth-of-type(3) { grid-row:span 2; }
+.mos-setup .mos-primary { min-height:49px; }
+.mos-setup legend,.mos-setup .mos-first { text-shadow:0 1px 4px #0d252c,0 1px 7px #0d252c; }
 .mos fieldset { border:0; margin:0; padding:0; min-width:0; }
 .mos legend,.mos-first { font-weight:850; margin-bottom:6px; }
 .mos-first { display:flex; flex-wrap:wrap; align-items:center; gap:7px; }
@@ -96,7 +99,9 @@ button.mos-cell:focus-visible { outline-color:#3e766b; }
   .mos-center-bowl { grid-column:1/-1; }
 }
 @media (max-width:720px) {
-  .mos-intro { min-height:0; justify-items:center; padding-top:49%; background-size:100% auto; background-position:top; background-repeat:no-repeat; }
+  .mos-intro { min-height:0; padding-top:49%; background-size:100% 100%,100% auto; background-position:top; background-repeat:no-repeat; }
+  .mos-setup { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+  .mos-setup fieldset:nth-of-type(3) { grid-row:auto; grid-column:1/-1; }
   .mos-bowls { grid-template-columns:repeat(3,minmax(0,1fr)); }
   .mos-center-bowl { grid-column:auto; }
   .mos-table { gap:7px; }

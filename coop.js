@@ -1,19 +1,19 @@
 const coopModes = {
-  little: { eggs:4, speed:1950, eggWidth:34, shieldWidth:18 },
-  family: { eggs:5, speed:1580, eggWidth:28, shieldWidth:15 },
+  little: { eggs:4, speed:1680, eggWidth:29, shieldWidth:15 },
+  family: { eggs:5, speed:1380, eggWidth:24, shieldWidth:12.5 },
 };
 const coopFoxLimit = 5;
 const coopIcon = kind => '<img src="./covers/coop-'+kind+'.png" alt="" draggable="false">';
 
 function coopTargets(mode, progress, random = Math.random) {
   const { eggWidth, shieldWidth, speed } = coopModes[mode];
-  const egg = { width:eggWidth * (1 - .26 * progress) };
-  const shield = { width:shieldWidth * (1 - .23 * progress) };
+  const egg = { width:eggWidth * (1 - .30 * progress) };
+  const shield = { width:shieldWidth * (1 - .27 * progress) };
   const free = 100 - egg.width - shield.width;
   const [first, last] = random() < .5 ? [egg, shield] : [shield, egg];
   first.start = free * (.22 + random() * .08);
   last.start = 100 - last.width - free * (.22 + random() * .08);
-  return { egg, shield, speed:speed * (1 - .23 * progress) };
+  return { egg, shield, speed:speed * (1 - .27 * progress) };
 }
 
 function coopOutcome(cursor, targets) {
