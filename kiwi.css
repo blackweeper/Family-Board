@@ -1,0 +1,419 @@
+.cover-open[data-detail="kiwi"] .cover-art, #details[data-game="kiwi"] .detail-art {
+  background: #317b79 url("covers/kiwi.jpg") 65% center / cover;
+}
+.kiwi-game {
+  --cream: #fff5d5;
+  --gold: #ffd277;
+  --navy: #0e3736;
+  min-height: calc(100dvh - 105px);
+  overflow: hidden;
+  border: 1px solid #629e8d;
+  border-radius: 24px;
+  color: var(--cream);
+  background: #123e3c;
+  font-family: Nunito, ui-rounded, system-ui, sans-serif;
+}
+.kiwi-game :is(button, a) { -webkit-tap-highlight-color: transparent; }
+.kiwi-game button { touch-action: manipulation; font: inherit; }
+.kiwi-game button:focus-visible, .kiwi-game a:focus-visible { outline: 3px solid #fff8ca; outline-offset: 3px; }
+.kiwi-bar, .kiwi-arena-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 9px clamp(10px, 2.1vw, 24px);
+  background: #102f31;
+}
+.kiwi-arena-bar {
+  justify-content: space-between;
+  gap: 6px;
+  padding: 5px clamp(10px, 2.1vw, 24px);
+  color: #fff0ba;
+  background: #1a4843;
+}
+.kiwi-bar #back { margin-inline-end: auto; }
+.kiwi-game .secondary, .kiwi-options button, .kiwi-range button {
+  min-height: 44px;
+  padding: 7px 13px;
+  border: 1px solid #80a99a;
+  border-radius: 12px;
+  color: var(--cream);
+  background: #275654;
+  font-weight: 850;
+}
+.kiwi-arena-bar .secondary { min-height: 35px; padding: 5px 11px; font-size: .83rem; }
+.kiwi-arena-bar button:only-child { margin-inline-start: auto; }
+.kiwi-game .kiwi-main {
+  min-height: 48px;
+  display: inline-grid;
+  place-items: center;
+  padding: 8px 19px;
+  border: 1px solid #ffecaa;
+  border-radius: 13px;
+  color: #292719;
+  background: linear-gradient(#ffea9c, #ffb766);
+  box-shadow: 0 4px #955c37;
+  font-weight: 950;
+}
+.kiwi-intro, .kiwi-results {
+  display: grid;
+  align-items: center;
+  min-height: min(660px, calc(100dvh - 144px));
+  padding: clamp(22px, 6vw, 69px);
+  background: linear-gradient(90deg,#0b2e42f5,#123a45e0 26%,#154c5640 62%,transparent 86%),
+    url("covers/kiwi.jpg") center 23% / cover;
+}
+.kiwi-intro-copy { max-width: 510px; }
+.kiwi-intro h1, .kiwi-results h2 {
+  margin: 0;
+  font-family: "Bricolage Grotesque", ui-rounded, system-ui, sans-serif;
+  font-size: clamp(3.65rem, 11vw, 9rem);
+  line-height: .78;
+  letter-spacing: -.08em;
+  font-weight: 950;
+  color: #fff2b6;
+  text-shadow: 0 .052em #ce7937, 0 .081em #663745;
+}
+.kiwi-intro h1 em { color: #d5fa83; font-style: normal; text-shadow: 0 .05em #668744, 0 .079em #323d4c; }
+.kiwi-meta { font-weight: 850; color: #ffeda8; margin: 17px 0 18px; }
+.kiwi-intro fieldset { border: 0; padding: 0; margin: 0 0 12px; }
+.kiwi-intro legend { font-weight: 850; padding: 0 0 4px; }
+.kiwi-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.kiwi-options button[aria-pressed="true"] { background: #ffe29b; border-color: #ffe29b; color: #273e33; }
+.kiwi-options .kiwi-select {
+  position: relative;
+  width: clamp(53px, 6.4vw, 80px);
+  height: clamp(47px, 5.9vw, 70px);
+  padding: 4px;
+  border: 2px solid var(--team);
+  background: radial-gradient(var(--ink), #193d3c);
+}
+.kiwi-select img { width: 100%; height: 100%; object-fit: contain; }
+.kiwi-select b { position: absolute; inset: auto auto 2px 3px; padding: 1px 4px; border-radius: 6px; background: var(--team); color: #29252c; font-size: .72em; }
+
+.kiwi-table {
+  --board: min(calc(100% - 320px), calc(100dvh - 432px), 525px);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(133px, 1fr) var(--board) minmax(133px, 1fr);
+  grid-template-rows: 82px auto 82px auto;
+  grid-template-areas: ". north ." "west crate east" ". south ." "live live live";
+  align-items: center;
+  justify-items: center;
+  gap: 7px 10px;
+  min-height: 0;
+  padding: 6px clamp(8px, 2vw, 22px);
+  isolation: isolate;
+  background: #6baba1 url("covers/kiwi-table.webp") center / cover;
+  overflow: hidden;
+}
+.game-theater .kiwi-table { --board: min(calc(100% - 320px), calc(100dvh - 327px), 630px); }
+.kiwi-crate {
+  grid-area: crate;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template: repeat(4, minmax(0, 1fr)) / repeat(4, minmax(0, 1fr));
+  gap: clamp(3px, .66vw, 9px);
+  width: 100%;
+  aspect-ratio: 1;
+  padding: clamp(8px, 1.5vw, 19px);
+  border: 2px solid #8c4c28;
+  border-radius: clamp(8px, 1.8vw, 22px);
+  background:
+    radial-gradient(circle at 2.4% 2.4%, #f3cb8d 0 .6%, #784b2e .8% 1.2%, transparent 1.32%),
+    radial-gradient(circle at 97.6% 2.4%, #f3cb8d 0 .6%, #784b2e .8% 1.2%, transparent 1.32%),
+    radial-gradient(circle at 2.4% 97.6%, #f3cb8d 0 .6%, #784b2e .8% 1.2%, transparent 1.32%),
+    radial-gradient(circle at 97.6% 97.6%, #f3cb8d 0 .6%, #784b2e .8% 1.2%, transparent 1.32%),
+    repeating-linear-gradient(7deg, #ad5f332b 0 1px, transparent 2px 11px),
+    linear-gradient(126deg, #ffe1a1, #e4a867 51%, #b16f3f);
+  box-shadow: inset 0 0 0 3px #ffd999, 0 8px 0 #874a2c, 0 13px 18px #0746429e;
+}
+.kiwi-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #9c6a3c;
+  border-radius: 8%;
+  background:
+    linear-gradient(135deg,#58351760,transparent 35%,#513b164a),
+    url("covers/kiwi-straw.webp") center / cover;
+  box-shadow: inset 2px 3px 5px #754f25c0, inset -2px -2px 5px #55341d90, 0 1px #ffe3a3;
+}
+.kiwi-cell.winner { box-shadow: inset 0 0 18px 4px #fff7b4; }
+.kiwi-cell.collected .kiwi-token { opacity: .25; }
+.kiwi-token {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 81%;
+  aspect-ratio: 1;
+}
+.kiwi-token-top, .kiwi-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: max(1px, .19vw) solid var(--ink);
+  background: radial-gradient(ellipse at 44% 27%, #fff7cc, var(--team) 53%, var(--ink));
+  box-shadow: 0 3px var(--ink), 0 4px 3px #472e23a8, inset 0 0 0 1px #fffad2d0;
+}
+.kiwi-layer { transform: translateY(calc(14% - var(--layer) * 4%)); filter: brightness(.77); }
+.kiwi-token img { width: 95%; height: 95%; object-fit: contain; position: relative; }
+.kiwi-token-top b, .kiwi-champion b {
+  position: absolute;
+  right: 3%;
+  bottom: 3%;
+  display: grid;
+  place-items: center;
+  width: 28%;
+  min-width: 11px;
+  aspect-ratio: 1;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  color: #242222;
+  background: var(--team);
+  font-size: clamp(.5rem, 1.15vw, .89rem);
+  line-height: 1;
+}
+.kiwi-pile-number {
+  position: absolute;
+  z-index: 1;
+  top: -7%;
+  left: -6%;
+  min-width: 19px;
+  padding: 2px 3px;
+  border: 1px solid #fff1ab;
+  border-radius: 8px;
+  color: #fff3bd;
+  background: #2b3b2f;
+  text-align: center;
+  font: 850 clamp(.58rem, 1.29vw, 1rem) / 1 system-ui, sans-serif;
+}
+
+.kiwi-ramp {
+  position: relative;
+  z-index: 3;
+  height: 82px;
+  width: clamp(142px, 20vw, 234px);
+  --pull: 0;
+  --side: 0;
+}
+.kiwi-ramp[data-seat="0"] { grid-area: south; }
+.kiwi-ramp[data-seat="1"] { grid-area: north; }
+.kiwi-ramp[data-seat="2"] { grid-area: east; }
+.kiwi-ramp[data-seat="3"] { grid-area: west; }
+.kiwi-ramp-inner {
+  position: absolute;
+  inset: 2px;
+  display: grid;
+  grid-template-columns: 1fr minmax(67px, 45%) 1fr;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border: 2px solid var(--team);
+  border-radius: 16px;
+  color: #fff5d5;
+  background: linear-gradient(145deg, var(--ink), #153b37);
+  box-shadow: 0 4px 0 #27433d, 0 6px 8px #38443c80;
+  transform: rotate(var(--angle));
+}
+.kiwi-ramp.drawing .kiwi-ramp-inner { box-shadow: 0 0 0 3px var(--team), 0 0 23px var(--team); }
+.kiwi-ramp.empty .kiwi-ramp-inner { filter: saturate(.52); opacity: .79; }
+.kiwi-ramp-count {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2px 4px;
+  font-size: clamp(.69rem, 1.4vw, 1.13rem);
+  font-weight: 950;
+  color: var(--team);
+}
+.kiwi-pips {
+  display: grid;
+  flex: 0 0 100%;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+  padding: 2px;
+}
+.kiwi-pips i { aspect-ratio: 1; border-radius: 50%; background: var(--team); opacity: .94; }
+.kiwi-pips i.used { opacity: .25; background: #d6e2d5; }
+.kiwi-catapult {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+.kiwi-ramp-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; filter: drop-shadow(0 3px 2px #172f28); }
+.kiwi-catapult [data-launch] {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 49%;
+  width: max(44px, 74%);
+  height: max(44px, 65%);
+  display: grid;
+  place-items: center;
+  padding: 1px;
+  border: 2px solid #fff5c7;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, #fff3ae, var(--team) 58%, var(--ink));
+  box-shadow: 0 3px var(--ink), 0 5px 6px #24282b99;
+  transform: translate(calc(-50% + var(--side) * 32px), calc(-50% + var(--pull) * 31px));
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.kiwi-ramp.drawing [data-launch] { cursor: grabbing; }
+.kiwi-catapult [data-launch]:disabled { cursor: default; }
+.kiwi-ramp.waiting [data-launch], .kiwi-ramp.empty [data-launch] { opacity: .23; }
+.kiwi-catapult [data-launch] img { width: 92%; height: 92%; object-fit: contain; pointer-events: none; }
+.kiwi-catapult [data-launch] span {
+  position: absolute;
+  right: -8%;
+  bottom: -7%;
+  min-width: 19px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: #fff1b8;
+  color: var(--ink);
+  font-size: .8rem;
+  line-height: 16px;
+  font-weight: 950;
+}
+.kiwi-rubber {
+  position: absolute;
+  z-index: 1;
+  top: 42%;
+  width: 48%;
+  height: 4px;
+  border-radius: 4px;
+  background: #fff2a2;
+  box-shadow: 0 1px #b96628, 0 0 1px #864821;
+}
+.kiwi-rubber.left { left: 5%; transform-origin: left; transform: rotate(calc(var(--pull) * 47deg)) scaleX(calc(1 + var(--pull) * .45)); }
+.kiwi-rubber.right { right: 5%; transform-origin: right; transform: rotate(calc(var(--pull) * -47deg)) scaleX(calc(1 + var(--pull) * .45)); }
+.kiwi-range { display: grid; justify-items: center; gap: 1px; }
+.kiwi-range button {
+  min-height: 25px;
+  min-width: 36px;
+  padding: 1px 5px;
+  line-height: 1;
+  background: #164743;
+  color: var(--team);
+  border-radius: 7px;
+}
+.kiwi-range button:disabled { opacity: .39; }
+.kiwi-range-value { color: #fff3bb; font-size: .67rem; line-height: 1; }
+
+.kiwi-air { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+.kiwi-air > span { position: absolute; transform: translate(-50%, -50%); pointer-events: none; }
+.kiwi-flyer, .kiwi-perch {
+  width: clamp(30px, 5.7vw, 77px);
+  aspect-ratio: 1;
+  border: 2px solid var(--team);
+  border-radius: 50%;
+  background: radial-gradient(#fff0ab, var(--team) 74%);
+  box-shadow: 0 4px 10px #253835aa, inset 0 0 0 2px #fff0b880;
+}
+.kiwi-flyer img, .kiwi-perch img { width: 100%; height: 100%; object-fit: contain; }
+.kiwi-flyer i { position: absolute; inset: 7% 69% 3% -46%; filter: blur(3px); border-radius: 50%; background: linear-gradient(90deg, transparent, var(--team)); z-index: -1; }
+.kiwi-perch { width: clamp(15px, 2.4vw, 34px); box-shadow: 1px 2px 3px #553c26; }
+.kiwi-dot, .kiwi-spark { width: 8px; aspect-ratio: 1; border: 1px solid #fff6ce; border-radius: 50%; background: var(--team); box-shadow: 0 2px 5px #2746499c; }
+.kiwi-spark { border-radius: 24%; }
+.kiwi-impact { width: clamp(27px, 5.4vw, 68px); aspect-ratio: 1; border: 3px solid var(--team); border-radius: 50%; box-shadow: 0 0 10px #fff6ad, inset 0 0 11px #fff4ad; }
+.kiwi-preview { width: 25px; aspect-ratio: 1; border: 2px dashed #fff8c7; border-radius: 50%; background: #fff5b474; box-shadow: 0 0 0 2px var(--ink); }
+.kiwi-preview.outside { border-color: #ff9c81; background: #ff8b8170; }
+.kiwi-win-outline { transform: none !important; border: 5px solid var(--team); border-radius: 12px; box-shadow: inset 0 0 21px #fff7ae, 0 0 16px var(--team); animation: kiwi-win-pulse 430ms ease-in-out alternate infinite; }
+.kiwi-parcel { display: grid; min-width: 35px; aspect-ratio: 1; place-items: center; border: 2px solid var(--ink); border-radius: 8px; background: var(--team); color: #263c35; font-weight: 950; box-shadow: 0 3px #343845; }
+.kiwi-countdown {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  padding: 0 .28em .1em;
+  border-radius: 16px;
+  color: #fff1ad;
+  background: #123d3bec;
+  box-shadow: 0 0 0 3px #ffe29a;
+  font-family: "Bricolage Grotesque", ui-rounded, system-ui, sans-serif;
+  font-size: clamp(2.1rem, 10vw, 6rem);
+  line-height: 1;
+  font-weight: 950;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.kiwi-countdown:empty { display: none; }
+.kiwi-live {
+  grid-area: live;
+  z-index: 2;
+  margin: 0;
+  min-height: 24px;
+  padding: 3px 9px;
+  width: max-content;
+  max-width: calc(100% - 10px);
+  border-radius: 8px;
+  background: #163d39ef;
+  color: #fff5c7;
+  font-size: clamp(.73rem, 1.3vw, .94rem);
+  font-weight: 800;
+  text-align: center;
+}
+.kiwi-live:empty { visibility: hidden; }
+.kiwi-results { justify-items: center; background-image: linear-gradient(#123d416a,#093537e8),url("covers/kiwi.jpg"); }
+.kiwi-results-card { position: relative; width: min(100%, 540px); text-align: center; padding: clamp(14px, 4vw, 42px); border: 2px solid #ffe0aa; border-radius: 24px; background: radial-gradient(#427d6f,#173b3e); }
+.kiwi-results h2 { font-size: clamp(2.2rem, 5.65vw, 4.5rem); line-height: .97; }
+.kiwi-results p { font-weight: 850; }
+.kiwi-plane { width: min(34%, 145px); height: auto; max-height: 110px; object-fit: contain; animation: kiwi-plane 1.15s cubic-bezier(.17,.84,.32,1.18) both; }
+.kiwi-champions { display: flex; justify-content: center; gap: 8px; margin: 2px 0 18px; }
+.kiwi-champion { position: relative; display: grid; place-items: center; width: min(21%, 105px); aspect-ratio: 1; border: 2px solid var(--team); border-radius: 50%; background: var(--ink); }
+.kiwi-champion img, .kiwi-results-scores img { width: 100%; height: 100%; object-fit: contain; }
+.kiwi-results-scores { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.kiwi-results-scores div { display: flex; align-items: center; gap: 5px; padding: 4px 9px; border: 1px solid var(--team); border-radius: 9px; color: var(--team); background: var(--ink); }
+.kiwi-results-scores img { width: 31px; height: 31px; }
+.kiwi-results .kiwi-options { justify-content: center; }
+.kiwi-dialog { width: min(650px, calc(100% - 20px)); max-height: 89dvh; padding: clamp(15px, 4vw, 30px); border: 1px solid #a5c6ab; border-radius: 20px; background: #163f3d; color: var(--cream); }
+.kiwi-dialog::backdrop { background: #0d292ad9; }
+.kiwi-dialog li { margin-bottom: .6em; }
+.kiwi-dialog a, .kiwi-rules-copy a { color: #ffe297; }
+.kiwi-dialog form { display: flex; justify-content: center; margin-top: 13px; }
+@keyframes kiwi-win-pulse { to { opacity: .61; } }
+@keyframes kiwi-plane { from { transform: translate(-150px, 61px) rotate(-14deg) scale(.32); opacity: 0; } }
+
+@media (max-width: 780px) and (orientation: portrait) {
+  .kiwi-table, .game-theater .kiwi-table {
+    --board: min(calc(100% - 108px), 460px);
+    grid-template-columns: minmax(47px, 1fr) var(--board) minmax(47px, 1fr);
+    grid-template-rows: 73px auto 73px auto;
+    gap: 4px;
+    padding: 4px;
+  }
+  .kiwi-ramp { width: 116px; height: 64px; }
+  .kiwi-ramp-inner { padding: 2px 3px; grid-template-columns: 1fr 52px 1fr; gap: 2px; }
+  .kiwi-ramp-count { gap: 2px; }
+  .kiwi-pips { padding-inline: 0; gap: 1px; }
+  .kiwi-range { gap: 0; }
+  .kiwi-range button { min-width: 23px; min-height: 20px; }
+  .kiwi-intro { background-position: 56% center; }
+}
+@media (max-height: 640px) and (orientation: landscape) {
+  .kiwi-table { --board: max(132px, min(calc(100% - 235px), calc(100dvh - 260px), 420px)); grid-template-rows: 49px auto 49px auto; padding: 2px 8px; }
+  .game-theater .kiwi-table { --board: max(132px, min(calc(100% - 235px), calc(100dvh - 196px), 420px)); }
+  .kiwi-table { grid-template-columns: minmax(100px,1fr) var(--board) minmax(100px,1fr); }
+  .kiwi-ramp { width: 128px; height: 51px; }
+  .kiwi-ramp-inner { padding: 0 4px; grid-template-columns: 1fr 54px 1fr; }
+  .kiwi-range-value { display: none; }
+  .kiwi-range button { min-height: 19px; min-width: 25px; }
+  .kiwi-pips { gap: 1px; }
+  .kiwi-crate { padding: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kiwi-game * { animation: none !important; }
+}

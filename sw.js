@@ -1,4 +1,4 @@
-const CACHE = 'family-board-v41';
+const CACHE = 'family-board-v42';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js',
@@ -35,6 +35,9 @@ const ASSETS = [
   'covers/carrot-board.webp', 'covers/carrot-goal.webp', 'covers/carrot-mole.webp',
   'covers/carrot-bridge.webp', 'covers/carrot-gate.webp',
   ...Array.from({ length: 4 }, (_, i) => 'covers/carrot-rabbit-' + i + '.webp'),
+  'kiwi-rules.js', 'kiwi.js', 'kiwi.css', 'covers/kiwi.jpg', 'covers/kiwi-table.webp',
+  'covers/kiwi-ramp.webp', 'covers/kiwi-plane.webp', 'covers/kiwi-straw.webp',
+  ...Array.from({ length: 4 }, (_, i) => 'covers/kiwi-bird-' + i + '.webp'),
   'launcher.js', 'manifest.webmanifest',
 ].map(path => new URL(path, self.registration.scope).href);
 

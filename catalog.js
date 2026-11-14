@@ -1,4 +1,5 @@
 const catalog = [
+  { id: 'kiwi', title: 'Flying Kiwis', color: 'mint', players: '2 à 4 joueurs · dès 5 ans', description: 'Tends ton élastique et envoie tes kiwis dans la caisse. Forme un carré avant les autres !' },
   { id: 'carrot', title: 'Croque-Carotte', color: 'mint', players: '2 à 4 joueurs · dès 4 ans', description: 'Fais bondir tes lapins au sommet de la colline. Gare à la taupe, au pont-levis et aux trous qui s’ouvrent quand la carotte tourne !' },
   { id: 'safari', title: 'Boum Safari', icon: '🐾', color: 'mint', type: 'home', category: 'À plusieurs', players: '2 à 4 joueurs', description: 'Deux animaux identiques ? Tape ta zone avant les autres. Cinq étoiles pour gagner !' },
   { id: 'lagoon', title: 'Lagon des Trésors', icon: '🐚', color: 'blue', type: 'home', category: 'À plusieurs', players: '2 à 4 joueurs', description: 'Pioche des trésors et mets tes perles à l’abri avant que ton radeau ne tangue.' },
