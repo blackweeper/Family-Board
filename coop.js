@@ -1,25 +1,42 @@
 const coopModes = {
-  little: { eggs:4, speed:1720, width:34 },
-  family: { eggs:5, speed:1390, width:29 },
+  little: { eggs:4, speed:1270, eggWidth:23, shieldWidth:11 },
+  family: { eggs:5, speed:1050, eggWidth:20, shieldWidth:9 },
 };
 const coopFoxLimit = 5;
 const coopIcon = kind => '<img src="./covers/coop-'+kind+'.png" alt="" draggable="false">';
 
+function coopTargets(mode, progress, random = Math.random) {
+  const { eggWidth, shieldWidth, speed } = coopModes[mode];
+  const early = 7 + random() * 19;
+  const late = 60 + random() * 19;
+  const forward = random() < .5;
+  const egg = { start:forward ? early : late - 8, width:eggWidth * (1 - .38 * progress) };
+  const shield = { start:forward ? late : early + 5, width:shieldWidth * (1 - .31 * progress) };
+  return { egg, shield, speed:speed * (1 - .28 * progress) };
+}
+
+function coopOutcome(cursor, targets) {
+  const contains = ({ start, width }) => cursor >= start && cursor <= start + width;
+  if (contains(targets.egg)) return 'egg';
+  if (contains(targets.shield)) return 'shield';
+  return 'fox';
+}
+
 const coopRules = `
   <h2>Comment jouer ?</h2>
   <ol>
-    <li>À ton tour, touche l’œuf ou le bouclier. Le nid concerné s’allume.</li>
-    <li>Quand le curseur passe dans le vert, touche <strong>Stop</strong>. Le bouclier a une zone verte beaucoup plus petite.</li>
-    <li>Une réussite ajoute un œuf ou un bouclier au nid. Plus les nids se remplissent, plus le curseur accélère et plus la zone verte rétrécit.</li>
-    <li>Si tu rates, le renard avance et vole un œuf au nid éclairé s’il y en a un. Un bouclier disparaît en bloquant le renard.</li>
+    <li>Appuie sur <strong>Lancer</strong> pour faire partir le curseur, puis sur <strong>Stop</strong> pour l’arrêter. Les deux récompenses sont sur la même jauge.</li>
+    <li>Dans la zone dorée, l’œuf rejoint le nid éclairé. Dans la zone verte, un bouclier protège ce nid. Un nid peut avoir un seul bouclier.</li>
+    <li>Si tu t’arrêtes dans la zone du renard, il avance et vole un œuf au nid éclairé s’il y en a un. Un bouclier bloque ce vol et disparaît.</li>
+    <li>Plus il y a d’œufs à l’abri, plus le curseur accélère et plus les zones de récompense rétrécissent.</li>
     <li>Remplissez les trois nids avant que le renard ne fasse cinq pas. Le jeu passe la main automatiquement.</li>
   </ol>`;
 
 function coopGame() {
   let count=2, mode='little', player=0, phase='setup', selected=0;
-  let nests=[], fox=0, effect='', reward='', notice='', stolen=false;
-  let left=0, width=0, speed=0, cursor=0, elapsed=0, lastFrame, frame, timer;
-  let soundOn=true, audio, wind, music, beat=0;
+  let nests=[], fox=0, effect='', notice='', stolen=false;
+  let targets, cursor=0, elapsed=0, lastFrame, frame, timer;
+  let soundOn=true, audio, field, music, beat=0;
   const config=()=>coopModes[mode];
   const goal=()=>3*config().eggs;
   const total=()=>nests.reduce((sum,nest)=>sum+nest.eggs,0);
@@ -53,61 +70,79 @@ function coopGame() {
   }
 
   function startAmbience() {
-    if (!soundOn || !window.AudioContext || wind) return;
+    if (!soundOn || !window.AudioContext || field) return;
     audio ??= new AudioContext();
     audio.resume().catch(()=>{});
-    const buffer=audio.createBuffer(1,audio.sampleRate*3,audio.sampleRate);
+    const buffer=audio.createBuffer(1,audio.sampleRate*4,audio.sampleRate);
     const samples=buffer.getChannelData(0);
-    for (let i=1;i<samples.length;i++) samples[i]=samples[i-1]*.94+(Math.random()-.5)*.12;
+    let seed=73, breeze=0;
+    for (let i=0;i<samples.length;i++) {
+      seed=(Math.imul(seed,1664525)+1013904223)>>>0;
+      breeze=.955*breeze+(seed/4294967296-.5)*.09;
+      samples[i]=breeze*Math.sin(Math.PI*i/samples.length)**2;
+    }
     const source=audio.createBufferSource(), filter=audio.createBiquadFilter(), gain=audio.createGain();
     source.buffer=buffer;
     source.loop=true;
-    filter.type='lowpass';
-    filter.frequency.value=410;
-    gain.gain.value=.23;
+    filter.type='bandpass';
+    filter.frequency.value=870;
+    filter.Q.value=.65;
+    gain.gain.value=.13;
     source.connect(filter).connect(gain).connect(audio.destination);
     source.start();
-    wind=[source,filter,gain];
-    const notes=[147,0,175,0,196,147,0,165,0,131,0,165];
+    field=[source,filter,gain];
+    const tune=[
+      [196,392],[0,0],[0,466],[0,523],[147,587],[0,0],[0,523],[0,466],
+      [175,440],[0,0],[0,523],[0,659],[131,587],[0,0],[0,466],[0,0],
+    ];
     music=setInterval(()=>{
-      if (audio.state!=='running') return;
-      const pitch=notes[beat%notes.length];
-      if (pitch) sound([pitch],.035,'triangle');
-      if (beat%12===7) cluck();
-      if (beat%12===2) sound([1560,1760],.014);
+      if (audio.state!=='running'||document.hidden) return;
+      const [bass, melody]=tune[beat%tune.length];
+      if (bass) farmNote(bass,.032,.35,1);
+      if (melody) farmNote(melody,.022,.21,.997);
+      if (beat%16===5||beat%16===13) cluck();
+      if (beat%16===2) {
+        farmNote(1600,.012,.115,1.31,.06);
+        farmNote(1910,.01,.1,.78,.21);
+      }
       beat++;
-    },380);
+    },302);
+  }
+
+  function farmNote(pitch, volume, length, sweep, delay=0, type='triangle') {
+    const start=audio.currentTime+delay;
+    const tone=audio.createOscillator(), envelope=audio.createGain();
+    tone.type=type;
+    tone.frequency.setValueAtTime(pitch,start);
+    tone.frequency.exponentialRampToValueAtTime(pitch*sweep,start+length*.8);
+    envelope.gain.setValueAtTime(.001,start);
+    envelope.gain.exponentialRampToValueAtTime(volume,start+.012);
+    envelope.gain.exponentialRampToValueAtTime(.001,start+length);
+    tone.connect(envelope).connect(audio.destination);
+    tone.start(start);
+    tone.stop(start+length+.01);
   }
 
   function cluck() {
-    for (const [delay,pitch] of [[0,320],[.15,420],[.28,300]]) {
-      const start=audio.currentTime+delay;
-      const tone=audio.createOscillator(), gain=audio.createGain();
-      tone.type='triangle';
-      tone.frequency.setValueAtTime(pitch,start);
-      tone.frequency.exponentialRampToValueAtTime(pitch*.63,start+.085);
-      gain.gain.setValueAtTime(.001,start);
-      gain.gain.exponentialRampToValueAtTime(.05,start+.014);
-      gain.gain.exponentialRampToValueAtTime(.001,start+.105);
-      tone.connect(gain).connect(audio.destination);
-      tone.start(start);
-      tone.stop(start+.11);
+    for (const [delay,pitch,length] of [[0,625,.075],[.12,660,.08],[.25,725,.155]]) {
+      farmNote(pitch,.038,length,.55,delay);
+      farmNote(pitch*1.83,.009,length,.59,delay+.006,'sine');
     }
   }
 
   function stopAmbience() {
     clearInterval(music);
-    if (!wind) return;
-    wind[0].stop();
-    wind.forEach(node=>node.disconnect());
-    wind=undefined;
+    if (!field) return;
+    field[0].stop();
+    field.forEach(node=>node.disconnect());
+    field=undefined;
   }
 
   function setup() {
     phase='setup';
     rulesButton.disabled=false;
     stage.innerHTML='<div class="coop-intro"><div class="coop-intro-copy"><h1>La Ronde du<br>Poulailler</h1>'+
-      '<p>Arrête le curseur dans le vert pour protéger les œufs.</p><fieldset><legend>Joueurs</legend><div class="coop-options">'+
+      '<p>Arrête le curseur sur l’œuf ou le bouclier.</p><fieldset><legend>Joueurs</legend><div class="coop-options">'+
       [1,2,3,4].map(n=>'<button data-count="'+n+'" aria-pressed="'+(count===n)+'">'+n+'</button>').join('')+
       '</div></fieldset><fieldset><legend>Mode</legend><div class="coop-options">'+
       '<button data-mode="little" aria-pressed="'+(mode==='little')+'">Petits</button>'+
@@ -121,13 +156,19 @@ function coopGame() {
     nests=Array.from({length:3},()=>({eggs:0,shield:false}));
     fox=0;
     effect='';
-    reward='';
     beat=0;
-    phase='ready';
+    ready();
     startAmbience();
     sound([392,523,659]);
     render();
     focus('[data-try]');
+  }
+
+  function ready() {
+    phase='ready';
+    effect='';
+    cursor=0;
+    targets=coopTargets(mode,total()/(goal()-1));
   }
 
   function nestMarkup(nest,i) {
@@ -147,13 +188,20 @@ function coopGame() {
   function render() {
     const angle=(count===2?[0,180]:[0,-90,180,90])[player];
     rulesButton.disabled=phase==='result';
-    const bar=phase==='ready'?'':'<div class="coop-meter" aria-hidden="true" style="--left:'+left+'%;--width:'+width+'%;--cursor:'+cursor+'%"><span class="coop-green"></span><span class="coop-cursor"></span></div>';
-    const action=phase==='ready'?
-      '<div class="coop-choices"><button class="coop-choice" data-try="egg" aria-label="Gagner un œuf">'+coopIcon('egg')+'</button>'+
-      '<button class="coop-choice" data-try="shield" aria-label="Gagner un bouclier, défi difficile" '+(nests[selected].shield?'disabled':'')+'>'+coopIcon('shield')+'</button></div>':
-      phase==='aim'?'<button class="coop-primary coop-stop" data-stop>'+coopIcon(reward)+'<span>Stop</span></button>':
+    const mark = (kind, {start,width}) => '<span class="coop-zone" data-zone="'+kind+'" style="--start:'+start+
+      '%;--size:'+width+'%">'+coopIcon(kind)+'</span>';
+    const low=targets.egg.start<targets.shield.start?targets.egg:targets.shield;
+    const high=low===targets.egg?targets.shield:targets.egg;
+    const dangerCenter=(low.start+low.width+high.start)/2;
+    const bar='<div class="coop-rail"><div class="coop-meter" aria-hidden="true" style="--cursor:'+cursor+
+      '%"><span class="coop-fox-icon" style="--start:'+dangerCenter+'%">'+coopIcon('fox')+'</span>'+
+      mark('egg',targets.egg)+mark('shield',targets.shield)+
+      '<span class="coop-cursor"></span></div></div>';
+    const action=phase==='result'?
       '<div class="coop-feedback" data-effect="'+effect+'" aria-hidden="true">'+coopIcon(effect==='blocked'?'shield':effect)+
-      '<span>'+(effect==='fox'?'×':effect==='blocked'?'✦':'✓')+'</span></div>';
+      '<span>'+(effect==='fox'?'×':effect==='blocked'?'✦':'✓')+'</span></div>':
+      '<button class="coop-tap" '+(phase==='ready'?'data-try':'data-stop')+'><span aria-hidden="true">'+
+      (phase==='ready'?'▶':'■')+'</span>'+ (phase==='ready'?'Lancer':'Stop')+'</button>';
     stage.innerHTML='<div class="coop-board" data-phase="'+phase+'" data-seat="'+player+'" data-count="'+count+
       '" style="--seat-angle:'+angle+'deg;--fox-step:'+49/coopFoxLimit+'cqw">'+
       '<div class="coop-hud"><strong class="coop-pill">'+(count===1?'Partie solo':'Joueur '+(player+1))+'</strong>'+
@@ -163,15 +211,10 @@ function coopGame() {
       '<div class="coop-fox '+(effect==='fox'?'advancing':'')+'" style="--fox:'+(86-49*fox/coopFoxLimit)+'%" aria-hidden="true">'+
       coopIcon('fox')+'</div><div class="coop-nests" aria-label="Les trois nids">'+nests.map(nestMarkup).join('')+'</div>'+
       '<div class="coop-center"><div class="coop-timing">'+bar+action+
-      '<p class="coop-status" role="status">'+(phase==='result'?notice:phase==='aim'?'Arrête le curseur dans le vert.':'')+'</p></div></div></div>';
+      '<p class="coop-status" role="status">'+(phase==='result'?notice:phase==='aim'?'Arrête le curseur sur l’œuf ou le bouclier.':'')+'</p></div></div></div>';
   }
 
-  function aim(kind) {
-    reward=kind;
-    const progress=total()/(goal()-1);
-    width=config().width*(1-.35*progress)*(kind==='shield'?.37:1);
-    speed=config().speed*(1-.34*progress);
-    left=19+Math.random()*(64-width);
+  function aim() {
     elapsed=0;
     cursor=0;
     lastFrame=undefined;
@@ -185,7 +228,7 @@ function coopGame() {
     if (phase!=='aim'||rules.open||!stage.isConnected) return;
     if (lastFrame!==undefined) elapsed+=Math.min(50,time-lastFrame);
     lastFrame=time;
-    const travel=(elapsed/speed)%2;
+    const travel=(elapsed/targets.speed)%2;
     cursor=100*(travel<=1?travel:2-travel);
     stage.querySelector('.coop-meter').style.setProperty('--cursor',cursor+'%');
     frame=requestAnimationFrame(moveCursor);
@@ -194,17 +237,17 @@ function coopGame() {
   function stopCursor() {
     cancelAnimationFrame(frame);
     const nest=nests[selected];
-    const hit=cursor>=left&&cursor<=left+width;
+    const hit=coopOutcome(cursor,targets);
     stolen=false;
-    if (hit&&reward==='egg') {
+    if (hit==='egg') {
       nest.eggs++;
       effect='egg';
       notice=nest.eggs===config().eggs?'Nid rempli !':'Un œuf à l’abri !';
       sound([523,659,784]);
-    } else if (hit) {
+    } else if (hit==='shield') {
+      notice=nest.shield?'Ce nid est déjà protégé !':'Nid protégé !';
       nest.shield=true;
       effect='shield';
-      notice='Nid protégé !';
       sound([440,587,740,880]);
     } else if (nest.shield) {
       nest.shield=false;
@@ -252,9 +295,7 @@ function coopGame() {
     const oldAngle=parseFloat(getComputedStyle(stage.querySelector('.coop-center')).rotate)||0;
     player=(player+1)%count;
     do { selected=(selected+1)%nests.length; } while (nests[selected].eggs===config().eggs);
-    phase='ready';
-    effect='';
-    reward='';
+    ready();
     render();
     const controls=stage.querySelector('.coop-center');
     const nextAngle=parseFloat(getComputedStyle(controls).rotate)||0;
@@ -289,7 +330,7 @@ function coopGame() {
       else mode=button.dataset.mode;
       setup();
       focus(button.dataset.count?'[data-count="'+count+'"]':'[data-mode="'+mode+'"]');
-    } else if (phase==='ready'&&button.dataset.try) aim(button.dataset.try);
+    } else if (phase==='ready'&&button.hasAttribute('data-try')) aim();
     else if (phase==='aim'&&button.hasAttribute('data-stop')) stopCursor();
   });
 

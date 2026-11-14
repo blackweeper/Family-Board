@@ -44,42 +44,65 @@
 }
 .coop-center {
   position:absolute; z-index:2; left:50%; top:57%; translate:-50% -50%;
-  width:min(91%,325px); display:grid;
+  width:min(94%,460px); display:grid;
 }
 .coop-timing {
-  position:relative; display:grid; align-content:center; justify-items:center; gap:9px; min-height:102px;
-  padding:9px 14px; border:1px solid #ffe6a4; border-radius:19px;
-  background:repeating-linear-gradient(2deg,#69412e 0 3px,#714832 4px 7px);
-  box-shadow:inset 0 0 0 3px #946242,0 4px #4a3022,0 7px 16px #293b25a6;
+  position:relative; display:grid; align-content:center; justify-items:center; gap:1px;
+}
+.coop-rail {
+  position:relative; isolation:isolate; width:100%; height:82px; display:grid; align-items:center; padding-inline:8.9%;
+  filter:drop-shadow(0 6px 5px #2735209c);
+}
+.coop-rail::after {
+  content:''; position:absolute; z-index:1; inset:0;
+  background:url('./covers/coop-rail.webp') center/100% 100% no-repeat; pointer-events:none;
 }
 .coop-meter {
-  position:relative; width:100%; height:25px; border:2px solid #d7af72; border-radius:999px;
-  background:linear-gradient(#3b2920,#513a29); box-shadow:inset 0 2px 6px #241b17;
+  position:relative; width:100%; height:62%; border:1px solid #5c3122; border-radius:12px;
+  background:repeating-linear-gradient(-35deg,#713633 0 6px,#87433a 6px 11px);
+  box-shadow:inset 0 0 10px #3b1f16b8;
 }
-.coop-green {
-  position:absolute; inset-block:2px; left:var(--left); width:var(--width); border-radius:999px;
-  border:1px solid #e6ffad; background:linear-gradient(#c7f47a,#6fae3b);
-  box-shadow:0 0 8px #b3f6677a;
+.coop-zone {
+  position:absolute; inset-block:0; width:var(--size); left:var(--start); display:grid; place-items:center;
+  border:1px solid #fff2b1; border-radius:6px;
+  background:linear-gradient(#ffefaa,#e9ac4f); box-shadow:inset 0 0 7px #fff2b6b0;
 }
+.coop-zone[data-zone=shield] {
+  background:linear-gradient(#def9a6,#86b446); border-color:#e6ffad; box-shadow:inset 0 0 7px #d5ff9cad;
+}
+.coop-zone img,.coop-fox-icon img { position:absolute; display:block; width:100%; height:100%; object-fit:contain; }
+.coop-zone img { padding:4px 1px; filter:drop-shadow(0 2px 2px #3c382b69); }
+.coop-zone[data-zone=shield] img { padding-block:5px; }
+.coop-fox-icon { position:absolute; left:var(--start); top:50%; translate:-50% -50%; width:clamp(25px,10%,42px); height:90%; }
+.coop-fox-icon img { filter:drop-shadow(0 2px 2px #37241a); }
+.coop-board[data-phase=result] .coop-timing:has(.coop-feedback[data-effect=egg]) [data-zone=egg],
+.coop-board[data-phase=result] .coop-timing:has(.coop-feedback[data-effect=shield]) [data-zone=shield] {
+  animation:coop-zone-flash .62s ease-out;
+}
+@keyframes coop-zone-flash { 38% { filter:brightness(1.72); } }
 .coop-cursor {
-  position:absolute; left:var(--cursor); top:50%; translate:-50% -50%; width:13px; height:31px;
-  border:2px solid #fff2b7; border-radius:6px; background:linear-gradient(90deg,#bd7c30,#ffda82,#b4772f);
-  box-shadow:0 2px 4px #261b12;
+  position:absolute; z-index:2; left:var(--cursor); top:50%; translate:-50% -50%;
+  width:4px; height:calc(100% + 15px); border-radius:4px;
+  background:#fff5cb; box-shadow:0 0 0 1px #63492b,0 0 6px #fff2b0;
 }
-.coop-choices { display:flex; align-items:center; gap:13px; }
-.coop-choice,.coop-stop {
-  display:flex; align-items:center; justify-content:center; gap:6px; min-width:73px; min-height:54px;
-  padding:5px 12px; border:1px solid #fff1bf; border-radius:14px; cursor:pointer; touch-action:manipulation;
-  background:linear-gradient(#ffedb5,#e6b977); color:#422b1e; box-shadow:0 3px #523021;
+.coop-cursor::before {
+  content:''; position:absolute; top:-1px; left:50%; translate:-50% -15%;
+  width:14px; height:14px; border:1px solid #fff3c6; border-radius:2px;
+  transform:rotate(45deg); background:#ffe69a; box-shadow:0 2px 4px #4e3028;
 }
-.coop-choice[data-try=shield] { background:linear-gradient(#d9ef9d,#9dba65); }
-.coop-choice:disabled { opacity:.45; cursor:default; }
-.coop-choice img,.coop-stop img { width:40px; height:40px; object-fit:contain; }
+.coop-tap {
+  display:flex; gap:11px; align-items:center; justify-content:center; min-width:132px; min-height:49px;
+  padding:5px 14px; border:2px solid #fff3b0; border-radius:100px; cursor:pointer;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  background:linear-gradient(#ffeaa7,#e9b76d); color:#39271c; box-shadow:0 3px #805037; font-weight:900;
+}
+.coop-tap span { display:grid; place-items:center; width:26px; aspect-ratio:1; border-radius:50%; background:#45472d; color:#fff1bb; }
+.coop-tap[data-stop] span { background:#7f3b29; }
 .coop-status {
   position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap;
 }
 .coop-feedback {
-  position:relative; display:grid; place-items:center; width:55px; aspect-ratio:1;
+  position:relative; display:grid; place-items:center; width:49px; aspect-ratio:1;
   border:1px solid #fdf2ae; border-radius:50%; background:#cde990; box-shadow:0 0 14px #f0ff9e8a;
   animation:coop-pop .48s cubic-bezier(.19,.8,.25,1.4) both;
 }
@@ -125,8 +148,8 @@
 @media (min-width:700px) and (orientation:landscape) {
   .coop-center { rotate:var(--seat-angle); }
   .coop-board[data-seat="2"] .coop-center,.coop-board[data-count="2"][data-seat="1"] .coop-center { top:57%; }
-  .coop-board[data-seat="1"]:not([data-count="2"]) .coop-center { left:82%; top:55%; width:clamp(208px,34svh,295px); }
-  .coop-board[data-seat="3"] .coop-center { left:18%; top:55%; width:clamp(208px,34svh,295px); }
+  .coop-board[data-seat="1"]:not([data-count="2"]) .coop-center { left:87%; top:53%; width:clamp(224px,42svh,350px); }
+  .coop-board[data-seat="3"] .coop-center { left:13%; top:53%; width:clamp(224px,42svh,350px); }
 }
 @media (max-width:699px), (orientation:portrait) {
   .coop-hud { inset-inline:7px; }
@@ -147,5 +170,6 @@
 @media(max-width:460px) { .coop-bar .secondary { padding-inline:7px; font-size:.8rem; } .coop-hud,.coop-nest { font-size:.83rem; } }
 @media(prefers-reduced-motion:reduce) {
   .coop-fox.advancing,.coop-egg.new,.coop-nest[data-effect],.coop-nest[data-effect] .coop-shield,.coop-feedback { animation:none; }
+  .coop-board[data-phase=result] .coop-timing [data-zone] { animation:none !important; }
   .coop-nest[data-effect=blocked] .coop-shield { opacity:.55; }
 }

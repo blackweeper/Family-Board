@@ -41,8 +41,6 @@ function safariGame() {
   let phase = 'setup';
   let target, card, matches;
   let deck = [];
-  let round = 0;
-  const rotations = [0, -90, 180, 90];
   let timer;
   let audio;
   let musicTimer;
@@ -174,7 +172,6 @@ function safariGame() {
     startMusic();
     scores = Array(playerCount).fill(0);
     deck = [];
-    round = 0;
     nextRound();
   }
 
@@ -211,15 +208,10 @@ function safariGame() {
   }
 
   function draw(message, scorer = -1) {
-    const facing = round % playerCount;
-    const previous = (round - 1) % playerCount;
-    const angle = playerCount === 2 && facing === 1 ? 180 : rotations[facing];
-    const previousAngle = playerCount === 2 && previous === 1 ? 180 : rotations[previous];
-    const startAngle = round ? angle + (previousAngle - angle + 540) % 360 - 180 : angle;
     stage.innerHTML = `
       <div class="safari-table seats-${playerCount}" data-phase="${phase}">
         <div class="safari-center">
-          <div class="safari-cards" data-facing="${facing + 1}" style="--facing:${angle}deg;--from:${startAngle}deg">
+          <div class="safari-cards">
             <div class="safari-card" aria-label="${target[1]}">${safariPortrait(target)}</div>
             <div class="safari-card ${phase === 'ready' ? 'face-down' : ''}" aria-label="${phase === 'ready' ? 'Carte cachée' : card[1]}">${phase === 'ready' ? '✦' : safariPortrait(card)}</div>
           </div>
@@ -237,10 +229,7 @@ function safariGame() {
   function endRound(message, scorer = -1) {
     phase = 'result';
     draw(message, scorer);
-    schedule(() => {
-      round++;
-      nextRound();
-    }, safariPace[mode].result);
+    schedule(nextRound, safariPace[mode].result);
   }
 
   function react(index, button) {

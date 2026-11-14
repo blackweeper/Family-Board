@@ -14,7 +14,7 @@
 .table-options button,.table-primary { cursor:pointer; min-height:48px; min-width:48px; padding:9px 16px; border:1px solid #ffdfb276; border-radius:13px; background:#41294c; font-weight:800; }
 .table-options button[aria-pressed=true],.table-game .table-primary { background:#ffe0a0; color:#33243c; }
 .table-primary:disabled { opacity:.75; cursor:default; }
-.table-board { display:grid; grid-template: "top top top" auto "left center right" 1fr "left controls right" auto "bottom bottom bottom" auto / minmax(75px,1fr) minmax(0,2.7fr) minmax(75px,1fr); align-items:center; gap:14px; padding:clamp(12px,3vw,32px); min-height:clamp(430px,69svh,650px); background:#0c4747 url('./covers/table-board.jpg') center/100% 100%; }
+.table-board { display:grid; grid-template: "top top top" auto "left center right" 1fr "left controls right" auto "bottom bottom bottom" auto / minmax(75px,1fr) minmax(0,2.7fr) minmax(75px,1fr); align-items:center; gap:14px; padding:clamp(12px,3vw,32px); min-height:clamp(430px,69svh,650px); background:#58273a url('./covers/table-board.jpg') center/100% 100%; }
 .table-player { display:grid; justify-items:center; justify-content:center; align-items:center; gap:7px; min-width:0; }
 .table-player.current .table-stack { box-shadow:0 2px 0 #190e24,0 0 9px color-mix(in srgb,var(--player),transparent 54%); }
 .table-player strong { color:var(--player); font-size:clamp(.72rem,1.55vw,1rem); }
@@ -45,7 +45,7 @@
 .table-guesses button.match { border-color:#adf3b2; box-shadow:0 0 15px #8feea68a; }
 .table-guesses button.wrong { border-color:#ffa497; opacity:.62; }
 .table-guesses button:focus-visible { outline-offset:3px; }
-.table-finish { display:grid; place-content:center; justify-items:center; gap:13px; padding:20px; min-height:clamp(435px,54vw,630px); text-align:center; background:radial-gradient(ellipse,#103e3e88,#07292dd2),url('./covers/table-board.jpg') center/cover; }
+.table-finish { display:grid; place-content:center; justify-items:center; gap:13px; padding:20px; min-height:clamp(435px,54vw,630px); text-align:center; background:radial-gradient(ellipse,#4f273964,#281628d2),url('./covers/table-board.jpg') center/cover; }
 .table-finish h1 { color:var(--player); font-size:clamp(2.1rem,5.3vw,4.6rem); }
 .table-finish p { margin:0; font-weight:800; }
 .table-finish .table-options { justify-content:center; }

@@ -14,7 +14,7 @@
 .safari-start { margin-top:8px; min-width:128px; }
 .safari-table { display:grid; grid-template-columns:1fr 2fr 1fr; grid-template-rows:1fr 2.25fr 1fr; gap:8px; padding:10px; min-height:clamp(340px,72svh,680px); border:2px solid #589778; border-radius:25px; background:radial-gradient(ellipse,#29664b,#102f2a 72%); }
 .safari-center { grid-area:2/2; display:grid; place-content:center; text-align:center; }
-.safari-cards { display:flex; rotate:var(--facing); justify-content:center; gap:clamp(8px,2vw,24px); }
+.safari-cards { display:flex; justify-content:center; gap:clamp(8px,2vw,24px); }
 .safari-card { width:clamp(66px,12vw,156px); aspect-ratio:4/5; display:grid; place-items:center; border:4px solid #fff2c9; border-radius:18px; background:#ffe9a6; color:#fff7d4; font-size:clamp(35px,7vw,90px); box-shadow:0 6px 0 #122921; }
 .safari-card.face-down { background:repeating-linear-gradient(135deg,#266b64 0 14px,#328078 14px 28px); }
 .safari-status { min-height:1.5em; margin:.75rem 0 0; font-weight:800; }
@@ -104,8 +104,6 @@
 @keyframes safari-reveal { from { opacity:.65; transform:scaleX(.74); } }
 .safari-mascot,.safari-winner { display:block; overflow:hidden; border:3px solid #fff4d0; box-shadow:0 2px 9px #24261966; border-radius:50%; }
 .safari-mascot { width:clamp(38px,7vw,88px); aspect-ratio:1; margin:auto; border-color:var(--seat); box-shadow:0 4px 12px #05190dd9; }
-.safari-table[data-phase=ready] .safari-cards { animation:safari-face-seat .27s ease-out both; }
-@keyframes safari-face-seat { from { rotate:var(--from); } }
 .safari-status { position:absolute; top:9px; left:12px; margin:0; font-size:clamp(.72rem,2.2vw,1rem); text-shadow:0 2px 4px #061a10,0 0 8px #061a10; }
 .safari-winner { width:clamp(88px,17vw,170px); aspect-ratio:1; margin:auto; }
 .safari-seat:focus-visible { outline:0; }

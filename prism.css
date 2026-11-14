@@ -33,7 +33,7 @@
 .prism-score { color:#ffe08d; font-weight:900; white-space:nowrap; }
 .prism-pop { animation:prism-pop .34s ease-out; }
 @keyframes prism-pop { 46% { transform:scale(1.36); filter:brightness(1.3); } }
-.prism-controls { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:min(100%,300px); gap:5px; }
+.prism-controls { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:min(100%,415px); gap:clamp(4px, .55vw, 8px); }
 .prism-target { display:block; width:100%; min-width:0; min-height:44px; padding:0; border:2px solid #d3c0ff56; border-radius:12px; background:#211c3a; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
 .prism-target.claimed,.prism-seat.locked .prism-target { opacity:.44; }
 .prism-target.correct { border-color:#ffe197; }
@@ -73,11 +73,11 @@
   .prism-table { position:relative; display:block; min-height:clamp(450px,76svh,675px); }
   .prism-seat,.prism-challenge { position:absolute; translate:-50% -50%; }
   .prism-challenge { top:50%; left:50%; width:min(58%,510px); }
-  .prism-seat { width:clamp(192px,37svh,300px); }
-  .prism-seat-0 { left:50%; top:85%; }
-  .prism-seat-1 { left:91%; top:50%; rotate:-90deg; }
-  .prism-seat-2,.prism-table[data-count="2"] .prism-seat-1 { left:50%; top:15%; rotate:180deg; }
-  .prism-seat-3 { left:9%; top:50%; rotate:90deg; }
+  .prism-seat { width:clamp(232px,50svh,415px); }
+  .prism-seat-0 { left:50%; top:86%; }
+  .prism-seat-1 { left:88.8%; top:50%; rotate:-90deg; }
+  .prism-seat-2,.prism-table[data-count="2"] .prism-seat-1 { left:50%; top:14%; rotate:180deg; }
+  .prism-seat-3 { left:11.2%; top:50%; rotate:90deg; }
 }
 @media (max-width:699px), (orientation:portrait) {
   .prism-table { grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:auto auto 1fr; align-items:start; }
@@ -89,7 +89,7 @@
   .prism-table { grid-template-columns:1fr; grid-template-rows:auto; }
   .prism-challenge { grid-area:auto; }
   .prism-seat { padding-block:5px; }
-  .prism-controls { width:min(100%,240px); }
+  .prism-controls { width:min(100%,355px); }
   .prism-intro { background-position:38% center; }
 }
 @media(prefers-reduced-motion:reduce) { .prism-pop { animation:none; } }
