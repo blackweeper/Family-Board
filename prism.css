@@ -3,7 +3,8 @@
 .prism-bar #back { margin-right:auto; }
 .prism-bar button { min-height:44px; }
 .prism-intro,.prism-table,.prism-finish { border:1px solid #c5b2ff66; border-radius:26px; box-shadow:0 14px 42px #08091d8c; }
-.prism-intro,.prism-finish { display:grid; align-items:center; min-height:clamp(420px,53vw,625px); background:linear-gradient(90deg,#141735fc 0 22%,#171539d9 36%,#24194913 68%),url('./covers/prism.jpg') center/cover; }
+.prism-intro,.prism-finish { display:grid; align-items:center; min-height:clamp(420px,53vw,625px); }
+.prism-intro { background:linear-gradient(90deg,#141735fc 0 22%,#171539d9 36%,#24194913 68%),url('./covers/prism.jpg') center/cover; }
 .prism-intro-copy { padding:clamp(18px,3vw,36px); }
 .prism h1 { margin:0; font:900 clamp(2.8rem,6vw,5.1rem)/.94 'DM Sans',system-ui; letter-spacing:-.065em; }
 .prism-intro p { font-weight:700; }
@@ -54,12 +55,69 @@
 .prism-seat-label .prism-portrait,.prism-final-scores .prism-portrait { width:38px; padding:2px; }
 .prism-clue { background:linear-gradient(#302b58,#211d46); }
 .prism-final-scores li { display:flex; align-items:center; gap:4px; }
-.prism-finish { place-content:center; justify-items:center; gap:10px; text-align:center; padding:24px; background:linear-gradient(#191630ab,#17142dd9),url('./covers/prism-board.jpg') center/cover; }
+.prism-finish {
+  position:relative; isolation:isolate; overflow:hidden; grid-template-columns:minmax(0,1fr); place-content:center; justify-items:center;
+  gap:clamp(8px,1.8vh,18px); text-align:center; padding:clamp(15px,3vw,30px);
+  background:radial-gradient(ellipse at 50% 36%,#2d244a20 12%,#17142ee8 85%),linear-gradient(#21193e86,#19132cc9),url('./covers/prism-board.jpg') center/cover;
+}
 .prism-finish h1 { font-size:clamp(2.3rem,6vw,4.5rem); }
 .prism-finish p { margin:5px 0; }
-.prism-cup { font-size:clamp(4rem,11vw,8rem); color:#ffe28d; line-height:1; text-shadow:0 0 32px #ffd7737d; }
-.prism-final-scores { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; padding:0; list-style:none; }
+.prism-result-heading { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.prism-result-star { font-size:clamp(3rem,10vw,6rem); color:#ffe28d; line-height:1; text-shadow:0 0 32px #ffd7737d; }
+.prism-celebration { position:relative; width:min(100%,800px); }
+.prism-podiums { position:relative; display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(8px,2vw,24px); }
+.prism-podium {
+  position:relative; isolation:isolate; display:grid; justify-items:center; align-content:end;
+  width:clamp(126px,19vw,198px); padding:clamp(13px,2vw,22px) 4px 0;
+  animation:prism-podium-in .64s var(--arrival) cubic-bezier(.19,.7,.31,1.18) both;
+}
+.prism-celebration[data-winners="1"] .prism-podium { width:clamp(205px,36vw,360px); }
+.prism-podium::before {
+  content:''; position:absolute; z-index:-1; inset:8% 0 8%; border-radius:50%;
+  background:radial-gradient(ellipse,color-mix(in srgb,var(--seat) 62%,transparent),transparent 70%);
+}
+.prism-winner-trophy {
+  position:relative; z-index:1; margin-bottom:-7%; font-size:clamp(1.7rem,4vw,3.35rem); line-height:1;
+  filter:drop-shadow(0 4px 6px #4a2834) drop-shadow(0 0 10px #ffdf91ba);
+  animation:prism-trophy-rise .72s calc(var(--arrival) + .32s) ease-out both;
+}
+.prism-celebration[data-winners="1"] .prism-winner-trophy { font-size:clamp(2.65rem,6vw,4.9rem); }
+.prism-winner-portrait { position:relative; z-index:1; width:100%; margin-bottom:-7%; }
+.prism-winner-portrait .prism-portrait { padding:0; }
+.prism-winner-portrait img { filter:drop-shadow(0 10px 10px #150d36cf); }
+.prism-podium-base {
+  position:relative; display:flex; justify-content:center; align-items:center; gap:.3em; width:86%; min-height:44px;
+  padding:6% 8px 2%; border:1px solid #fff2b9; border-radius:50% 50% 24% 24% / 32% 32% 25% 25%;
+  background:linear-gradient(#ffe8a1 0 31%,#d98b44 33%,#ffd58b 73%,#d5854d); box-shadow:0 8px 18px #140e2a91;
+  color:#482b42; font-size:clamp(1rem,2.9vw,2rem); font-weight:950;
+}
+.prism-podium-base span { color:#793c53; }
+.prism-confetti { position:absolute; z-index:2; inset:43% auto auto 50%; pointer-events:none; }
+.prism-confetti i {
+  position:absolute; width:11px; height:7px; border-radius:3px; background:#ffd887;
+  animation:prism-confetti 1.18s calc(.42s + var(--delay)) cubic-bezier(.13,.6,.3,1) both;
+}
+.prism-confetti i:nth-child(3n) { background:#a4eeda; }
+.prism-confetti i:nth-child(3n + 1) { background:#ffc2e6; }
+.prism-confetti i:nth-child(4n) { width:9px; height:9px; border-radius:50%; }
+@keyframes prism-podium-in {
+  from { opacity:0; transform:translateY(30px) scale(.63); }
+  72% { opacity:1; transform:translateY(-6px) scale(1.05); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes prism-trophy-rise {
+  from { opacity:0; transform:translateY(22px) rotate(-17deg) scale(.5); }
+  63% { opacity:1; transform:translateY(-8px) rotate(10deg) scale(1.15); }
+  to { opacity:1; transform:translateY(0) rotate(0) scale(1); }
+}
+@keyframes prism-confetti {
+  from { opacity:0; transform:scale(.25); }
+  18%,57% { opacity:1; }
+  to { opacity:0; transform:translate(calc(clamp(124px,38vw,418px) * var(--x)),calc(clamp(104px,30vh,242px) * var(--y) + 56px)) rotate(var(--spin)); }
+}
+.prism-final-scores { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; padding:0; margin:0; list-style:none; }
 .prism-final-scores li { padding:8px 12px; border:1px solid var(--seat); border-radius:999px; background:#231e45; color:var(--seat); }
+.prism-final-scores li[data-winner] { border-color:#ffd98d; background:#42314d; }
 .prism-final-scores strong { margin-left:5px; color:#ffe197; }
 .prism-rules { width:min(530px,calc(100% - 28px)); max-height:calc(100% - 28px); border:1px solid #bdb0ff; border-radius:22px; padding:24px; color:#faf4ff; background:#262245; }
 .prism-rules::backdrop { background:#100c23df; }
@@ -92,4 +150,10 @@
   .prism-controls { width:min(100%,355px); }
   .prism-intro { background-position:38% center; }
 }
-@media(prefers-reduced-motion:reduce) { .prism-pop { animation:none; } }
+@media(max-width:699px) {
+  .prism-celebration[data-winners="4"] .prism-podiums { max-width:440px; margin-inline:auto; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .prism-pop,.prism-podium,.prism-winner-trophy { animation:none; }
+  .prism-confetti { display:none; }
+}

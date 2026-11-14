@@ -276,16 +276,32 @@ function prismGame() {
     stopClock();
     phase = 'finished';
     const best = Math.max(...scores);
-    const winners = scores.flatMap((score, i) => score === best ? [mascot(i).name] : []);
+    const winners = scores.flatMap((score, i) => best > 0 && score === best ? [i] : []);
+    const title = best === 0 ? 'Bien essayé !' : winners.length === 1 ? mascot(winners[0]).name + ' gagne !' :
+      'Victoire partagée ! ' + winners.map(i => mascot(i).name).join(', ');
+    const confetti = winners.length ? Array.from({ length: 24 }, (_, i) => {
+      const angle = Math.PI * 2 * i / 24;
+      const radius = .62 + (i % 4) * .11;
+      const x = (Math.cos(angle) * radius).toFixed(3);
+      const y = (Math.sin(angle) * radius).toFixed(3);
+      return `<i style="--x:${x};--y:${y};--delay:${i % 5 * 55}ms;--spin:${120 + i * 43}deg"></i>`;
+    }).join('') : '';
     sound([523, 659, 784, 1047]);
     stage.innerHTML = `<div class="prism-finish">
-      <span class="prism-cup" aria-hidden="true">✦</span>
-      <h1>${best === 0 ? 'Bien essayé !' : winners.length === 1 ? winners[0] + ' gagne !' : 'Victoire partagée !'}</h1>
-      <p>${best === 0 ? 'Aucun éclat cette fois.' : winners.join(' · ')}</p>
-      <ul class="prism-final-scores">${scores.map((score, i) => `<li style="--seat:${mascot(i).paint}" aria-label="${mascot(i).name}, ${score} éclats">${prismPortrait(lineup[i])}<strong>✦ ${score}</strong></li>`).join('')}</ul>
+      <h1 tabindex="-1" class="${winners.length ? 'prism-result-heading' : ''}">${title}</h1>
+      ${winners.length ? `<div class="prism-celebration" data-winners="${winners.length}">
+        <div class="prism-confetti" aria-hidden="true">${confetti}</div>
+        <div class="prism-podiums">${winners.map((i, place) => `
+          <div class="prism-podium" style="--seat:${mascot(i).paint};--arrival:${place * 110}ms">
+            <span class="prism-winner-trophy" aria-hidden="true">🏆</span>
+            <div class="prism-winner-portrait">${prismPortrait(lineup[i])}</div>
+            <div class="prism-podium-base" aria-hidden="true"><span>✦</span>${best}</div>
+          </div>`).join('')}</div>
+      </div>` : '<span class="prism-result-star" aria-hidden="true">✦</span><p>Aucun éclat cette fois.</p>'}
+      <ul class="prism-final-scores">${scores.map((score, i) => `<li style="--seat:${mascot(i).paint}" aria-label="${mascot(i).name}, ${score} éclats"${winners.includes(i) ? ' data-winner' : ''}>${prismPortrait(lineup[i])}<strong>✦ ${score}</strong></li>`).join('')}</ul>
       <div class="prism-choices"><button class="prism-action" data-start>↻ Rejouer</button><button class="secondary" data-setup>Réglages</button></div>
     </div>`;
-    focus('[data-start]');
+    focus('.prism-finish h1');
   }
 
   stage.addEventListener('pointerdown', event => {
