@@ -1,4 +1,6 @@
 const catalog = [
+  { id:'shark', title:'Festin des requins', color:'blue', players:'2 à 5 joueurs · dès 5 ans', description:'Choisis une pile en secret et découvre quels requins convoitent le même plat. Cinq tridents ou le meilleur festin te donnent la victoire.' },
+  { id:'mud', title:'Plongée dans la boue', color:'mint', players:'2 à 4 joueurs · dès 5 ans', description:'Fais avancer ton cochon, bondis du plongeoir et remplis tes bassines avec les mottes qui éclaboussent le plateau.' },
   { id:'archeo', title:'Les Fouilles d’Archéo', color:'coral', players:'1 à 5 joueurs · dès 5 ans', description:'Soulève les couches de terre, rassemble les fossiles et trouve l’œuf secret avant que toutes les pelles ne cassent.' },
   { id: 'mosaic', title: 'L’Atelier des mosaïques', color: 'mint', players: '2 à 4 joueurs · dès 5 ans', description: 'Choisis des tuiles dans les bols et assembles-en les formes. Termine ton animal ou complète les petits dessins pour gagner des étoiles.' },
   { id: 'flip7', title: 'Flip 7', color: 'coral', players: '3 à 18 joueurs · dès 8 ans', description: 'Sept numéros différents, quinze points de bonus. Tente une nouvelle carte ou mets tes points à l’abri.' },

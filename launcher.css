@@ -65,6 +65,7 @@ button:focus-visible,a:focus-visible,select:focus-visible { outline:3px solid #f
   min-height:calc(100dvh - max(8px,env(safe-area-inset-top)) - max(8px,env(safe-area-inset-bottom)) - 56px);
 }
 [data-fullscreen] { white-space:nowrap; }
+.game-theater .party-intro,.game-theater .party-finish { min-height:calc(100dvh - 70px); }
 @media(max-width:460px) {
   .shell [data-fullscreen],.shell :is(.prism-bar,.safari-bar,.lagoon-bar) .secondary { padding-inline:7px; font-size:.8rem; }
 }
