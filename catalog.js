@@ -1,4 +1,7 @@
 const catalog = [
+  { id:'mist', title:'Les Brumes du Kakapo', color:'mint', players:'2 à 4 joueurs · dès 10 ans', description:'Remportez les bons plis, assemblez les tuiles Esprit et libérez les sanctuaires dans une campagne de 22 missions.' },
+  { id:'kraken', title:'À l’assaut du Kraken', color:'blue', players:'1 à 4 joueurs · dès 7 ans', description:'Choisissez votre équipage, défendez le pont et repoussez ensemble les tentacules avant que le bateau ne prenne l’eau.' },
+  { id:'magnet', title:'Cœurs magnétiques', color:'coral', players:'2 à 5 joueurs · jeu d’adresse', description:'Vise, ajuste ta force et fais glisser les cœurs. Empoche les groupes qui se forment et rattrape ceux qui s’échappent !' },
   { id:'sand', title:'La Course des embruns', color:'blue', players:'2 à 5 joueurs · dès 6 ans', description:'Fais tourner le moulin, propulse les chars à voile et prédis le podium. Gare à la marée et à la tempête !' },
   { id:'flock', title:'Les Brebis des cimes', color:'mint', players:'2 à 4 joueurs · dès 5 ans', description:'Lance les dés et pousse tes brebis en file vers le pâturage. Mémé Brebis et le Petit Agneau peuvent se joindre au troupeau.' },
   { id:'spaceport', title:'Fusées en fête', color:'violet', players:'2 à 5 joueurs · dès 4 ans', description:'Embarque les animaux dans tes fusées, ou assemble des navettes et place tes astronautes avec les trois pouvoirs.' },

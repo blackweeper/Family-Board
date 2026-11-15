@@ -1,4 +1,4 @@
-const CACHE = 'family-board-v54';
+const CACHE = 'family-board-v55';
 const HOME = new URL('index.html', self.registration.scope).href;
 const ASSETS = [
   'index.html', 'styles.css', 'launcher.css', 'app.js', 'catalog.js', 'game-music.js',
@@ -55,6 +55,8 @@ const ASSETS = [
   'panoplie.js', 'panoplie.css',
   'covers/flock-paths.webp', 'covers/spaceparts-icons.webp',
   ...['sand','flock','spaceport'].flatMap(id => [id+'.js',id+'-rules.js','covers/'+id+'.jpg','covers/'+id+'-board.webp','covers/'+id+'-icons.webp']),
+  'trio.css', 'covers/mist-water.webp', 'covers/mist-map.webp', 'covers/kraken-tools-icons.webp',
+  ...['mist','kraken','magnet'].flatMap(id => [id+'.js',id+'-rules.js','covers/'+id+'.jpg','covers/'+id+'-board.webp','covers/'+id+'-icons.webp']),
   'launcher.js', 'manifest.webmanifest',
 ].map(path => new URL(path, self.registration.scope).href);
 

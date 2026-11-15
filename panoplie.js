@@ -23,7 +23,7 @@ function tripShell(id,title,rules) {
   return {
     stage,music,focus,
     sound(notes){effects.play(notes,muted);},
-    later(action,ms){clearTimeout(timer);timer=setTimeout(action,motion.matches?30:ms);},
+    later(action,ms,animation=true){clearTimeout(timer);timer=setTimeout(action,motion.matches&&animation?30:ms);},
     cancel(){clearTimeout(timer);},
     handle(action){stage.onclick=event=>{const button=event.target.closest('button');if(button&&!button.disabled&&!dialog.open)action(button.dataset,button);};},
     finish(heading,art,more=''){
