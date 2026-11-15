@@ -1,4 +1,7 @@
 const catalog = [
+  { id:'sand', title:'La Course des embruns', color:'blue', players:'2 à 5 joueurs · dès 6 ans', description:'Fais tourner le moulin, propulse les chars à voile et prédis le podium. Gare à la marée et à la tempête !' },
+  { id:'flock', title:'Les Brebis des cimes', color:'mint', players:'2 à 4 joueurs · dès 5 ans', description:'Lance les dés et pousse tes brebis en file vers le pâturage. Mémé Brebis et le Petit Agneau peuvent se joindre au troupeau.' },
+  { id:'spaceport', title:'Fusées en fête', color:'violet', players:'2 à 5 joueurs · dès 4 ans', description:'Embarque les animaux dans tes fusées, ou assemble des navettes et place tes astronautes avec les trois pouvoirs.' },
   { id:'mail', title:'Le Courrier des lapins', color:'mint', players:'3 à 6 joueurs · dès 6 ans', description:'Choisissez des images, retrouvez l’invitation en votant en secret et réunissez les huit lapins pour la fête.' },
   { id:'wombat', title:'La Tour des wombats', color:'coral', players:'1 à 4 joueurs · dès 6 ans', description:'Orientez la tour et lancez le dé sur les assaillants. Défendez ensemble les quatre chemins avant que les boucliers cèdent.' },
   { id:'shark', title:'Festin des requins', color:'blue', players:'2 à 5 joueurs · dès 5 ans', description:'Choisis une pile en secret et découvre quels requins convoitent le même plat. Cinq tridents ou le meilleur festin te donnent la victoire.' },
